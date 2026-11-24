@@ -119,7 +119,7 @@ function syncHolidayAtmosphere() {
             const tow = document.createElement("div");
             tow.className = "holiday-tow";
             tow.innerHTML = '<i class="tow-cabin"></i><i class="tow-body"></i><i class="tow-beacon"></i><i class="tow-wheel tow-wheel-front"></i><i class="tow-wheel tow-wheel-back"></i><i class="tow-trailer"></i><i class="tow-trailer-wheel"></i><i class="tow-loaded-car"></i>';
-            tow.style.left = "-210px";
+            tow.style.left = "calc(100% + 220px)";
             tow.style.setProperty("--tow-stop-left", `${Math.max(0, targetX - 100)}px`);
             street.append(tow);
             tow.classList.add("is-arriving");
