@@ -818,27 +818,57 @@ async function countRows(table, filters = {}) {
 }
 
 async function renderHome(view) {
-  const actions = [
-    { title: "Новости", text: "Последние объявления и новости проекта", href: "https://forum.mytanks.net/index.php?forums/%D0%9D%D0%BE%D0%B2%D0%BE%D1%81%D1%82%D0%B8.37/", iconName: "i-book-open" },
-    { title: "Жалобы", text: "Раздел обращений и жалоб игроков", href: "https://forum.mytanks.net/index.php?forums/Жалобы.38/", iconName: "i-warning" },
-    { title: "Написать заявление об уходе в неактив", text: "Шаблон заявления на временный уход", href: "https://forum.mytanks.net/index.php?threads/%D0%A8%D0%B0%D0%B1%D0%BB%D0%BE%D0%BD-%D0%B7%D0%B0%D1%8F%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F-%D0%BE%D0%B1-%D1%83%D1%85%D0%BE%D0%B4%D0%B5-%D0%B2-%D0%BD%D0%B5%D0%B0%D0%BA%D1%82%D0%B8%D0%B2.1301/", iconName: "i-clock" },
-    { title: "Написать прошение о пропуске собрания", text: "Шаблон прошения о пропуске еженедельного обзвона", href: "https://forum.mytanks.net/index.php?threads/%D0%A8%D0%B0%D0%B1%D0%BB%D0%BE%D0%BD-%D0%B7%D0%B0%D1%8F%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F-%D0%BD%D0%B0-%D0%BF%D1%80%D0%BE%D0%BF%D1%83%D1%81%D0%BA-%D0%B5%D0%B6%D0%B5%D0%BD%D0%B5%D0%B4%D0%B5%D0%BB%D1%8C%D0%BD%D0%BE%D0%B3%D0%BE-%D0%BE%D0%B1%D0%B7%D0%B2%D0%BE%D0%BD%D0%B0.1317/", iconName: "i-clock" },
-    { title: "Написать прошение о переносе собрания", text: "Шаблон прошения о переносе собрания", href: "https://forum.mytanks.net/index.php?threads/%D0%A8%D0%B0%D0%B1%D0%BB%D0%BE%D0%BD-%D0%BF%D1%80%D0%BE%D1%88%D0%B5%D0%BD%D0%B8%D1%8F-%D0%BE-%D0%BF%D0%B5%D1%80%D0%B5%D0%BD%D0%BE%D1%81%D0%B5-%D1%81%D0%BE%D0%B1%D1%80%D0%B0%D0%BD%D0%B8%D1%8F.1318/", iconName: "i-refresh" },
-    { title: "Шаблон ежедневного отчёта", text: "Единый универсальный шаблон для MT DOCS", href: "https://forum.mytanks.net/index.php?threads/%D0%95%D0%B4%D0%B8%D0%BD%D1%8B%D0%B9-%D1%83%D0%BD%D0%B8%D0%B2%D0%B5%D1%80%D1%81%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9-%D1%88%D0%B0%D0%B1%D0%BB%D0%BE%D0%BD-%D0%B4%D0%BB%D1%8F-mt-docs.1320/", iconName: "i-doc" },
-    { title: "Шаблон формы на выдачу наказания", text: "Универсальный шаблон оформления наказания", href: "https://forum.mytanks.net/index.php?threads/%D0%A3%D0%BD%D0%B8%D0%B2%D0%B5%D1%80%D1%81%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9-%D1%88%D0%B0%D0%B1%D0%BB%D0%BE%D0%BD-%D1%84%D0%BE%D1%80%D0%BC%D1%8B-%D0%BD%D0%B0-%D0%B2%D1%8B%D0%B4%D0%B0%D1%87%D1%83-%D0%BD%D0%B0%D0%BA%D0%B0%D0%B7%D0%B0%D0%BD%D0%B8%D0%B9.1319/", iconName: "i-shield" }
-  ];
+  const links = {
+    news: { title: "Новости проекта", text: "Последние объявления и новости MyTanks", href: "https://forum.mytanks.net/index.php?forums/%D0%9D%D0%BE%D0%B2%D0%BE%D1%81%D1%82%D0%B8.37/", iconName: "i-book-open" },
+    complaints: { title: "Жалобы", text: "Раздел обращений и жалоб игроков", href: "https://forum.mytanks.net/index.php?forums/Жалобы.38/", iconName: "i-warning" },
+    inactivity: { title: "Заявление об уходе в неактив", text: "Оформление временного ухода", href: "https://forum.mytanks.net/index.php?threads/%D0%A8%D0%B0%D0%B1%D0%BB%D0%BE%D0%BD-%D0%B7%D0%B0%D1%8F%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F-%D0%BE%D0%B1-%D1%83%D1%85%D0%BE%D0%B4%D0%B5-%D0%B2-%D0%BD%D0%B5%D0%B0%D0%BA%D1%82%D0%B8%D0%B2.1301/", iconName: "i-clock" },
+    meetingAbsence: { title: "Прошение о пропуске собрания", text: "Пропуск еженедельного обзвона", href: "https://forum.mytanks.net/index.php?threads/%D0%A8%D0%B0%D0%B1%D0%BB%D0%BE%D0%BD-%D0%B7%D0%B0%D1%8F%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F-%D0%BD%D0%B0-%D0%BF%D1%80%D0%BE%D0%BF%D1%83%D1%81%D0%BA-%D0%B5%D0%B6%D0%B5%D0%BD%D0%B5%D0%B4%D0%B5%D0%BB%D1%8C%D0%BD%D0%BE%D0%B3%D0%BE-%D0%BE%D0%B1%D0%B7%D0%B2%D0%BE%D0%BD%D0%B0.1317/", iconName: "i-clock" },
+    meetingMove: { title: "Прошение о переносе собрания", text: "Запрос на перенос собрания", href: "https://forum.mytanks.net/index.php?threads/%D0%A8%D0%B0%D0%B1%D0%BB%D0%BE%D0%BD-%D0%BF%D1%80%D0%BE%D1%88%D0%B5%D0%BD%D0%B8%D1%8F-%D0%BE-%D0%BF%D0%B5%D1%80%D0%B5%D0%BD%D0%BE%D1%81%D0%B5-%D1%81%D0%BE%D0%B1%D1%80%D0%B0%D0%BD%D0%B8%D1%8F.1318/", iconName: "i-refresh" },
+    dailyTemplate: { title: "Шаблон ежедневного отчёта", text: "Единый универсальный шаблон MT DOCS", href: "https://forum.mytanks.net/index.php?threads/%D0%95%D0%B4%D0%B8%D0%BD%D1%8B%D0%B9-%D1%83%D0%BD%D0%B8%D0%B2%D0%B5%D1%80%D1%81%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9-%D1%88%D0%B0%D0%B1%D0%BB%D0%BE%D0%BD-%D0%B4%D0%BB%D1%8F-mt-docs.1320/", iconName: "i-doc" },
+    sanctionTemplate: { title: "Шаблон формы на выдачу наказания", text: "Универсальный шаблон оформления наказания", href: "https://forum.mytanks.net/index.php?threads/%D0%A3%D0%BD%D0%B8%D0%B2%D0%B5%D1%80%D1%81%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9-%D1%88%D0%B0%D0%B1%D0%BB%D0%BE%D0%BD-%D1%84%D0%BE%D1%80%D0%BC%D1%8B-%D0%BD%D0%B0-%D0%B2%D1%8B%D0%B4%D0%B0%D1%87%D1%83-%D0%BD%D0%B0%D0%BA%D0%B0%D0%B7%D0%B0%D0%BD%D0%B8%D0%B9.1319/", iconName: "i-shield" }
+  };
+  const externalRow = (item) => rowLink({ ...item, external: true });
+  const adminGroup = (title, items) => h("section", { class: "home-admin-group" },
+    h("h3", { class: "home-admin-group-title", text: title }),
+    h("div", { class: "row-list" }, ...items.map(externalRow))
+  );
+  const block = (modifier, title, subtitle, iconName, content) => h("section", {
+    class: `card home-block home-block-${modifier}`,
+    "aria-label": title
+  },
+    h("div", { class: "card-heading home-block-heading" },
+      h("span", { class: "section-icon" }, icon(iconName)),
+      h("div", {}, h("h2", { text: title }), h("p", { text: subtitle }))
+    ),
+    content,
+    h("div", { class: "home-block-snow", "aria-hidden": "true" })
+  );
+
   view.append(
-    h("div", { class: "page-heading" }, h("div", {}, h("div", { class: "eyebrow" }, h("span"), "РАБОЧЕЕ ПРОСТРАНСТВО"), h("h1", { text: `Приветствую, ${state.profile?.nickname || "сотрудник"}!` }), h("p", { text: "Быстрый доступ к важным разделам и рабочим материалам." }))),
-    h("section", { class: "home-actions", "aria-label": "Быстрые действия" }, ...actions.map((action) =>
-      h("a", { class: "home-action", href: action.href, target: "_blank", rel: "noopener noreferrer" },
-        h("span", { class: "home-action-icon" }, icon(action.iconName)),
-        h("span", { class: "home-action-copy" }, h("strong", { text: action.title }), h("small", { text: action.text })),
-        icon("i-external", "home-action-arrow")
+    h("div", { class: "page-heading" },
+      h("div", {},
+        h("div", { class: "eyebrow" }, h("span"), "РАБОЧЕЕ ПРОСТРАНСТВО"),
+        h("h1", { text: `Приветствую, ${state.profile?.nickname || "сотрудник"}!` }),
+        h("p", { text: "Основные материалы и рабочие разделы команды — на одной странице." })
       )
-    ))
+    ),
+    h("div", { class: "home-newspaper" },
+      block("news", "Новости", "Объявления и новости проекта", "i-book-open",
+        h("div", { class: "row-list" }, externalRow(links.news))
+      ),
+      block("admin", "Админ-Раздел", "Заявления, прошения и рабочие шаблоны", "i-shield",
+        h("div", { class: "home-admin-content" },
+          adminGroup("Заявления", [links.inactivity]),
+          adminGroup("Прошения", [links.meetingAbsence, links.meetingMove]),
+          adminGroup("Шаблоны", [links.dailyTemplate, links.sanctionTemplate])
+        )
+      ),
+      block("complaints", "Отработка обращений", "Работа с жалобами игроков", "i-warning",
+        h("div", { class: "row-list" }, externalRow(links.complaints))
+      )
+    )
   );
 }
-
 async function renderReports(view, route, current) {
   const mine = rowLink({ href: "#/reports/mine", iconName: "i-doc", title: "Мои отчёты", text: "История ваших ежедневных отчётов", meta: "…" });
   view.append(
