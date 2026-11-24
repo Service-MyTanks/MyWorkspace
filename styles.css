@@ -1133,9 +1133,9 @@ html[data-theme="new-year"] .home-block .row-link { position: relative; z-index:
 }
 @keyframes holiday-car-skid {
   0% { transform: translate(0,0) rotate(0); }
-  32% { transform: translate(-7px,-5px) rotate(-5deg); }
-  68% { transform: translate(9px,3px) rotate(8deg); }
-  100% { transform: translate(3px,5px) rotate(13deg); }
+  22% { transform: translate(calc(var(--skid-distance) * .16),-5px) rotate(-5deg); }
+  58% { transform: translate(calc(var(--skid-distance) * .72),2px) rotate(7deg); }
+  100% { transform: translate(var(--skid-distance),5px) rotate(12deg); }
 }
 .holiday-car.is-wrecked { opacity: 0; pointer-events: none; }
 .holiday-snowman.is-exploding { animation: snowman-impact .35s ease-out forwards; }
@@ -1257,41 +1257,40 @@ html[data-theme="new-year"] .home-block .row-link { position: relative; z-index:
   background: #9bb7c8;
 }
 @keyframes tow-arrive {
-  from { transform: translateX(0); }
-  to { transform: translateX(var(--tow-arrival-x, 0px)); }
+  from { left: -210px; }
+  to { left: var(--tow-stop-left, 0px); }
 }
 @keyframes tow-haul {
-  from { transform: translateX(0); }
-  to { transform: translateX(calc(100vw + 440px)); }
+  from { left: var(--tow-stop-left, 0px); }
+  to { left: calc(100vw + 240px); }
 }
 @keyframes tow-beacon-flash { 50% { opacity: .25; } }
 html[data-theme="new-year"] .sidebar .brand-mark { position: relative; overflow: visible; }
-html[data-theme="new-year"] .sidebar .brand-mark { position: relative; overflow: visible; }
-html[data-theme="new-year"] .sidebar .brand-mark::before {
+.sidebar .brand-logo-wrap { position: relative; display: inline-flex; flex: 0 0 38px; width: 38px; height: 40px; overflow: visible; }
+html[data-theme="new-year"] .sidebar .brand-logo-wrap::before {
   content: "";
   position: absolute;
-  z-index: 5;
-  width: 29px;
-  height: 23px;
-  left: -5px;
-  top: -15px;
-  border-radius: 65% 12% 48% 18%;
-  background: linear-gradient(145deg, #f05c58 0%, #c93642 65%, #922b38 100%);
-  clip-path: polygon(4% 28%, 100% 0, 76% 100%, 30% 91%);
-  transform: rotate(-15deg);
-  filter: drop-shadow(0 2px 2px #0007);
+  z-index: 50;
+  left: -8px;
+  top: -12px;
+  width: 31px;
+  height: 27px;
+  background: linear-gradient(145deg, #fa6b63 0%, #d83b48 62%, #a52c3a 100%);
+  clip-path: polygon(0 20%, 88% 0, 77% 60%, 58% 100%, 37% 78%, 18% 53%);
+  transform: rotate(-13deg);
+  filter: drop-shadow(0 2px 2px #0008);
 }
-html[data-theme="new-year"] .sidebar .brand-mark::after {
+html[data-theme="new-year"] .sidebar .brand-logo-wrap::after {
   content: "";
   position: absolute;
-  z-index: 6;
-  width: 27px;
+  z-index: 51;
+  left: -8px;
+  top: 3px;
+  width: 25px;
   height: 7px;
-  left: -4px;
-  top: -3px;
-  border-radius: 8px 7px 5px 5px;
-  background: linear-gradient(#fff, #dce8f0);
-  transform: rotate(-15deg);
-  box-shadow: -2px -9px 0 -1px #fff, -3px -9px 0 0 #dce8f0;
+  border-radius: 8px;
+  background: linear-gradient(#fff, #dbe5ed);
+  transform: rotate(-13deg);
+  box-shadow: 18px -17px 0 -1px #fff;
 }
 
