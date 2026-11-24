@@ -117,10 +117,7 @@ function syncHolidayAtmosphere() {
     tree.className = "holiday-tree";
     tree.innerHTML = '<i class="holiday-tree-star"></i><i class="holiday-tree-top"></i><i class="holiday-tree-middle"></i><i class="holiday-tree-bottom"></i><i class="holiday-tree-trunk"></i><i class="holiday-tree-lights"></i><i class="holiday-tree-gifts"><b></b><b></b><b></b></i>';
     city.append(tree);
-    window.setInterval(() => {
-      if (!tree.isConnected || state.globalTheme !== "new-year") return;
-      tree.classList.toggle("lights-phase");
-    }, 850);    city.append(street);
+    city.append(street);
     document.body.append(city);
     state.holidayCity = city;
     state.holidayCityWindows = windows;
