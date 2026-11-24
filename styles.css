@@ -897,6 +897,9 @@ html[data-theme="new-year"] .home-block-snow { display: none; }
 .holiday-snowman.is-running-left { left: -70px !important; transform: translateX(-50%) scale(var(--snowman-scale)) rotate(-8deg); }
 .holiday-snowman.is-running-right { left: calc(100% + 70px) !important; transform: translateX(-50%) scale(var(--snowman-scale)) rotate(8deg); }
 .holiday-snowman.is-rising:not(.is-running-left):not(.is-running-right) { transform: translateX(-50%) scale(var(--snowman-scale)); }
+.holiday-snowman.is-returning {
+  transition: left 0s, transform 1.15s cubic-bezier(.18,.8,.25,1), opacity 1.15s ease;
+}
 @media (prefers-reduced-motion: reduce) {
   .holiday-traffic { animation-duration: 180s; }
   .holiday-snowman { transition-duration: .1s; }
