@@ -77,6 +77,39 @@ function syncHolidayAtmosphere() {
       }
       city.append(building);
     }
+    const street = document.createElement("div");
+    street.className = "holiday-street";
+    const snowmen = [];
+    [12, 31, 54, 76, 91].forEach((position, index) => {
+      const snowman = document.createElement("div");
+      snowman.className = "holiday-snowman";
+      snowman.style.setProperty("--snowman-x", `${position}%`);
+      snowman.style.setProperty("--snowman-scale", index % 2 ? ".82" : "1");
+      snowman.innerHTML = '<i class="snowman-hat"></i><i class="snowman-head"></i><i class="snowman-scarf"></i><i class="snowman-body"></i><i class="snowman-arm snowman-arm-left"></i><i class="snowman-arm snowman-arm-right"></i><i class="snowman-buttons"></i>';
+      street.append(snowman);
+      snowmen.push(snowman);
+    });
+    for (let carIndex = 0; carIndex < 2; carIndex++) {
+      const car = document.createElement("div");
+      car.className = `holiday-car holiday-car-${carIndex + 1}`;
+      car.innerHTML = '<i class="car-body"></i><i class="car-cabin"></i><i class="car-window"></i><i class="car-headlight"></i><i class="car-wheel car-wheel-front"></i><i class="car-wheel car-wheel-back"></i>';
+      const duration = 24 + Math.floor(Math.random() * 13) + carIndex * 8;
+      car.style.setProperty("--drive-duration", `${duration}s`);
+      car.style.setProperty("--drive-delay", `${carIndex * -9}s`);
+      car.addEventListener("animationiteration", () => {
+        if (state.globalTheme !== "new-year" || Math.random() >= .15) return;
+        const target = snowmen[Math.floor(Math.random() * snowmen.length)];
+        if (!target || target.classList.contains("is-exploding")) return;
+        const delay = Math.max(0, (parseFloat(target.style.getPropertyValue("--snowman-x")) / 100) * duration * 1000);
+        window.setTimeout(() => {
+          if (!target.isConnected || state.globalTheme !== "new-year") return;
+          target.classList.add("is-exploding");
+          window.setTimeout(() => target.isConnected && target.classList.remove("is-exploding"), 1900);
+        }, delay);
+      });
+      street.append(car);
+    }
+    city.append(street);
     document.body.append(city);
     state.holidayCity = city;
     state.holidayCityWindows = windows;
