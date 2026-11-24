@@ -1368,13 +1368,12 @@ html[data-theme="new-year"] .holiday-traffic-car {
   margin: 0;
   transform: scale(var(--car-scale));
   transform-origin: center bottom;
-  animation: holiday-traffic-creep 14s ease-in-out infinite;
+  animation: holiday-traffic-creep 5.5s ease-in-out 1 forwards;
   animation-delay: var(--queue-delay);
 }
 @keyframes holiday-traffic-creep {
-  0%, 24% { translate: 0 0; }
-  38%, 78% { translate: 18px 0; }
-  100% { translate: 0 0; }
+  0%, 42% { translate: 0 0; }
+  100% { translate: 18px 0; }
 }
 .traffic-headlight {
   position: absolute;
