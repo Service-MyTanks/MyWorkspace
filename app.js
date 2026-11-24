@@ -115,7 +115,8 @@ function syncHolidayAtmosphere() {
             const tow = document.createElement("div");
             tow.className = "holiday-tow";
             tow.innerHTML = '<i class="tow-cabin"></i><i class="tow-body"></i><i class="tow-beacon"></i><i class="tow-wheel tow-wheel-front"></i><i class="tow-wheel tow-wheel-back"></i><i class="tow-trailer"></i><i class="tow-trailer-wheel"></i><i class="tow-loaded-car"></i>';
-            tow.style.left = `${Math.max(-170, targetX - 165)}px`;
+            tow.style.left = "-210px";
+            tow.style.setProperty("--tow-arrival-x", `${Math.max(0, targetX + 80)}px`);
             street.append(tow);
             tow.classList.add("is-arriving");
             window.setTimeout(() => {
@@ -129,8 +130,8 @@ function syncHolidayAtmosphere() {
               car.style.left = "";
               car.dataset.recovery = "false";
               target.classList.remove("is-exploding");
-            }, 10500);
-          }, 1250);
+            }, 9600);
+          }, 5000);
         }, Math.max(500, (targetX / Math.max(1, street.clientWidth)) * duration * 1000));
         towTimers.push(crashTimer);
       });
