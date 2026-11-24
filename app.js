@@ -80,15 +80,16 @@ function syncHolidayAtmosphere() {
     const street = document.createElement("div");
     street.className = "holiday-street";
     const snowmen = [];
-    [12, 31, 54, 76, 91].forEach((position, index) => {
+    [18, 50, 82].forEach((position, index) => {
       const snowman = document.createElement("div");
       snowman.className = "holiday-snowman";
       snowman.style.setProperty("--snowman-x", `${position}%`);
-      snowman.style.setProperty("--snowman-scale", index % 2 ? ".82" : "1");
+      snowman.style.setProperty("--snowman-scale", index === 1 ? ".9" : "1");
       snowman.innerHTML = '<i class="snowman-hat"></i><i class="snowman-head"></i><i class="snowman-scarf"></i><i class="snowman-body"></i><i class="snowman-arm snowman-arm-left"></i><i class="snowman-arm snowman-arm-right"></i><i class="snowman-buttons"></i>';
       street.append(snowman);
       snowmen.push(snowman);
     });
+    const towTimers = [];
     for (let carIndex = 0; carIndex < 2; carIndex++) {
       const car = document.createElement("div");
       car.className = `holiday-car holiday-car-${carIndex + 1}`;
@@ -97,15 +98,41 @@ function syncHolidayAtmosphere() {
       car.style.setProperty("--drive-duration", `${duration}s`);
       car.style.setProperty("--drive-delay", `${carIndex * -9}s`);
       car.addEventListener("animationiteration", () => {
-        if (state.globalTheme !== "new-year" || Math.random() >= .15) return;
+        if (state.globalTheme !== "new-year" || car.dataset.recovery === "true" || Math.random() >= .15) return;
         const target = snowmen[Math.floor(Math.random() * snowmen.length)];
         if (!target || target.classList.contains("is-exploding")) return;
-        const delay = Math.max(0, (parseFloat(target.style.getPropertyValue("--snowman-x")) / 100) * duration * 1000);
-        window.setTimeout(() => {
-          if (!target.isConnected || state.globalTheme !== "new-year") return;
+        car.dataset.recovery = "true";
+        const targetX = street.clientWidth * parseFloat(target.style.getPropertyValue("--snowman-x")) / 100;
+        const crashTimer = window.setTimeout(() => {
+          if (!street.isConnected || state.globalTheme !== "new-year") return;
+          car.style.left = `${Math.max(0, targetX - 50)}px`;
+          car.classList.add("is-skidding");
           target.classList.add("is-exploding");
-          window.setTimeout(() => target.isConnected && target.classList.remove("is-exploding"), 1900);
-        }, delay);
+          window.setTimeout(() => {
+            if (!street.isConnected || state.globalTheme !== "new-year") return;
+            car.classList.remove("is-skidding");
+            car.classList.add("is-wrecked");
+            const tow = document.createElement("div");
+            tow.className = "holiday-tow";
+            tow.innerHTML = '<i class="tow-cabin"></i><i class="tow-body"></i><i class="tow-beacon"></i><i class="tow-wheel tow-wheel-front"></i><i class="tow-wheel tow-wheel-back"></i><i class="tow-trailer"></i><i class="tow-trailer-wheel"></i><i class="tow-loaded-car"></i>';
+            tow.style.left = `${Math.max(-170, targetX - 165)}px`;
+            street.append(tow);
+            tow.classList.add("is-arriving");
+            window.setTimeout(() => {
+              if (!tow.isConnected) return;
+              tow.classList.remove("is-arriving");
+              tow.classList.add("is-hauling");
+            }, 1900);
+            window.setTimeout(() => {
+              tow.remove();
+              car.classList.remove("is-wrecked");
+              car.style.left = "";
+              car.dataset.recovery = "false";
+              target.classList.remove("is-exploding");
+            }, 10500);
+          }, 1250);
+        }, Math.max(500, (targetX / Math.max(1, street.clientWidth)) * duration * 1000));
+        towTimers.push(crashTimer);
       });
       street.append(car);
     }
