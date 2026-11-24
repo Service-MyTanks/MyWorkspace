@@ -1175,76 +1175,37 @@ html[data-theme="new-year"] .home-block .row-link { position: relative; z-index:
 .holiday-tow.is-arriving { animation: tow-arrive 1.9s cubic-bezier(.2,.7,.25,1) forwards; }
 .holiday-tow.is-hauling { animation: tow-haul 7.5s linear forwards; }
 .tow-body {
-  position: absolute;
-  left: 45px;
-  bottom: 7px;
-  width: 69px;
-  height: 17px;
-  border-radius: 5px 7px 3px 3px;
-  background: linear-gradient(#e5b64d,#a76c25);
+  position: absolute; left: 5px; bottom: 7px; width: 69px; height: 17px;
+  border-radius: 8px 5px 3px 5px; background: linear-gradient(#e5b64d,#a76c25);
 }
 .tow-cabin {
-  position: absolute;
-  left: 77px;
-  bottom: 21px;
-  width: 34px;
-  height: 17px;
-  border-radius: 8px 9px 0 0;
-  background: linear-gradient(#f4d27b,#b77b2d);
-  clip-path: polygon(10% 0,80% 0,100% 100%,0 100%);
+  position: absolute; left: 5px; bottom: 21px; width: 35px; height: 17px;
+  border-radius: 9px 8px 0 0; background: linear-gradient(#f4d27b,#b77b2d);
+  clip-path: polygon(15% 0,80% 0,100% 100%,0 100%);
 }
 .tow-beacon {
-  position: absolute;
-  left: 87px;
-  bottom: 39px;
-  width: 11px;
-  height: 4px;
-  border-radius: 4px 4px 1px 1px;
-  background: #ff5c43;
-  box-shadow: 0 0 9px #ff674f;
-  animation: tow-beacon-flash .55s steps(2,end) infinite;
+  position: absolute; left: 17px; bottom: 39px; width: 11px; height: 4px;
+  border-radius: 4px 4px 1px 1px; background: #ff5c43;
+  box-shadow: 0 0 9px #ff674f; animation: tow-beacon-flash .55s steps(2,end) infinite;
 }
 .tow-wheel {
-  position: absolute;
-  bottom: 1px;
-  width: 13px;
-  height: 13px;
-  border: 3px solid #202b3a;
-  border-radius: 50%;
-  background: #aab5c0;
+  position: absolute; bottom: 1px; width: 13px; height: 13px;
+  border: 3px solid #202b3a; border-radius: 50%; background: #aab5c0;
 }
-.tow-wheel-front { left: 91px; }
-.tow-wheel-back { left: 55px; }
+.tow-wheel-front { left: 12px; }
+.tow-wheel-back { left: 49px; }
 .tow-trailer {
-  position: absolute;
-  left: -7px;
-  bottom: 7px;
-  width: 49px;
-  height: 5px;
-  border: 2px solid #aeb8c4;
-  border-top: 0;
-  transform: skewX(-8deg);
+  position: absolute; left: 79px; bottom: 7px; width: 101px; height: 5px;
+  border: 2px solid #aeb8c4; border-top: 0; transform: skewX(8deg);
 }
 .tow-trailer-wheel {
-  position: absolute;
-  left: 10px;
-  bottom: 1px;
-  width: 12px;
-  height: 12px;
-  border: 3px solid #202b3a;
-  border-radius: 50%;
-  background: #aab5c0;
+  position: absolute; left: 151px; bottom: 1px; width: 12px; height: 12px;
+  border: 3px solid #202b3a; border-radius: 50%; background: #aab5c0;
 }
 .tow-loaded-car {
-  position: absolute;
-  left: -4px;
-  bottom: 13px;
-  width: 48px;
-  height: 13px;
-  border-radius: 10px 11px 3px 3px;
-  background: linear-gradient(#d95b50,#8f2935);
-  border: 1px solid #f29a7c88;
-  transform: rotate(-2deg);
+  position: absolute; left: 91px; bottom: 13px; width: 76px; height: 17px;
+  border-radius: 12px 14px 4px 4px; background: linear-gradient(#d95b50,#8f2935);
+  border: 1px solid #f29a7c88; transform: rotate(2deg);
 }
 .tow-loaded-car::before {
   content: "";
