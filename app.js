@@ -82,65 +82,48 @@ function syncHolidayAtmosphere() {
     const street = document.createElement("div");
     street.className = "holiday-street";
 
-    const snowmen = [];
-    const makeSnowman = () => {
-      const snowman = document.createElement("div");
-      snowman.className = "holiday-snowman";
-      snowman.style.setProperty("--snowman-x", `${8 + Math.random() * 84}%`);
-      snowman.style.setProperty("--snowman-scale", `${.78 + Math.random() * .34}`);
-      snowman.innerHTML = '<i class="snowman-hat"></i><i class="snowman-horns"></i><i class="snowman-head"></i><i class="snowman-eyes"></i><i class="snowman-nose"></i><i class="snowman-scarf"></i><i class="snowman-body"></i><i class="snowman-arm snowman-arm-left"></i><i class="snowman-arm snowman-arm-right"></i><i class="snowman-buttons"></i>';
-      return snowman;
-    };
-    for (let i = 0; i < 6; i++) {
-      const snowman = makeSnowman();
-      city.append(snowman);
-      snowmen.push(snowman);
-    }
-
     const traffic = document.createElement("div");
     traffic.className = "holiday-traffic";
-    const carMarkup = '<i class="traffic-car-body"></i><i class="traffic-car-cabin"></i><i class="traffic-car-window"></i><i class="traffic-car-wheel traffic-wheel-front"></i><i class="traffic-car-wheel traffic-wheel-back"></i>';
-    const colors = ["red", "blue", "silver", "green", "gold", "red", "blue", "silver"];
-    const makeTrafficLane = () => {
-      const lane = document.createElement("div");
-      lane.className = "holiday-traffic-lane";
+    const carMarkup = '<i class="traffic-car-body"></i><i class="traffic-car-cabin"></i><i class="traffic-car-window"></i><i class="traffic-car-wheel traffic-wheel-front"></i><i class="traffic-car-wheel traffic-wheel-back"></i><i class="traffic-headlight traffic-headlight-front"></i><i class="traffic-headlight traffic-headlight-rear"></i>';
+    const colors = ["red", "blue", "silver", "green", "gold", "red", "blue"];
+    const makeTrafficRow = (rowName, rowIndex) => {
+      const row = document.createElement("div");
+      row.className = `holiday-traffic-row ${rowName}`;
       colors.forEach((color, index) => {
         const car = document.createElement("div");
         car.className = `holiday-traffic-car car-${color}`;
         car.innerHTML = carMarkup;
-        car.style.setProperty("--car-gap", `${18 + Math.floor(Math.random() * 34)}px`);
-        car.style.setProperty("--car-scale", `${.84 + Math.random() * .18}`);
-        lane.append(car);
+        car.style.setProperty("--car-scale", `${.82 + Math.random() * .14}`);
+        car.style.setProperty("--queue-delay", `${index * (rowIndex ? .58 : .46)}s`);
+        row.append(car);
       });
-      return lane;
+      return row;
     };
-    const trafficLane = makeTrafficLane();
-    traffic.append(trafficLane, trafficLane.cloneNode(true));
+    traffic.append(makeTrafficRow("traffic-row-back", 1), makeTrafficRow("traffic-row-front", 0));
     street.append(traffic);
-    city.append(street);
+
+    const streetlamps = document.createElement("div");
+    streetlamps.className = "holiday-streetlamps";
+    [12, 38, 66, 91].forEach((position) => {
+      const lamp = document.createElement("div");
+      lamp.className = "holiday-lamp";
+      lamp.style.left = `${position}%`;
+      lamp.innerHTML = '<i class="holiday-lamp-post"></i><i class="holiday-lamp-head"></i><i class="holiday-lamp-glow"></i>';
+      streetlamps.append(lamp);
+    });
+    city.append(streetlamps);
+
+    const tree = document.createElement("div");
+    tree.className = "holiday-tree";
+    tree.innerHTML = '<i class="holiday-tree-star"></i><i class="holiday-tree-top"></i><i class="holiday-tree-middle"></i><i class="holiday-tree-bottom"></i><i class="holiday-tree-trunk"></i><i class="holiday-tree-lights"></i><i class="holiday-tree-gifts"><b></b><b></b><b></b></i>';
+    city.append(tree);
+    window.setInterval(() => {
+      if (!tree.isConnected || state.globalTheme !== "new-year") return;
+      tree.classList.toggle("lights-phase");
+    }, 850);    city.append(street);
     document.body.append(city);
     state.holidayCity = city;
     state.holidayCityWindows = windows;
-  }
-  if (!state.holidayDemonTimer) {
-    state.holidayDemonTimer = setInterval(() => {
-      if (state.globalTheme !== "new-year" || !state.holidayCity?.isConnected || Math.random() >= .15) return;
-      const candidates = [...state.holidayCity.querySelectorAll(".holiday-snowman:not(.is-demon):not(.is-running)")];
-      if (!candidates.length) return;
-      const snowman = candidates[Math.floor(Math.random() * candidates.length)];
-      const direction = Math.random() < .5 ? "left" : "right";
-      snowman.classList.add("is-demon", `is-running-${direction}`);
-      window.setTimeout(() => {
-        if (!snowman.isConnected || state.globalTheme !== "new-year") return;
-        snowman.classList.add("is-rising", "is-returning");
-        snowman.classList.remove("is-demon", "is-running-left", "is-running-right");
-        snowman.style.setProperty("--snowman-x", `${8 + Math.random() * 84}%`);
-        window.requestAnimationFrame(() => window.requestAnimationFrame(() => {
-          snowman.classList.remove("is-rising");
-          window.setTimeout(() => snowman.classList.remove("is-returning"), 1300);
-        }));
-      }, 7500);
-    }, 5000);
   }
   if (!state.holidayLightsTimer) {
     state.holidayLightsTimer = setInterval(() => {
