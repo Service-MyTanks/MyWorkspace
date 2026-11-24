@@ -1241,6 +1241,14 @@ html[data-theme="new-year"] .brand-mark {
   position: relative;
   z-index: 1;
 }
+html[data-theme="new-year"] .brand-mark::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: #000;
+  clip-path: inherit;
+}
 html[data-theme="new-year"] .brand-mark,
 html[data-theme="new-year"] .brand-mark span {
   color: transparent;
