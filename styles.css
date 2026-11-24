@@ -1218,11 +1218,13 @@ html[data-theme="new-year"] .home-block .row-link { position: relative; z-index:
   background: #9bb7c8;
 }
 @keyframes tow-arrive {
-  from { left: -210px; }
+  from { left: calc(100% + 220px); }
   to { left: var(--tow-stop-left, 0px); }
 }
 @keyframes tow-haul {
   from { left: var(--tow-stop-left, 0px); }
+  to { left: -220px; }
+}
   to { left: calc(100vw + 240px); }
 }
 @keyframes tow-beacon-flash { 50% { opacity: .25; } }
