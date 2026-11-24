@@ -114,7 +114,8 @@ function syncHolidayAtmosphere() {
       });
       return lane;
     };
-    traffic.append(makeTrafficLane(), makeTrafficLane());
+    const trafficLane = makeTrafficLane();
+    traffic.append(trafficLane, trafficLane.cloneNode(true));
     street.append(traffic);
     city.append(street);
     document.body.append(city);
