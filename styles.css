@@ -794,3 +794,56 @@ html[data-theme="new-year"] .card-heading { padding-right: 62px; }
   .training-prefix-group { padding: 11px; }
   .training-prefix-chip { font-size: 10px; }
 }
+
+
+/* Newspaper-style home dashboard */
+.home-newspaper {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+  align-items: start;
+  gap: 18px;
+}
+.home-block { min-width: 0; margin: 0; }
+.home-block-heading { min-height: 82px; }
+.home-block-admin { grid-row: span 2; }
+.home-block-complaints { grid-column: 1; }
+.home-admin-content { padding: 2px 0 12px; }
+.home-admin-group + .home-admin-group { border-top: 1px solid var(--border); }
+.home-admin-group-title {
+  margin: 0;
+  padding: 13px 22px 8px;
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.05px;
+  text-transform: uppercase;
+}
+.home-admin-group .row-link { padding-top: 12px; padding-bottom: 12px; }
+.home-admin-group .row-link:first-child { border-top: 0; }
+.home-block-snow { display: none; }
+html[data-theme="new-year"] .home-block { padding-bottom: 20px; }
+html[data-theme="new-year"] .home-block-snow {
+  position: absolute;
+  display: block;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 22px;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 8% 100%, #edf6f0 0 8px, transparent 9px),
+    radial-gradient(ellipse at 24% 100%, #dcebe1 0 11px, transparent 12px),
+    radial-gradient(ellipse at 43% 100%, #f5faf6 0 9px, transparent 10px),
+    radial-gradient(ellipse at 65% 100%, #dcebe1 0 12px, transparent 13px),
+    radial-gradient(ellipse at 88% 100%, #f5faf6 0 10px, transparent 11px),
+    linear-gradient(to bottom, transparent 0 7px, #dcebe1 8px, #f5faf6 100%);
+  opacity: .78;
+}
+html[data-theme="new-year"] .home-block .card-heading { padding-top: 34px; }
+html[data-theme="new-year"] .home-block .card-heading::after { top: 27px; }
+html[data-theme="new-year"] .home-block .row-link { position: relative; z-index: 1; }
+@media (max-width: 760px) {
+  .home-newspaper { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .home-block-admin { grid-row: auto; }
+  .home-block-complaints { grid-column: auto; }
+}
