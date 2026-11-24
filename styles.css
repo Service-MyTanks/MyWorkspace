@@ -1163,95 +1163,24 @@ html[data-theme="new-year"] .home-block .row-link { position: relative; z-index:
   0% { opacity: 1; transform: translate(-50%,0) scale(1); }
   100% { opacity: 0; transform: translate(-50%,-42px) scale(.2) rotate(160deg); }
 }
-.holiday-tow {
-  position: absolute;
-  z-index: 9;
-  bottom: 12px;
-  width: 190px;
-  height: 37px;
-  left: -210px;
-  filter: drop-shadow(0 3px 3px #0009);
-}
-.holiday-tow.is-arriving { animation: tow-arrive 1.9s cubic-bezier(.2,.7,.25,1) forwards; }
-.holiday-tow.is-hauling { animation: tow-haul 7.5s linear forwards; }
-.tow-body {
-  position: absolute; left: 5px; bottom: 7px; width: 69px; height: 17px;
-  border-radius: 8px 5px 3px 5px; background: linear-gradient(#e5b64d,#a76c25);
-}
-.tow-cabin {
-  position: absolute; left: 5px; bottom: 21px; width: 35px; height: 17px;
-  border-radius: 9px 8px 0 0; background: linear-gradient(#f4d27b,#b77b2d);
-  clip-path: polygon(15% 0,80% 0,100% 100%,0 100%);
-}
-.tow-beacon {
-  position: absolute; left: 17px; bottom: 39px; width: 11px; height: 4px;
-  border-radius: 4px 4px 1px 1px; background: #ff5c43;
-  box-shadow: 0 0 9px #ff674f; animation: tow-beacon-flash .55s steps(2,end) infinite;
-}
-.tow-wheel {
-  position: absolute; bottom: 1px; width: 13px; height: 13px;
-  border: 3px solid #202b3a; border-radius: 50%; background: #aab5c0;
-}
-.tow-wheel-front { left: 12px; }
-.tow-wheel-back { left: 49px; }
-.tow-trailer {
-  position: absolute; left: 79px; bottom: 7px; width: 101px; height: 5px;
-  border: 2px solid #aeb8c4; border-top: 0; transform: skewX(8deg);
-}
-.tow-trailer-wheel {
-  position: absolute; left: 151px; bottom: 1px; width: 12px; height: 12px;
-  border: 3px solid #202b3a; border-radius: 50%; background: #aab5c0;
-}
-.tow-loaded-car {
-  position: absolute; left: 91px; bottom: 13px; width: 76px; height: 17px;
-  border-radius: 12px 14px 4px 4px; background: linear-gradient(#d95b50,#8f2935);
-  border: 1px solid #f29a7c88; transform: rotate(2deg);
-}
-.tow-loaded-car::before {
-  content: "";
-  position: absolute;
-  left: 20px;
-  top: -10px;
-  width: 37px;
-  height: 11px;
-  border-radius: 8px 9px 0 0;
-  background: #9bb7c8;
-}
-@keyframes tow-arrive {
-  from { left: calc(100% + 220px); }
-  to { left: var(--tow-stop-left, 0px); }
-}
-@keyframes tow-haul {
-  from { left: var(--tow-stop-left, 0px); }
-  to { left: -220px; }
-}
+.holiday-tow { position:absolute; z-index:9; bottom:12px; left:0; width:190px; height:43px; transform:translate3d(calc(100vw + 230px),0,0); will-change:transform; filter:drop-shadow(0 3px 3px #0009); }
+.holiday-tow.is-arriving { animation:tow-arrive 1.9s cubic-bezier(.22,.68,.18,1) forwards; }
+.holiday-tow.is-hauling { animation:tow-haul 7.5s linear forwards; }
+.tow-body { position:absolute; left:4px; bottom:7px; width:69px; height:17px; border-radius:7px 5px 3px 5px; background:linear-gradient(#e5b64d,#a76c25); }
+.tow-cabin { position:absolute; left:7px; bottom:21px; width:36px; height:19px; border-radius:10px 9px 1px 1px; background:linear-gradient(135deg,#f8dc91,#e3b85f 65%,#b77b2d); clip-path:polygon(18% 0,76% 0,100% 100%,0 100%); }
+.tow-cabin::after { content:""; position:absolute; left:11px; top:4px; width:17px; height:9px; background:#354c60; border-radius:5px 5px 1px 1px; clip-path:polygon(15% 0,78% 0,100% 100%,0 100%); }
+.tow-beacon { position:absolute; left:19px; bottom:40px; width:11px; height:4px; border-radius:4px 4px 1px 1px; background:#ff5c43; box-shadow:0 0 9px #ff674f; animation:tow-beacon-flash .55s steps(2,end) infinite; }
+.tow-wheel { position:absolute; bottom:1px; width:13px; height:13px; border:3px solid #202b3a; border-radius:50%; background:#aab5c0; }
+.tow-wheel-front { left:12px; } .tow-wheel-back { left:49px; }
+.tow-trailer { position:absolute; left:79px; bottom:7px; width:101px; height:6px; border:2px solid #aeb8c4; border-top:0; border-radius:0 0 3px 3px; }
+.tow-trailer-wheel { position:absolute; left:151px; bottom:1px; width:12px; height:12px; border:3px solid #202b3a; border-radius:50%; background:#aab5c0; }
+.tow-loaded-car { position:absolute; left:91px; bottom:13px; width:76px; height:17px; box-sizing:border-box; border-radius:13px 15px 4px 4px; background:linear-gradient(180deg,#d95b50,#b83e43 58%,#8f2935); border:1px solid #f29a7c88; }
+.tow-loaded-car::before { content:""; position:absolute; left:17px; bottom:11px; width:42px; height:12px; border-radius:10px 12px 1px 1px; background:linear-gradient(180deg,#d95b50,#b83e43); clip-path:polygon(18% 0,78% 0,100% 100%,0 100%); }
+.tow-loaded-car::after { content:""; position:absolute; left:24px; bottom:13px; width:27px; height:7px; border-radius:6px 7px 1px 1px; background:#31495d; clip-path:polygon(18% 0,78% 0,100% 100%,0 100%); }
+@keyframes tow-arrive { from { transform:translate3d(calc(100vw + 230px),0,0); } to { transform:translate3d(var(--tow-stop-x,0px),0,0); } }
+@keyframes tow-haul { from { transform:translate3d(var(--tow-stop-x,0px),0,0); } to { transform:translate3d(-230px,0,0); } }
 @keyframes tow-beacon-flash { 50% { opacity: .25; } }
-html[data-theme="new-year"] .sidebar .brand-mark { position: relative; overflow: visible; }
-.sidebar .brand-logo-wrap { position: relative; display: inline-flex; flex: 0 0 38px; width: 38px; height: 40px; overflow: visible; }
-html[data-theme="new-year"] .sidebar .brand-logo-wrap::before {
-  content: "";
-  position: absolute;
-  z-index: 50;
-  left: -8px;
-  top: -12px;
-  width: 31px;
-  height: 27px;
-  background: linear-gradient(145deg, #fa6b63 0%, #d83b48 62%, #a52c3a 100%);
-  clip-path: polygon(0 20%, 88% 0, 77% 60%, 58% 100%, 37% 78%, 18% 53%);
-  transform: rotate(-13deg);
-  filter: drop-shadow(0 2px 2px #0008);
-}
-html[data-theme="new-year"] .sidebar .brand-logo-wrap::after {
-  content: "";
-  position: absolute;
-  z-index: 51;
-  left: -8px;
-  top: 3px;
-  width: 25px;
-  height: 7px;
-  border-radius: 8px;
-  background: linear-gradient(#fff, #dbe5ed);
-  transform: rotate(-13deg);
-  box-shadow: 18px -17px 0 -1px #fff;
-}
-
+html[data-theme="new-year"] .sidebar .brand-mark { position:relative; overflow:visible; }
+.sidebar .brand-logo-wrap { position:relative; display:inline-flex; flex:0 0 38px; width:38px; height:40px; overflow:visible; }
+html[data-theme="new-year"] .sidebar .brand-logo-wrap::before { content:""; position:absolute; z-index:50; left:2px; top:-13px; width:25px; height:24px; background:linear-gradient(145deg,#ff7770 0%,#e34b50 58%,#b72e3e 100%); border-radius:85% 12% 45% 12%; transform:rotate(-27deg) skewY(-8deg); clip-path:path("M 2 22 Q 7 7 22 1 Q 19 12 28 21 Q 17 17 2 22 Z"); filter:drop-shadow(0 2px 2px #0008); }
+html[data-theme="new-year"] .sidebar .brand-logo-wrap::after { content:""; position:absolute; z-index:51; left:-1px; top:3px; width:25px; height:7px; border-radius:8px; background:linear-gradient(#fff,#dbe5ed); box-shadow:21px -15px 0 -1px #fff,19px -17px 0 1px #f5f8fb; transform:rotate(-10deg); }
