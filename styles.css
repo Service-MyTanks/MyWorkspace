@@ -723,7 +723,7 @@ html[data-theme="new-year"] .home-block-snow { display: none; }
   width: 94px;
   height: 29px;
   margin-right: var(--car-gap);
-  transform: scale(var(--car-scale));
+  transform: scaleX(-1) scale(var(--car-scale));
   transform-origin: center bottom;
   filter: drop-shadow(0 2px 2px #0009);
 }
@@ -1182,4 +1182,15 @@ html[data-theme="new-year"] .sidebar .brand-logo-wrap::after {
 @keyframes holiday-garland-lights {
   from { filter: brightness(.7); opacity: .72; }
   to { filter: brightness(1.5) drop-shadow(0 0 4px currentColor); opacity: 1; }
+}
+
+
+/* New Year refinements: monochrome MT mark and extra scroll clearance. */
+html[data-theme="new-year"] .brand-mark {
+  background: #f4f4f1;
+  color: #111318;
+  box-shadow: 0 0 0 1px #ffffff35;
+}
+html[data-theme="new-year"] main#view {
+  padding-bottom: clamp(280px, 42vh, 460px);
 }
