@@ -88,7 +88,7 @@ function syncHolidayAtmosphere() {
       snowman.className = "holiday-snowman";
       snowman.style.setProperty("--snowman-x", `${8 + Math.random() * 84}%`);
       snowman.style.setProperty("--snowman-scale", `${.78 + Math.random() * .34}`);
-      snowman.innerHTML = '<i class="snowman-hat"></i><i class="snowman-horns"></i><i class="snowman-head"></i><i class="snowman-eyes"></i><i class="snowman-scarf"></i><i class="snowman-body"></i><i class="snowman-arm snowman-arm-left"></i><i class="snowman-arm snowman-arm-right"></i><i class="snowman-buttons"></i>';
+      snowman.innerHTML = '<i class="snowman-hat"></i><i class="snowman-horns"></i><i class="snowman-head"></i><i class="snowman-eyes"></i><i class="snowman-nose"></i><i class="snowman-scarf"></i><i class="snowman-body"></i><i class="snowman-arm snowman-arm-left"></i><i class="snowman-arm snowman-arm-right"></i><i class="snowman-buttons"></i>';
       return snowman;
     };
     for (let i = 0; i < 6; i++) {
@@ -132,9 +132,14 @@ function syncHolidayAtmosphere() {
       snowman.classList.add("is-demon", `is-running-${direction}`);
       window.setTimeout(() => {
         if (!snowman.isConnected || state.globalTheme !== "new-year") return;
+        snowman.classList.add("is-rising", "is-returning");
         snowman.classList.remove("is-demon", "is-running-left", "is-running-right");
         snowman.style.setProperty("--snowman-x", `${8 + Math.random() * 84}%`);
-      }, 6200);
+        window.requestAnimationFrame(() => window.requestAnimationFrame(() => {
+          snowman.classList.remove("is-rising");
+          window.setTimeout(() => snowman.classList.remove("is-returning"), 1300);
+        }));
+      }, 7500);
     }, 5000);
   }
   if (!state.holidayLightsTimer) {
