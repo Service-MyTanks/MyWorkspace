@@ -1225,8 +1225,6 @@ html[data-theme="new-year"] .home-block .row-link { position: relative; z-index:
   from { left: var(--tow-stop-left, 0px); }
   to { left: -220px; }
 }
-  to { left: calc(100vw + 240px); }
-}
 @keyframes tow-beacon-flash { 50% { opacity: .25; } }
 html[data-theme="new-year"] .sidebar .brand-mark { position: relative; overflow: visible; }
 .sidebar .brand-logo-wrap { position: relative; display: inline-flex; flex: 0 0 38px; width: 38px; height: 40px; overflow: visible; }
