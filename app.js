@@ -93,7 +93,7 @@ function syncHolidayAtmosphere() {
     };
     for (let i = 0; i < 6; i++) {
       const snowman = makeSnowman();
-      street.append(snowman);
+      city.append(snowman);
       snowmen.push(snowman);
     }
 
