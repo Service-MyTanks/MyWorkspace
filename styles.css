@@ -729,7 +729,10 @@ html[data-theme="new-year"] .home-block-snow { display: none; }
   opacity: .95;
   box-shadow: 0 0 7px #e5c98588;
 }
-.sidebar, .topbar, main#view { position: relative; z-index: 1; }
+.workspace { position: relative; z-index: 1; }
+.topbar, main#view { position: relative; z-index: 1; }
+/* Keep the navigation pinned to the viewport. */
+.sidebar { position: fixed; z-index: 40; }
 html[data-theme="new-year"] body {
   background-color: #080f1b;
   background-image:
