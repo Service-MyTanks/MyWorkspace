@@ -1124,3 +1124,169 @@ html[data-theme="new-year"] .home-block .row-link { position: relative; z-index:
   .home-block-complaints { grid-column: auto; grid-row: auto; }
   .home-block-admin { grid-column: auto; grid-row: auto; }
 }
+
+/* Slippery-road collision, snowman breakup and tow-truck recovery. */
+.holiday-car.is-skidding {
+  animation: holiday-car-skid 1.25s cubic-bezier(.2,.75,.3,1) forwards !important;
+  z-index: 8;
+}
+@keyframes holiday-car-skid {
+  0% { transform: translate(0,0) rotate(0); }
+  28% { transform: translate(15px,-8px) rotate(-9deg); }
+  58% { transform: translate(30px,2px) rotate(17deg); }
+  100% { transform: translate(42px,8px) rotate(72deg); }
+}
+.holiday-car.is-wrecked { opacity: 0; pointer-events: none; }
+.holiday-snowman.is-exploding { animation: snowman-impact .35s ease-out forwards; }
+.holiday-snowman.is-exploding::before,
+.holiday-snowman.is-exploding::after {
+  content: "";
+  position: absolute;
+  z-index: 7;
+  left: 50%;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f7fcff;
+  box-shadow: -22px -12px #dceaf3, 18px -20px #fff, 27px 7px #dceaf3, -18px 19px #fff, 4px 26px #c7d8e5, -29px 2px #fff, 13px 14px #eaf5fb;
+  animation: snowman-debris .95s ease-out forwards;
+}
+.holiday-snowman.is-exploding::after { animation-delay: .08s; }
+@keyframes snowman-impact {
+  0% { transform: translateX(-50%) scale(1); }
+  25% { transform: translateX(-50%) scale(1.2) rotate(-8deg); }
+  100% { opacity: 0; transform: translateX(-50%) scale(.2) rotate(25deg); }
+}
+@keyframes snowman-debris {
+  0% { opacity: 1; transform: translate(-50%,0) scale(1); }
+  100% { opacity: 0; transform: translate(-50%,-42px) scale(.2) rotate(160deg); }
+}
+.holiday-tow {
+  position: absolute;
+  z-index: 9;
+  bottom: 12px;
+  width: 190px;
+  height: 37px;
+  left: -210px;
+  filter: drop-shadow(0 3px 3px #0009);
+}
+.holiday-tow.is-arriving { animation: tow-arrive 1.9s cubic-bezier(.2,.7,.25,1) forwards; }
+.holiday-tow.is-hauling { animation: tow-haul 7.5s linear forwards; }
+.tow-body {
+  position: absolute;
+  left: 5px;
+  bottom: 7px;
+  width: 69px;
+  height: 17px;
+  border-radius: 5px 7px 3px 3px;
+  background: linear-gradient(#e5b64d,#a76c25);
+}
+.tow-cabin {
+  position: absolute;
+  left: 39px;
+  bottom: 21px;
+  width: 34px;
+  height: 17px;
+  border-radius: 8px 9px 0 0;
+  background: linear-gradient(#f4d27b,#b77b2d);
+  clip-path: polygon(10% 0,80% 0,100% 100%,0 100%);
+}
+.tow-beacon {
+  position: absolute;
+  left: 49px;
+  bottom: 39px;
+  width: 11px;
+  height: 4px;
+  border-radius: 4px 4px 1px 1px;
+  background: #ff5c43;
+  box-shadow: 0 0 9px #ff674f;
+  animation: tow-beacon-flash .55s steps(2,end) infinite;
+}
+.tow-wheel {
+  position: absolute;
+  bottom: 1px;
+  width: 13px;
+  height: 13px;
+  border: 3px solid #202b3a;
+  border-radius: 50%;
+  background: #aab5c0;
+}
+.tow-wheel-front { left: 48px; }
+.tow-wheel-back { left: 12px; }
+.tow-trailer {
+  position: absolute;
+  left: 79px;
+  bottom: 7px;
+  width: 101px;
+  height: 5px;
+  border: 2px solid #aeb8c4;
+  border-top: 0;
+  transform: skewX(-8deg);
+}
+.tow-trailer-wheel {
+  position: absolute;
+  left: 151px;
+  bottom: 1px;
+  width: 12px;
+  height: 12px;
+  border: 3px solid #202b3a;
+  border-radius: 50%;
+  background: #aab5c0;
+}
+.tow-loaded-car {
+  position: absolute;
+  left: 91px;
+  bottom: 13px;
+  width: 76px;
+  height: 17px;
+  border-radius: 12px 14px 4px 4px;
+  background: linear-gradient(#d95b50,#8f2935);
+  border: 1px solid #f29a7c88;
+  transform: rotate(-4deg);
+}
+.tow-loaded-car::before {
+  content: "";
+  position: absolute;
+  left: 20px;
+  top: -10px;
+  width: 37px;
+  height: 11px;
+  border-radius: 8px 9px 0 0;
+  background: #9bb7c8;
+}
+@keyframes tow-arrive {
+  from { transform: translateX(0); }
+  to { transform: translateX(0); }
+}
+@keyframes tow-haul {
+  from { transform: translateX(0); }
+  to { transform: translateX(calc(100vw + 440px)); }
+}
+@keyframes tow-beacon-flash { 50% { opacity: .25; } }
+html[data-theme="new-year"] .sidebar .brand-mark { position: relative; overflow: visible; }
+html[data-theme="new-year"] .sidebar .brand-mark::before {
+  content: "";
+  position: absolute;
+  z-index: 5;
+  width: 24px;
+  height: 13px;
+  left: 12px;
+  top: -10px;
+  border-radius: 14px 14px 3px 3px;
+  background: linear-gradient(150deg,#d94c50,#a92e3c);
+  transform: rotate(-18deg);
+  box-shadow: inset 0 -2px #8c2731;
+}
+html[data-theme="new-year"] .sidebar .brand-mark::after {
+  content: "";
+  position: absolute;
+  z-index: 6;
+  width: 9px;
+  height: 9px;
+  left: 7px;
+  top: -7px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 1px #d9e3eb;
+}
