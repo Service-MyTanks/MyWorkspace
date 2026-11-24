@@ -105,8 +105,11 @@ function syncHolidayAtmosphere() {
         const targetX = street.clientWidth * parseFloat(target.style.getPropertyValue("--snowman-x")) / 100;
         const crashTimer = window.setTimeout(() => {
           if (!street.isConnected || state.globalTheme !== "new-year") return;
+          const currentLeft = car.offsetLeft;
+          const impactLeft = Math.max(0, targetX - 48);
           car.style.animation = "none";
-          car.style.left = `${Math.max(0, targetX - 48)}px`;
+          car.style.left = `${currentLeft}px`;
+          car.style.setProperty("--skid-distance", `${impactLeft - currentLeft}px`);
           car.classList.add("is-skidding");
           target.classList.add("is-exploding");
           window.setTimeout(() => {
@@ -117,7 +120,7 @@ function syncHolidayAtmosphere() {
             tow.className = "holiday-tow";
             tow.innerHTML = '<i class="tow-cabin"></i><i class="tow-body"></i><i class="tow-beacon"></i><i class="tow-wheel tow-wheel-front"></i><i class="tow-wheel tow-wheel-back"></i><i class="tow-trailer"></i><i class="tow-trailer-wheel"></i><i class="tow-loaded-car"></i>';
             tow.style.left = "-210px";
-            tow.style.setProperty("--tow-arrival-x", `${Math.max(0, targetX - 100 + 210)}px`);
+            tow.style.setProperty("--tow-stop-left", `${Math.max(0, targetX - 100)}px`);
             street.append(tow);
             tow.classList.add("is-arriving");
             window.setTimeout(() => {
@@ -129,6 +132,7 @@ function syncHolidayAtmosphere() {
               tow.remove();
               car.classList.remove("is-wrecked");
               car.style.left = "";
+              car.style.removeProperty("--skid-distance");
               car.style.animation = "";
               car.dataset.recovery = "false";
               target.classList.remove("is-exploding");
