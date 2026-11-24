@@ -22,7 +22,7 @@ const POSITIONS = Object.freeze([
   "Заместитель Специального Администратора", "Специальный Администратор",
 ]);
 
-const state = { client: null, session: null, profile: null, renderId: 0, sanctionKind: "ban", recovery: false, theme: "mt-standard", globalTheme: "mt-standard", globalThemeChannel: null };
+const state = { client: null, session: null, profile: null, renderId: 0, sanctionKind: "ban", recovery: false, theme: "mt-standard", globalTheme: "mt-standard", globalThemeChannel: null, holidayLightsTimer: null, holidayCity: null };
 
 const THEME_OPTIONS = [
   { id: "mt-standard", name: "MT Standard", description: "Исходное оформление MyWorkspace", swatch: "theme-swatch-standard" },
@@ -46,11 +46,59 @@ function themeStorageKey() {
   return state.session?.user?.id ? `myworkspace.theme.${state.session.user.id}` : "myworkspace.theme";
 }
 
+function syncHolidayAtmosphere() {
+  const active = state.globalTheme === "new-year";
+  document.documentElement.dataset.theme = active ? "new-year" : state.theme;
+  if (!active) {
+    if (state.holidayLightsTimer) clearInterval(state.holidayLightsTimer);
+    state.holidayLightsTimer = null;
+    state.holidayCity?.remove();
+    state.holidayCity = null;
+    return;
+  }
+  if (!state.holidayCity) {
+    const city = document.createElement("div");
+    city.className = "holiday-cityscape";
+    city.setAttribute("aria-hidden", "true");
+    const windows = [];
+    for (let buildingIndex = 0; buildingIndex < 17; buildingIndex++) {
+      const building = document.createElement("div");
+      building.className = "holiday-building";
+      building.style.setProperty("--building-height", `${38 + Math.floor(Math.random() * 58)}%`);
+      building.style.setProperty("--building-width", `${42 + Math.floor(Math.random() * 34)}px`);
+      const count = 8 + Math.floor(Math.random() * 16);
+      for (let i = 0; i < count; i++) {
+        const windowLight = document.createElement("i");
+        windowLight.className = "holiday-window";
+        windowLight.classList.toggle("is-lit", Math.random() > .58);
+        windowLight.style.setProperty("--light-delay", `${Math.random() * 4}s`);
+        building.append(windowLight);
+        windows.push(windowLight);
+      }
+      city.append(building);
+    }
+    document.body.append(city);
+    state.holidayCity = city;
+    state.holidayCityWindows = windows;
+  }
+  if (!state.holidayLightsTimer) {
+    state.holidayLightsTimer = setInterval(() => {
+      const windows = state.holidayCityWindows || [];
+      if (!windows.length || state.globalTheme !== "new-year") return;
+      const changes = 3 + Math.floor(Math.random() * Math.max(3, Math.floor(windows.length * .16)));
+      const chosen = new Set();
+      while (chosen.size < Math.min(changes, windows.length)) chosen.add(Math.floor(Math.random() * windows.length));
+      for (const index of chosen) windows[index].classList.toggle("is-lit", Math.random() > .5);
+    }, 120000);
+  }
+}
+
 function applyTheme(theme, persist = false) {
   const allowed = THEME_OPTIONS.some((item) => item.id === theme);
   const safeTheme = allowed ? theme : "mt-standard";
   state.theme = safeTheme;
-  document.documentElement.dataset.theme = state.globalTheme === "new-year" ? "new-year" : safeTheme;
+  state.theme = safeTheme;
+  syncHolidayAtmosphere();
   if (persist) {
     try { localStorage.setItem(themeStorageKey(), safeTheme); } catch {}
   }
@@ -856,7 +904,7 @@ async function renderHome(view) {
       block("news", "Новости", "Объявления и новости проекта", "i-book-open",
         h("div", { class: "row-list" }, externalRow(links.news))
       ),
-      block("admin", "Админ-Раздел", "Заявления, прошения и рабочие шаблоны", "i-shield",
+      block("admin", "Административный Раздел", "Заявления, прошения и рабочие шаблоны", "i-shield",
         h("div", { class: "home-admin-content" },
           adminGroup("Заявления", [links.inactivity]),
           adminGroup("Прошения", [links.meetingAbsence, links.meetingMove]),
