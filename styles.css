@@ -1257,7 +1257,7 @@ html[data-theme="new-year"] .home-block .row-link { position: relative; z-index:
 }
 @keyframes tow-arrive {
   from { transform: translateX(0); }
-  to { transform: translateX(0); }
+  to { transform: translateX(var(--tow-arrival-x, 0px)); }
 }
 @keyframes tow-haul {
   from { transform: translateX(0); }
