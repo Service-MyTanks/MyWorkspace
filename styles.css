@@ -678,13 +678,14 @@ html[data-theme="new-year"] .home-block { padding-bottom: 18px; }
 html[data-theme="new-year"] .home-block-snow { display: none; }
 
 
-/* Street-level 2D traffic and snowmen. */
+/* Slow continuous traffic queue and randomly placed snowmen. */
 .holiday-street {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
-  height: 58px;
+  height: 64px;
+  overflow: hidden;
   border-top: 2px solid #71809633;
   background: linear-gradient(to bottom, #111b2a, #080f19);
   box-shadow: 0 -8px 20px #050a1277;
@@ -692,97 +693,106 @@ html[data-theme="new-year"] .home-block-snow { display: none; }
 .holiday-street::before {
   content: "";
   position: absolute;
+  z-index: 1;
   left: 0;
   right: 0;
-  top: 27px;
+  top: 31px;
   border-top: 1px dashed #d9e2ec55;
 }
-.holiday-car {
+.holiday-traffic {
   position: absolute;
-  z-index: 4;
-  left: -150px;
-  bottom: 15px;
-  width: 92px;
-  height: 29px;
-  animation: holiday-car-drive var(--drive-duration) linear var(--drive-delay) infinite;
-  filter: drop-shadow(0 3px 3px #0009);
+  z-index: 3;
+  left: 0;
+  bottom: 13px;
+  display: flex;
+  width: max-content;
+  height: 34px;
+  animation: holiday-traffic-flow 95s linear infinite;
+  will-change: transform;
 }
-.holiday-car-2 { transform: scale(.82); transform-origin: center bottom; bottom: 7px; }
-.car-body {
+.holiday-traffic-lane {
+  display: flex;
+  align-items: flex-end;
+  gap: 0;
+  width: max-content;
+  padding-right: 12px;
+}
+.holiday-traffic-car {
+  position: relative;
+  flex: 0 0 94px;
+  width: 94px;
+  height: 29px;
+  margin-right: var(--car-gap);
+  transform: scale(var(--car-scale));
+  transform-origin: center bottom;
+  filter: drop-shadow(0 2px 2px #0009);
+}
+.traffic-car-body {
   position: absolute;
   left: 3px;
-  bottom: 5px;
-  width: 84px;
+  bottom: 4px;
+  width: 86px;
   height: 16px;
+  border: 1px solid #ffffff30;
   border-radius: 13px 18px 5px 5px;
-  background: linear-gradient(180deg, #d95b50, #8f2935);
-  border: 1px solid #f29a7c88;
+  background: linear-gradient(180deg,#d95b50,#8f2935);
 }
-.holiday-car-2 .car-body { background: linear-gradient(180deg, #5a9fc4, #275b83); border-color: #9ed8f488; }
-.car-cabin {
+.car-blue .traffic-car-body { background: linear-gradient(180deg,#5a9fc4,#275b83); }
+.car-silver .traffic-car-body { background: linear-gradient(180deg,#b8c2cb,#657383); }
+.car-green .traffic-car-body { background: linear-gradient(180deg,#6da783,#315f4b); }
+.car-gold .traffic-car-body { background: linear-gradient(180deg,#d7b56b,#8e692e); }
+.traffic-car-cabin {
   position: absolute;
-  left: 23px;
-  bottom: 17px;
+  left: 24px;
+  bottom: 16px;
   width: 43px;
-  height: 15px;
-  border-radius: 13px 15px 0 0;
+  height: 14px;
+  border-radius: 12px 14px 0 0;
   background: #a8c5d6;
-  clip-path: polygon(18% 0, 78% 0, 100% 100%, 0 100%);
+  clip-path: polygon(18% 0,78% 0,100% 100%,0 100%);
 }
-.car-window {
+.traffic-car-window {
   position: absolute;
-  left: 32px;
-  bottom: 20px;
+  left: 33px;
+  bottom: 19px;
   width: 25px;
   height: 8px;
   background: #263d55;
-  clip-path: polygon(20% 0, 75% 0, 100% 100%, 0 100%);
+  clip-path: polygon(20% 0,75% 0,100% 100%,0 100%);
 }
-.car-headlight {
-  position: absolute;
-  right: 0;
-  bottom: 10px;
-  width: 5px;
-  height: 5px;
-  border-radius: 2px;
-  background: #ffe6a1;
-  box-shadow: 5px 0 12px #ffe6a199;
-}
-.car-wheel {
+.traffic-car-wheel {
   position: absolute;
   bottom: 0;
-  width: 15px;
-  height: 15px;
+  width: 13px;
+  height: 13px;
   border: 3px solid #202b3a;
   border-radius: 50%;
   background: #9aa8b8;
   box-shadow: inset 0 0 0 2px #48566a;
-  animation: holiday-wheel-spin .45s linear infinite;
 }
-.car-wheel-front { right: 12px; }
-.car-wheel-back { left: 15px; }
-@keyframes holiday-car-drive {
-  from { left: -150px; }
-  to { left: calc(100% + 150px); }
+.traffic-wheel-front { right: 12px; }
+.traffic-wheel-back { left: 15px; }
+@keyframes holiday-traffic-flow {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
 }
-@keyframes holiday-wheel-spin { to { transform: rotate(360deg); } }
 .holiday-snowman {
   position: absolute;
-  z-index: 3;
+  z-index: 4;
   left: var(--snowman-x);
-  bottom: 48px;
+  bottom: 52px;
   width: 28px;
   height: 43px;
   transform: translateX(-50%) scale(var(--snowman-scale));
   transform-origin: bottom center;
-  transition: opacity .2s ease;
   filter: drop-shadow(0 2px 2px #0008);
+  transition: left 5.8s cubic-bezier(.2,.72,.2,1), transform 5.8s cubic-bezier(.2,.72,.2,1), opacity .4s ease;
 }
 .snowman-head, .snowman-body {
   position: absolute;
   left: 7px;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 25%, #fff, #dce7ef 70%, #aebdca);
+  background: radial-gradient(circle at 35% 25%,#fff,#dce7ef 70%,#aebdca);
   border: 1px solid #aebdca;
 }
 .snowman-head { top: 3px; width: 15px; height: 15px; }
@@ -829,24 +839,38 @@ html[data-theme="new-year"] .home-block-snow { display: none; }
   background: #34445b;
   box-shadow: 0 -6px #34445b;
 }
-.holiday-snowman.is-exploding { animation: snowman-burst .45s ease-out forwards; }
-.holiday-snowman.is-exploding::before,
-.holiday-snowman.is-exploding::after {
-  content: "";
+.snowman-horns, .snowman-eyes { display: none; }
+.holiday-snowman.is-demon .snowman-hat { opacity: 0; }
+.holiday-snowman.is-demon .snowman-horns {
+  display: block;
   position: absolute;
-  z-index: 5;
-  left: 50%;
-  top: 50%;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #f4fbff;
-  box-shadow: -17px -12px #dceaf3, 15px -17px #fff, 20px 5px #dceaf3, -13px 15px #fff, 3px 20px #c7d8e5, -22px 3px #fff;
-  animation: snowman-fragments .9s ease-out forwards;
+  z-index: 6;
+  left: 5px;
+  top: -3px;
+  width: 19px;
+  height: 12px;
+  background: #762c38;
+  clip-path: polygon(0 100%,12% 0,43% 73%,56% 73%,88% 0,100% 100%);
+  filter: drop-shadow(0 0 2px #ff334f);
 }
-.holiday-snowman.is-exploding::after { animation-delay: .08s; transform: rotate(40deg); }
-@keyframes snowman-burst { 20% { transform: translateX(-50%) scale(1.12); } 100% { opacity: 0; transform: translateX(-50%) scale(.35) rotate(28deg); } }
-@keyframes snowman-fragments { to { opacity: 0; transform: translate(-50%, -38px) scale(.25) rotate(130deg); } }
+.holiday-snowman.is-demon .snowman-eyes {
+  display: block;
+  position: absolute;
+  z-index: 7;
+  left: 10px;
+  top: 9px;
+  width: 4px;
+  height: 3px;
+  border-radius: 50%;
+  background: #ff1d38;
+  box-shadow: 7px 0 0 #ff1d38, 0 0 5px 2px #ff1d3888, 7px 0 5px 2px #ff1d3888;
+}
+.holiday-snowman.is-running-left { left: -70px !important; transform: translateX(-50%) scale(var(--snowman-scale)) rotate(-8deg); }
+.holiday-snowman.is-running-right { left: calc(100% + 70px) !important; transform: translateX(-50%) scale(var(--snowman-scale)) rotate(8deg); }
+@media (prefers-reduced-motion: reduce) {
+  .holiday-traffic { animation-duration: 180s; }
+  .holiday-snowman { transition-duration: .1s; }
+}
 
 /* Minimal animated night skyline, kept behind workspace surfaces. */
 .holiday-cityscape {
@@ -1125,62 +1149,37 @@ html[data-theme="new-year"] .home-block .row-link { position: relative; z-index:
   .home-block-admin { grid-column: auto; grid-row: auto; }
 }
 
-/* Slippery-road collision, snowman breakup and tow-truck recovery. */
-.holiday-car.is-skidding {
-  animation: holiday-car-skid 1.15s cubic-bezier(.18,.72,.24,1) forwards !important;
-  z-index: 8;
-  transform-origin: 50% 75%;
-}
-@keyframes holiday-car-skid {
-  0% { transform: translate(0,0) rotate(0); }
-  22% { transform: translate(calc(var(--skid-distance) * .16),-5px) rotate(-5deg); }
-  58% { transform: translate(calc(var(--skid-distance) * .72),2px) rotate(7deg); }
-  100% { transform: translate(var(--skid-distance),5px) rotate(12deg); }
-}
-.holiday-car.is-wrecked { opacity: 0; pointer-events: none; }
-.holiday-snowman.is-exploding { animation: snowman-impact .35s ease-out forwards; }
-.holiday-snowman.is-exploding::before,
-.holiday-snowman.is-exploding::after {
+
+/* Simple festive garland over the MT logo — no hat decoration. */
+.sidebar .brand-logo-wrap { position: relative; display: inline-flex; flex: 0 0 38px; width: 38px; height: 40px; overflow: visible; }
+html[data-theme="new-year"] .sidebar .brand-logo-wrap::before {
   content: "";
   position: absolute;
-  z-index: 7;
-  left: 50%;
-  top: 50%;
-  width: 8px;
-  height: 8px;
+  z-index: 50;
+  left: 1px;
+  top: -3px;
+  width: 36px;
+  height: 13px;
+  border-bottom: 1.5px solid #e8d9ae;
+  border-radius: 0 0 50% 50%;
+  transform: rotate(-5deg);
+  pointer-events: none;
+}
+html[data-theme="new-year"] .sidebar .brand-logo-wrap::after {
+  content: "";
+  position: absolute;
+  z-index: 51;
+  left: 3px;
+  top: 5px;
+  width: 4px;
+  height: 4px;
   border-radius: 50%;
-  background: #f7fcff;
-  box-shadow: -22px -12px #dceaf3, 18px -20px #fff, 27px 7px #dceaf3, -18px 19px #fff, 4px 26px #c7d8e5, -29px 2px #fff, 13px 14px #eaf5fb;
-  animation: snowman-debris .95s ease-out forwards;
+  background: #ff6868;
+  box-shadow: 7px 2px 0 #f4d36c, 14px 3px 0 #77d7a0, 21px 2px 0 #76b9ff, 28px 0 0 #ff6868;
+  animation: holiday-garland-lights 1.8s ease-in-out infinite alternate;
+  pointer-events: none;
 }
-.holiday-snowman.is-exploding::after { animation-delay: .08s; }
-@keyframes snowman-impact {
-  0% { transform: translateX(-50%) scale(1); }
-  25% { transform: translateX(-50%) scale(1.2) rotate(-8deg); }
-  100% { opacity: 0; transform: translateX(-50%) scale(.2) rotate(25deg); }
+@keyframes holiday-garland-lights {
+  from { filter: brightness(.7); opacity: .72; }
+  to { filter: brightness(1.5) drop-shadow(0 0 4px currentColor); opacity: 1; }
 }
-@keyframes snowman-debris {
-  0% { opacity: 1; transform: translate(-50%,0) scale(1); }
-  100% { opacity: 0; transform: translate(-50%,-42px) scale(.2) rotate(160deg); }
-}
-.holiday-tow { position:absolute; z-index:9; bottom:12px; left:0; width:190px; height:43px; transform:translate3d(calc(100vw + 230px),0,0); will-change:transform; filter:drop-shadow(0 3px 3px #0009); }
-.holiday-tow.is-arriving { animation:tow-arrive 1.9s cubic-bezier(.22,.68,.18,1) forwards; }
-.holiday-tow.is-hauling { animation:tow-haul 7.5s linear forwards; }
-.tow-body { position:absolute; left:4px; bottom:7px; width:69px; height:17px; border-radius:7px 5px 3px 5px; background:linear-gradient(#e5b64d,#a76c25); }
-.tow-cabin { position:absolute; left:7px; bottom:21px; width:36px; height:19px; border-radius:10px 9px 1px 1px; background:linear-gradient(135deg,#f8dc91,#e3b85f 65%,#b77b2d); clip-path:polygon(18% 0,76% 0,100% 100%,0 100%); }
-.tow-cabin::after { content:""; position:absolute; left:11px; top:4px; width:17px; height:9px; background:#354c60; border-radius:5px 5px 1px 1px; clip-path:polygon(15% 0,78% 0,100% 100%,0 100%); }
-.tow-beacon { position:absolute; left:19px; bottom:40px; width:11px; height:4px; border-radius:4px 4px 1px 1px; background:#ff5c43; box-shadow:0 0 9px #ff674f; animation:tow-beacon-flash .55s steps(2,end) infinite; }
-.tow-wheel { position:absolute; bottom:1px; width:13px; height:13px; border:3px solid #202b3a; border-radius:50%; background:#aab5c0; }
-.tow-wheel-front { left:12px; } .tow-wheel-back { left:49px; }
-.tow-trailer { position:absolute; left:79px; bottom:7px; width:101px; height:6px; border:2px solid #aeb8c4; border-top:0; border-radius:0 0 3px 3px; }
-.tow-trailer-wheel { position:absolute; left:151px; bottom:1px; width:12px; height:12px; border:3px solid #202b3a; border-radius:50%; background:#aab5c0; }
-.tow-loaded-car { position:absolute; left:91px; bottom:13px; width:76px; height:17px; box-sizing:border-box; border-radius:13px 15px 4px 4px; background:linear-gradient(180deg,#d95b50,#b83e43 58%,#8f2935); border:1px solid #f29a7c88; }
-.tow-loaded-car::before { content:""; position:absolute; left:17px; bottom:11px; width:42px; height:12px; border-radius:10px 12px 1px 1px; background:linear-gradient(180deg,#d95b50,#b83e43); clip-path:polygon(18% 0,78% 0,100% 100%,0 100%); }
-.tow-loaded-car::after { content:""; position:absolute; left:24px; bottom:13px; width:27px; height:7px; border-radius:6px 7px 1px 1px; background:#31495d; clip-path:polygon(18% 0,78% 0,100% 100%,0 100%); }
-@keyframes tow-arrive { from { transform:translate3d(calc(100vw + 230px),0,0); } to { transform:translate3d(var(--tow-stop-x,0px),0,0); } }
-@keyframes tow-haul { from { transform:translate3d(var(--tow-stop-x,0px),0,0); } to { transform:translate3d(-230px,0,0); } }
-@keyframes tow-beacon-flash { 50% { opacity: .25; } }
-html[data-theme="new-year"] .sidebar .brand-mark { position:relative; overflow:visible; }
-.sidebar .brand-logo-wrap { position:relative; display:inline-flex; flex:0 0 38px; width:38px; height:40px; overflow:visible; }
-html[data-theme="new-year"] .sidebar .brand-logo-wrap::before { content:""; position:absolute; z-index:50; left:2px; top:-13px; width:25px; height:24px; background:linear-gradient(145deg,#ff7770 0%,#e34b50 58%,#b72e3e 100%); border-radius:85% 12% 45% 12%; transform:rotate(-27deg) skewY(-8deg); clip-path:path("M 2 22 Q 7 7 22 1 Q 19 12 28 21 Q 17 17 2 22 Z"); filter:drop-shadow(0 2px 2px #0008); }
-html[data-theme="new-year"] .sidebar .brand-logo-wrap::after { content:""; position:absolute; z-index:51; left:-1px; top:3px; width:25px; height:7px; border-radius:8px; background:linear-gradient(#fff,#dbe5ed); box-shadow:20px -16px 0 2px #fff; transform:rotate(-10deg); }
