@@ -677,6 +677,177 @@ html[data-theme="new-year"] .card .card-note { position: relative; z-index: 1; }
 html[data-theme="new-year"] .home-block { padding-bottom: 18px; }
 html[data-theme="new-year"] .home-block-snow { display: none; }
 
+
+/* Street-level 2D traffic and snowmen. */
+.holiday-street {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 58px;
+  border-top: 2px solid #71809633;
+  background: linear-gradient(to bottom, #111b2a, #080f19);
+  box-shadow: 0 -8px 20px #050a1277;
+}
+.holiday-street::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 27px;
+  border-top: 1px dashed #d9e2ec55;
+}
+.holiday-car {
+  position: absolute;
+  z-index: 4;
+  left: -150px;
+  bottom: 15px;
+  width: 92px;
+  height: 29px;
+  animation: holiday-car-drive var(--drive-duration) linear var(--drive-delay) infinite;
+  filter: drop-shadow(0 3px 3px #0009);
+}
+.holiday-car-2 { transform: scale(.82); transform-origin: center bottom; bottom: 7px; }
+.car-body {
+  position: absolute;
+  left: 3px;
+  bottom: 5px;
+  width: 84px;
+  height: 16px;
+  border-radius: 13px 18px 5px 5px;
+  background: linear-gradient(180deg, #d95b50, #8f2935);
+  border: 1px solid #f29a7c88;
+}
+.holiday-car-2 .car-body { background: linear-gradient(180deg, #5a9fc4, #275b83); border-color: #9ed8f488; }
+.car-cabin {
+  position: absolute;
+  left: 23px;
+  bottom: 17px;
+  width: 43px;
+  height: 15px;
+  border-radius: 13px 15px 0 0;
+  background: #a8c5d6;
+  clip-path: polygon(18% 0, 78% 0, 100% 100%, 0 100%);
+}
+.car-window {
+  position: absolute;
+  left: 32px;
+  bottom: 20px;
+  width: 25px;
+  height: 8px;
+  background: #263d55;
+  clip-path: polygon(20% 0, 75% 0, 100% 100%, 0 100%);
+}
+.car-headlight {
+  position: absolute;
+  right: 0;
+  bottom: 10px;
+  width: 5px;
+  height: 5px;
+  border-radius: 2px;
+  background: #ffe6a1;
+  box-shadow: 5px 0 12px #ffe6a199;
+}
+.car-wheel {
+  position: absolute;
+  bottom: 0;
+  width: 15px;
+  height: 15px;
+  border: 3px solid #202b3a;
+  border-radius: 50%;
+  background: #9aa8b8;
+  box-shadow: inset 0 0 0 2px #48566a;
+  animation: holiday-wheel-spin .45s linear infinite;
+}
+.car-wheel-front { right: 12px; }
+.car-wheel-back { left: 15px; }
+@keyframes holiday-car-drive {
+  from { left: -150px; }
+  to { left: calc(100% + 150px); }
+}
+@keyframes holiday-wheel-spin { to { transform: rotate(360deg); } }
+.holiday-snowman {
+  position: absolute;
+  z-index: 3;
+  left: var(--snowman-x);
+  bottom: 48px;
+  width: 28px;
+  height: 43px;
+  transform: translateX(-50%) scale(var(--snowman-scale));
+  transform-origin: bottom center;
+  transition: opacity .2s ease;
+  filter: drop-shadow(0 2px 2px #0008);
+}
+.snowman-head, .snowman-body {
+  position: absolute;
+  left: 7px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 25%, #fff, #dce7ef 70%, #aebdca);
+  border: 1px solid #aebdca;
+}
+.snowman-head { top: 3px; width: 15px; height: 15px; }
+.snowman-body { left: 3px; bottom: 0; width: 23px; height: 25px; }
+.snowman-hat {
+  position: absolute;
+  z-index: 2;
+  left: 8px;
+  top: 0;
+  width: 14px;
+  height: 5px;
+  background: #29374d;
+  border-radius: 2px 2px 0 0;
+  box-shadow: -3px 4px 0 -1px #29374d;
+}
+.snowman-scarf {
+  position: absolute;
+  z-index: 3;
+  left: 7px;
+  top: 17px;
+  width: 16px;
+  height: 4px;
+  border-radius: 2px;
+  background: #bd4c4c;
+}
+.snowman-arm {
+  position: absolute;
+  z-index: 0;
+  top: 22px;
+  width: 12px;
+  height: 2px;
+  background: #805c3c;
+}
+.snowman-arm-left { left: -3px; transform: rotate(25deg); }
+.snowman-arm-right { right: -3px; transform: rotate(-25deg); }
+.snowman-buttons {
+  position: absolute;
+  z-index: 3;
+  left: 13px;
+  bottom: 5px;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #34445b;
+  box-shadow: 0 -6px #34445b;
+}
+.holiday-snowman.is-exploding { animation: snowman-burst .45s ease-out forwards; }
+.holiday-snowman.is-exploding::before,
+.holiday-snowman.is-exploding::after {
+  content: "";
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #f4fbff;
+  box-shadow: -17px -12px #dceaf3, 15px -17px #fff, 20px 5px #dceaf3, -13px 15px #fff, 3px 20px #c7d8e5, -22px 3px #fff;
+  animation: snowman-fragments .9s ease-out forwards;
+}
+.holiday-snowman.is-exploding::after { animation-delay: .08s; transform: rotate(40deg); }
+@keyframes snowman-burst { 20% { transform: translateX(-50%) scale(1.12); } 100% { opacity: 0; transform: translateX(-50%) scale(.35) rotate(28deg); } }
+@keyframes snowman-fragments { to { opacity: 0; transform: translate(-50%, -38px) scale(.25) rotate(130deg); } }
+
 /* Minimal animated night skyline, kept behind workspace surfaces. */
 .holiday-cityscape {
   position: fixed;
@@ -684,7 +855,7 @@ html[data-theme="new-year"] .home-block-snow { display: none; }
   left: 242px;
   right: 0;
   bottom: 0;
-  height: clamp(130px, 24vh, 250px);
+  height: clamp(230px, 36vh, 390px);
   display: flex;
   align-items: flex-end;
   justify-content: space-around;
@@ -698,27 +869,27 @@ html[data-theme="new-year"] .home-block-snow { display: none; }
 .holiday-building {
   position: relative;
   flex: 1 1 var(--building-width);
-  max-width: 86px;
-  min-width: 22px;
+  max-width: 118px;
+  min-width: 34px;
   height: var(--building-height);
   display: grid;
   grid-template-columns: repeat(3, minmax(3px, 1fr));
-  grid-auto-rows: 7px;
+  grid-auto-rows: 10px;
   align-content: start;
   justify-items: center;
-  gap: 5px 4px;
-  padding: 11px 7px 0;
+  gap: 7px 5px;
+  padding: 16px 9px 0;
   border: 1px solid #35465d66;
   border-bottom: 0;
   background: linear-gradient(145deg, #152338, #0b1422 75%);
   box-shadow: inset 0 8px 18px #253c5822;
 }
-.holiday-building:nth-child(3n) { max-width: 64px; }
-.holiday-building:nth-child(4n) { max-width: 102px; }
+.holiday-building:nth-child(3n) { max-width: 88px; }
+.holiday-building:nth-child(4n) { max-width: 132px; }
 .holiday-window {
   width: 100%;
-  max-width: 9px;
-  height: 5px;
+  max-width: 12px;
+  height: 7px;
   border-radius: 1px;
   background: #27384a;
   opacity: .45;
@@ -742,8 +913,8 @@ html[data-theme="new-year"] body {
 html[data-theme="new-year"] .sidebar { background: #0c1522ed; }
 html[data-theme="new-year"] .card { background-color: #111d2bdc; }
 @media (max-width: 760px) {
-  .holiday-cityscape { left: 0; height: 17vh; opacity: .32; }
-  .holiday-building { padding-left: 4px; padding-right: 4px; gap: 4px 3px; }
+  .holiday-cityscape { left: 0; height: 30vh; opacity: .38; }
+  .holiday-building { padding-left: 5px; padding-right: 5px; gap: 5px 3px; }
 }
 @media (prefers-reduced-motion: reduce) {
   html[data-theme="new-year"] .card::before { animation: none; }
