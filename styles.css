@@ -1195,3 +1195,62 @@ html[data-theme="new-year"] .brand-mark {
 html[data-theme="new-year"] main#view {
   padding-bottom: clamp(280px, 42vh, 460px);
 }
+
+
+/* Festive MT mark: separated yellow initials and tiny presents underneath. */
+html[data-theme="new-year"] .brand-mark,
+html[data-theme="new-year"] .brand-mark span {
+  color: #ffd84a;
+  -webkit-text-stroke: 1px #050505;
+  paint-order: stroke fill;
+  text-shadow: 0 1px 0 #000, 1px 0 0 #000, -1px 0 0 #000;
+}
+html[data-theme="new-year"] .brand-gifts {
+  position: absolute;
+  z-index: 52;
+  left: 5px;
+  bottom: -9px;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  width: 28px;
+  height: 10px;
+  pointer-events: none;
+}
+html[data-theme="new-year"] .brand-gifts i {
+  position: relative;
+  display: block;
+  width: 8px;
+  height: 7px;
+  border: 1px solid #6e3b27;
+  border-radius: 1px;
+  background: #d84b48;
+  box-shadow: inset 0 2px 0 #ffffff30;
+}
+html[data-theme="new-year"] .brand-gifts i:nth-child(2) {
+  height: 9px;
+  background: #3e9a70;
+}
+html[data-theme="new-year"] .brand-gifts i:nth-child(3) {
+  height: 6px;
+  background: #e6b84e;
+}
+html[data-theme="new-year"] .brand-gifts i::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: -2px;
+  width: 2px;
+  height: 100%;
+  background: #f7df9b;
+}
+html[data-theme="new-year"] .brand-gifts i::after {
+  content: "";
+  position: absolute;
+  left: 1px;
+  top: -3px;
+  width: 4px;
+  height: 2px;
+  border: 1px solid #f7df9b;
+  border-radius: 50%;
+}
