@@ -681,6 +681,7 @@ html[data-theme="new-year"] .home-block-snow { display: none; }
 /* Slow continuous traffic queue and randomly placed snowmen. */
 .holiday-street {
   position: absolute;
+  z-index: 2;
   left: 0;
   right: 0;
   bottom: 0;
@@ -723,7 +724,7 @@ html[data-theme="new-year"] .home-block-snow { display: none; }
   width: 94px;
   height: 29px;
   margin-right: var(--car-gap);
-  transform: scaleX(-1) scale(var(--car-scale));
+  transform: scale(var(--car-scale));
   transform-origin: center bottom;
   filter: drop-shadow(0 2px 2px #0009);
 }
@@ -773,8 +774,8 @@ html[data-theme="new-year"] .home-block-snow { display: none; }
 .traffic-wheel-front { right: 12px; }
 .traffic-wheel-back { left: 15px; }
 @keyframes holiday-traffic-flow {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
 }
 .holiday-snowman {
   position: absolute;
@@ -1187,8 +1188,8 @@ html[data-theme="new-year"] .sidebar .brand-logo-wrap::after {
 
 /* New Year refinements: monochrome MT mark and extra scroll clearance. */
 html[data-theme="new-year"] .brand-mark {
-  background: #f4f4f1;
-  color: #111318;
+  background: #000;
+  color: #fff;
   box-shadow: 0 0 0 1px #ffffff35;
 }
 html[data-theme="new-year"] main#view {
