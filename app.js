@@ -119,12 +119,9 @@ function syncHolidayAtmosphere() {
       sequence.className = "holiday-traffic-sequence";
       const queueColors = Array.from({ length: 18 }, (_, index) => colors[index % colors.length]);
       queueColors.forEach((color, index) => {
-        const isHolidayTank = Math.random() < 0.05;
         const vehicle = document.createElement("div");
-        vehicle.className = isHolidayTank ? "holiday-traffic-car holiday-traffic-tank" : `holiday-traffic-car car-${color}`;
-        vehicle.innerHTML = isHolidayTank
-          ? '<img class="holiday-tank-sprite" src="./holiday-wasp-smoky.webp" alt="" draggable="false">'
-          : carMarkup;
+        vehicle.className = `holiday-traffic-car car-${color}`;
+        vehicle.innerHTML = carMarkup;
         vehicle.style.setProperty("--car-scale", `${.92 + (index % 4) * .02}`);
         vehicle.style.setProperty("--car-gap", `${10 + (index % 3) * 10}px`);
         sequence.append(vehicle);
