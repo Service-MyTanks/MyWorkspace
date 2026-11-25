@@ -2045,29 +2045,83 @@ async function changePassword(event) {
 }
 
 async function renderAdmin(view, current) {
+  const content = { node: loadingBlock() };
+  const refreshButton = h("button", {
+    type: "button",
+    class: "icon-button admin-refresh-button",
+    title: "Обновить список сотрудников и заявок",
+    "aria-label": "Обновить список сотрудников и заявок",
+    onclick: refreshAdminList
+  }, icon("i-refresh"));
   const section = h("section", { class: "card" },
-    h("div", { class: "card-heading" }, h("span", { class: "section-icon" }, icon("i-user")), h("div", {}, h("h2", { text: "Сотрудники и заявки" }), h("p", { text: "Одобрение регистраций и управление доступом" }))),
-    loadingBlock());
+    h("div", { class: "card-heading admin-card-heading" },
+      h("span", { class: "section-icon" }, icon("i-user")),
+      h("div", { class: "admin-card-heading-copy" },
+        h("h2", { text: "Сотрудники и заявки" }),
+        h("p", { text: "Одобрение регистраций и управление доступом" })
+      ),
+      refreshButton
+    ),
+    content.node
+  );
   view.append(section);
-  const { data, error } = await state.client.from("profiles").select("id, email, nickname, position, status, is_admin, created_at, avatar_path").order("created_at", { ascending: false });
-  if (!current()) return;
-  if (error) { section.lastChild.replaceWith(errorBlock(error, render)); return; }
-  const groups = [["pending", "Ожидают одобрения"], ["approved", "Активные"], ["rejected", "Отклонённые и отозванные"]];
-  const statusAction = (person, status, label, className) => h("button", { type: "button", class: `button ${className} small`, onclick: () => changeStatus(person, status) }, label);
-  section.lastChild.replaceWith(h("div", { class: "admin-groups" }, ...groups.map(([status, title]) => {
-    const people = data.filter((person) => person.status === status);
-    return h("div", { class: "admin-group" }, h("h3", {}, title, h("span", { class: "count", text: String(people.length) })),
-      people.length ? h("div", { class: "people" }, ...people.map((person) => h("div", { class: "person" },
-        h("img", { class: "team-avatar", src: avatarPublicUrl(person.avatar_path), alt: "Аватар " + person.nickname, width: 36, height: 36 }),
-         h("div", { class: "person-text" }, h("strong", {}, person.nickname, person.is_admin ? h("span", { class: "pill", text: "руководитель" }) : null), h("small", { text: `${person.position} · ${person.email}` }), h("small", { text: `Регистрация: ${formatDateTime(person.created_at)}` })),
-        h("div", { class: "person-actions" },
-          person.id === state.profile.id ? h("span", { class: "muted small-text", text: "Это вы" }) : null,
-          person.id !== state.profile.id && status !== "approved" ? statusAction(person, "approved", "Одобрить", "button-primary") : null,
-          person.id !== state.profile.id && status === "pending" ? statusAction(person, "rejected", "Отклонить", "button-secondary") : null,
-          person.id !== state.profile.id && status === "approved" ? statusAction(person, "rejected", "Отозвать доступ", "button-secondary") : null,
-          h("button", { type: "button", class: "icon-button account-settings-button", title: "Настройки аккаунта", "aria-label": "Настройки аккаунта " + person.nickname, onclick: () => openAccountControlPanel(person) }, "⚙")))))
-        : h("p", { class: "muted small-text", text: "Нет сотрудников." }));
-  })));
+
+  async function refreshAdminList() {
+    if (refreshButton.disabled) return;
+    refreshButton.disabled = true;
+    refreshButton.classList.add("is-loading");
+    refreshButton.title = "Обновляем список…";
+    try {
+      const { data, error } = await state.client.from("profiles")
+        .select("id, email, nickname, position, status, is_admin, created_at, avatar_path")
+        .order("created_at", { ascending: false });
+      if (!current()) return;
+      let nextContent;
+      if (error) {
+        nextContent = errorBlock(error, refreshAdminList);
+      } else {
+        const groups = [["pending", "Ожидают одобрения"], ["approved", "Активные"], ["rejected", "Отклонённые и отозванные"]];
+        const statusAction = (person, status, label, className) => h("button", {
+          type: "button", class: `button ${className} small`, onclick: () => changeStatus(person, status)
+        }, label);
+        nextContent = h("div", { class: "admin-groups" }, ...groups.map(([status, title]) => {
+          const people = data.filter((person) => person.status === status);
+          return h("div", { class: "admin-group" },
+            h("h3", {}, title, h("span", { class: "count", text: String(people.length) })),
+            people.length ? h("div", { class: "people" }, ...people.map((person) => h("div", { class: "person" },
+              h("img", { class: "team-avatar", src: avatarPublicUrl(person.avatar_path), alt: "Аватар " + person.nickname, width: 36, height: 36 }),
+              h("div", { class: "person-text" },
+                h("strong", {}, person.nickname, person.is_admin ? h("span", { class: "pill", text: "руководитель" }) : null),
+                h("small", { text: `${person.position} · ${person.email}` }),
+                h("small", { text: `Регистрация: ${formatDateTime(person.created_at)}` })
+              ),
+              h("div", { class: "person-actions" },
+                person.id === state.profile.id ? h("span", { class: "muted small-text", text: "Это вы" }) : null,
+                person.id !== state.profile.id && status !== "approved" ? statusAction(person, "approved", "Одобрить", "button-primary") : null,
+                person.id !== state.profile.id && status === "pending" ? statusAction(person, "rejected", "Отклонить", "button-secondary") : null,
+                person.id !== state.profile.id && status === "approved" ? statusAction(person, "rejected", "Отозвать доступ", "button-secondary") : null,
+                h("button", {
+                  type: "button", class: "icon-button account-settings-button",
+                  title: "Настройки аккаунта", "aria-label": "Настройки аккаунта " + person.nickname,
+                  onclick: () => openAccountControlPanel(person)
+                }, "⚙")
+              )
+            ))) : h("p", { class: "muted small-text", text: "Нет сотрудников." })
+          );
+        }));
+      }
+      content.node.replaceWith(nextContent);
+      content.node = nextContent;
+    } catch (error) {
+      showToast("Не удалось обновить список: " + friendlyError(error));
+    } finally {
+      refreshButton.disabled = false;
+      refreshButton.classList.remove("is-loading");
+      refreshButton.title = "Обновить список сотрудников и заявок";
+    }
+  }
+
+  await refreshAdminList();
 }
 
 

@@ -2249,3 +2249,13 @@ main#view { flex: 1 0 auto; }
   .account-control-dialog { width: calc(100% - 16px); max-height: 96vh; }
   .account-control-dialog .dialog-heading, .account-control-dialog .dialog-body { padding-left: 16px; padding-right: 16px; }
 }
+
+
+/* Employee and registration list refresh control. */
+.admin-card-heading { gap: 13px; }
+.admin-card-heading-copy { flex: 1; min-width: 0; }
+.admin-refresh-button { width: 36px; height: 36px; border-radius: 50%; margin-left: auto; }
+.admin-refresh-button svg { width: 17px; height: 17px; }
+.admin-refresh-button:disabled { cursor: wait; opacity: .65; }
+.admin-refresh-button.is-loading svg { animation: admin-refresh-spin .8s linear infinite; }
+@keyframes admin-refresh-spin { to { transform: rotate(360deg); } }
