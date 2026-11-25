@@ -1688,3 +1688,12 @@ html[data-theme="new-year"] .holiday-chimney b:nth-child(2) {
   .training-social-row { gap: 10px; }
   .training-social-kind { min-width: 78px; }
 }
+
+/* Collapsible social-network group */
+.training-social-container > summary { list-style: none; }
+.training-social-container > summary::-webkit-details-marker { display: none; }
+.training-social-container[open] > summary .row-arrow { transform: rotate(90deg); color: var(--accent); }
+.training-social-container > .training-social-list { display: none; }
+.training-social-container[open] > .training-social-list { display: block; }
+.training-social-heading { cursor: pointer; }
+.training-social-heading:hover { background: #20252d; }
