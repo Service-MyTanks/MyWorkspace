@@ -1039,7 +1039,6 @@ async function countRows(table, filters = {}) {
 
 async function renderHome(view) {
   const links = {
-    news: { title: "Новости проекта", text: "Последние объявления и новости MyTanks", href: "https://forum.mytanks.net/index.php?forums/%D0%9D%D0%BE%D0%B2%D0%BE%D1%81%D1%82%D0%B8.37/", iconName: "i-newspaper" },
     complaints: { title: "Жалобы", text: "Раздел жалоб на действия игроков", href: "https://forum.mytanks.net/index.php?forums/%D0%96%D0%B0%D0%BB%D0%BE%D0%B1%D1%8B.38/", iconName: "i-alert-triangle" },
     appeals: { title: "Апелляции", text: "Раздел апелляций", href: "https://forum.mytanks.net/index.php?forums/%D0%90%D0%BF%D0%B5%D0%BB%D0%BB%D1%8F%D1%86%D0%B8%D0%B8.52/", iconName: "i-scale" },
     objections: { title: "Обжалования", text: "Раздел обжалований", href: "https://forum.mytanks.net/index.php?forums/%D0%9E%D0%B1%D0%B6%D0%B0%D0%BB%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5.56/", iconName: "i-message-circle" },
@@ -1078,7 +1077,7 @@ async function renderHome(view) {
     h("div", { class: "home-newspaper" },
       block("news", "Быстрые действия", "Основные ресурсы проекта в одном месте", "i-zap",
         h("div", { class: "row-list" },
-          externalRow(links.news),
+          rowLink({ href: "#/reports/new", iconName: "i-file-text", title: "Новый отчёт", text: "Перейти к составлению ежедневного отчёта" }),
           externalRow({ title: "Форум", text: "Официальный форум MyTanks", href: "https://forum.mytanks.net/", iconName: "i-messages" }),
           rowLink({ href: "#/training", iconName: "i-graduation-cap", title: "Учебный центр", text: "Курсы и обучающие материалы MT DOCS" })
         )
