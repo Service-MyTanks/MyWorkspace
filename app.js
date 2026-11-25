@@ -522,8 +522,8 @@ function setTrainingViewMode(mode) {
 function renderTrainingIndex(view) {
   const courses = [
     ["gameplay", "Игровой процесс", "Дежурство, игровой чат, режим наблюдателя и мониторинг битв.", "i-monitor"],
+    ["community", "Работа с сообществом", "Социальные сети, игровой чат и работа с обращениями игроков.", "i-users"],
     ["forum", "Работа с форумом", "Права доступа, административные разделы и работа с обращениями.", "i-messages"],
-    ["community", "Работа с сообществом", "Обучающие материалы по взаимодействию с сообществом.", "i-users"],
     ["administration", "Административный аппарат", "Структура команды, обязанности, регламенты и нормативы.", "i-shield"]
   ];
   view.append(
@@ -701,6 +701,104 @@ async function renderTraining(view, route) {
       accessCard,
       gameplayCard,
       reportCard
+    );
+    return;
+  }
+
+  if (route.sectionKey === "community") {
+    const communityStageCard = (title, description, iconName, content) => h("section", { class: "card" },
+      h("div", { class: "card-heading" },
+        h("span", { class: "section-icon" }, icon(iconName)),
+        h("div", {}, h("h2", { text: title }), h("p", { text: description }))
+      ),
+      content
+    );
+    const infoRow = (id, title, iconName, label, content) => h("div", { class: "training-info-item" },
+      h("button", { type: "button", class: "training-info-trigger", popovertarget: id, "aria-label": `Открыть раздел: ${title}` },
+        h("span", { class: "section-icon" }, icon(iconName)),
+        h("span", { class: "row-text" }, h("strong", { text: label || title })),
+        icon("i-chevron", "row-arrow")
+      ),
+      h("div", { id, popover: "auto", class: "training-content-popover", role: "dialog", "aria-label": title },
+        h("div", { class: "training-report-body" }, content)
+      )
+    );
+    const socialRow = (id, platform, links, explanation) => h("div", { class: "training-social-row" },
+      h("div", { class: "training-social-main" },
+        h("strong", { text: platform }),
+        ...links.map(([kind, url]) => h("div", { class: "training-social-link" },
+          h("span", { class: "training-social-kind", text: kind }),
+          h("a", { href: url, target: "_blank", rel: "noopener noreferrer" }, url)
+        ))
+      ),
+      h("button", { type: "button", class: "training-help-trigger", popovertarget: id, "aria-label": `Пояснение: ${platform}`, title: `О платформе ${platform}` }, "?"),
+      h("div", { id, popover: "auto", class: "training-content-popover", role: "dialog", "aria-label": `Пояснение: ${platform}` },
+        h("div", { class: "training-report-body" }, h("p", {}, h("strong", { text: platform }), " — ", explanation))
+      )
+    );
+
+    view.append(
+      pageHeading("ОБУЧЕНИЕ СОТРУДНИКОВ", route.section, "Знакомство с площадками проекта, правилами коммуникации и обработкой обращений игроков."),
+      communityStageCard("1. Начальный этап — Социальные сети и игровой чат", "Узнай, где находится игровое сообщество и через какие площадки с ним взаимодействовать.", "i-users",
+        h("div", { class: "row-list training-info-list" },
+          infoRow("community-everywhere-popover", "Мы — везде!", "i-globe",
+            "Мы — везде!",
+            h("p", {}, "Основополагающим принципом работы с сообществом является знание мест, где расположены чаты для возможности коммуникации с игровым сообществом. Таких мест три (3): ",
+              h("strong", { text: "Социальные сети" }), ", ", h("strong", { text: "Игровой чат" }), " и ", h("strong", { text: "Форум" }), "."),
+            h("p", { text: "Следующие блоки информации подробнее познакомят тебя с конкретными ссылками на тематические игровые чаты, группы и социальные сети, где они расположены." })
+          ),
+          h("div", { class: "training-info-item training-social-container" },
+            h("div", { class: "training-info-trigger training-social-heading" },
+              h("span", { class: "section-icon" }, icon("i-share")),
+              h("span", { class: "row-text" }, h("strong", { text: "Социальные сети" })),
+              icon("i-chevron", "row-arrow")
+            ),
+            h("div", { class: "training-social-list" },
+              socialRow("community-vk-popover", "ВКонтакте", [
+                ["Группа", "https://vk.ru/mytanksnet"],
+                ["Чат", "https://vk.me/join/qo641OM6_tTNBRtrMPBs8b7R94xDD1Os4k0="]
+              ], "ВКонтакте — основная платформа проекта, где происходит коммуникация между администрацией, разработчиками и игровым сообществом (игроками)."),
+              socialRow("community-telegram-popover", "Telegram", [
+                ["Канал 1", "https://t.me/mytanks_ru"],
+                ["Канал 2", "https://t.me/mytanksnet"],
+                ["Чат", "https://t.me/mytanks_chat"]
+              ], "Telegram — альтернативная платформа проекта для тех, у кого нет ВКонтакте или кто им не пользуется, а также для тех, кто хочет быть всегда и везде в курсе событий."),
+              socialRow("community-discord-popover", "Discord", [
+                ["Игровой канал", "https://discord.com/invite/c3sxErTNwd"]
+              ], "Discord — ещё одна площадка проекта. Она может служить альтернативой или дополнением к нашим основным социальным сетям.")
+            )
+          ),
+          infoRow("community-game-chat-popover", "Игровой чат", "i-message",
+            "Игровой чат",
+            h("p", {}, h("strong", { text: "Игровой чат" }), " — чат, расположенный в левой части игрового экрана, где ты также можешь взаимодействовать с игроками путём прямой коммуникации: отвечать на вопросы, информировать о предстоящих обновлениях и просто общаться для души.")
+          )
+        )
+      ),
+      communityStageCard("2. Промежуточный этап — Как правильно работать с игровым сообществом?", "Основные принципы общения, информирования и соблюдения делового стиля.", "i-message-circle",
+        h("div", { class: "row-list training-info-list" },
+          infoRow("community-work-rules-popover", "Как правильно работать с игровым сообществом?", "i-users",
+            "Как правильно работать с игровым сообществом?",
+            h("p", {}, h("strong", { text: "Работа с игровым сообществом" }), " подразумевает информирование игроков, ответы на вопросы, отработку жалоб и вежливое общение в ", h("u", { text: "деловом стиле" }), "."),
+            h("p", {}, h("strong", { text: "Запомни!" })),
+            h("p", { text: "Веди общение с игровым сообществом всегда вежливо, в деловом стиле и только по существу. За предоставление неверной информации можно получить по шапке от руководителя. Если не уверен в той или иной информации, лучше спроси у руководителя. Так будет в разы безопаснее и правильнее с этической и практической точки зрения. Ты не уронишь свою репутацию администратора перед игроками и не предоставишь им неверную информацию." }),
+            h("p", {}, "Подробнее с должностными обязанностями можно ознакомиться по ссылке ниже или в разделе учебного центра «Административный аппарат». Дополнительные вопросы можно задать руководителю."),
+            h("p", {}, h("strong", { text: "Должностные обязанности и значения должностей" }), ": ", h("a", { href: "https://forum.mytanks.net/index.php?threads/%D0%97%D0%9D%D0%90%D0%A7%D0%95%D0%9D%D0%98%D0%95-%D0%94%D0%9E%D0%9B%D0%96%D0%9D%D0%9E%D0%A1%D0%A2%D0%95%D0%99-%D0%92-%D0%98%D0%95%D0%A0%D0%90%D0%A0%D0%A5%D0%98%D0%98.1167/", target: "_blank", rel: "noopener noreferrer" }, "Открыть материал на форуме"))
+          )
+        )
+      ),
+      communityStageCard("3. Финальный этап — Отработка обращений и жалоб от игроков", "Научись замечать обращения игроков и определять, через какие каналы они поступают.", "i-inbox",
+        h("div", { class: "row-list training-info-list" },
+          infoRow("community-complaints-popover", "Отработка обращений и жалоб от игроков", "i-inbox",
+            "Отработка обращений и жалоб от игроков",
+            h("p", {}, h("strong", { text: "Отработка обращений и жалоб от игроков" }), " подразумевает мониторинг социальных сетей, чатов в них и игрового чата во время дежурства. Отработка обращений и жалоб от игроков может происходить тремя способами:"),
+            h("ol", {},
+              h("li", {}, h("strong", { text: "Игровой чат. " }), "Игрок пишет напрямую в игровой чат свой вопрос (обращение) и/или жалуется на определённого игрока с конкретным ником по поводу нарушения правил сообщества и игры (нецензурная брань, оскорбления, читы и так далее)."),
+              h("li", {}, h("strong", { text: "Чат в социальных сетях. " }), "Игрок пишет в чат или группу свой вопрос (обращение) и/или жалуется на определённого игрока с конкретным ником по поводу нарушения правил сообщества и игры (нецензурная брань, оскорбления, читы и так далее)."),
+              h("li", {}, h("strong", { text: "Форум. " }), "Игрок составляет свой вопрос (обращение) и/или жалобу на форуме согласно регламенту и шаблонам подачи жалоб, в отведённых для этого темах и разделах. Подробнее см. в разделе учебного центра «Работа с форумом».")
+            )
+          )
+        )
+      )
     );
     return;
   }
