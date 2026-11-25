@@ -1470,3 +1470,79 @@ html[data-theme="new-year"] .holiday-tree {
   html[data-theme="new-year"] .holiday-traffic-row { padding: 0 1%; gap: 0; }
   html[data-theme="new-year"] .holiday-traffic-car { flex-basis: 72px; transform: scale(.78); }
 }
+
+
+/* v30: continuous opposing traffic, deliberately uneven 10px-step spacing,
+   and a truly uniform white-to-black logo background. */
+html[data-theme="new-year"] .holiday-traffic-row {
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: 100%;
+  overflow: hidden;
+  display: block;
+  padding: 0;
+  gap: 0;
+}
+html[data-theme="new-year"] .holiday-traffic-track {
+  display: flex;
+  width: max-content;
+  height: 100%;
+  will-change: transform;
+}
+html[data-theme="new-year"] .holiday-traffic-sequence {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: flex-end;
+  gap: 0;
+  padding: 0;
+}
+html[data-theme="new-year"] .holiday-traffic-car {
+  box-sizing: border-box;
+  flex: 0 0 94px;
+  width: 94px;
+  min-width: 94px;
+  height: 34px;
+  margin: 0 var(--car-gap) 0 0;
+  animation: none;
+  transform: scale(var(--car-scale));
+  transform-origin: center bottom;
+}
+html[data-theme="new-year"] .traffic-row-back .holiday-traffic-track {
+  animation: holiday-traffic-left 48s linear infinite;
+}
+html[data-theme="new-year"] .traffic-row-front .holiday-traffic-track {
+  animation: holiday-traffic-right 48s linear infinite;
+}
+html[data-theme="new-year"] .traffic-row-back .holiday-traffic-car {
+  transform: scaleX(-1) scale(var(--car-scale));
+}
+@keyframes holiday-traffic-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes holiday-traffic-right {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+html[data-theme="new-year"] .brand-mark {
+  background: linear-gradient(to top, #fff 0%, #000 100%) !important;
+  background-clip: border-box !important;
+  -webkit-background-clip: border-box !important;
+}
+@media (max-width: 760px) {
+  html[data-theme="new-year"] .holiday-traffic-car {
+    flex-basis: 72px;
+    width: 72px;
+    min-width: 72px;
+    height: 31px;
+  }
+  html[data-theme="new-year"] .holiday-traffic-row {
+    padding: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme="new-year"] .holiday-traffic-track {
+    animation-duration: 120s;
+  }
+}
