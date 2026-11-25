@@ -1973,3 +1973,41 @@ html[data-theme="new-year"] .holiday-chimney b:nth-child(2) {
  .report-time-estimate { display:none; }
  .report-checklist { grid-template-columns:1fr; }
 }
+
+
+/* MT-DOCS report navigation and shared instruction dialog */
+.report-heading-actions { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.report-section-nav-card { padding:17px; }
+.report-section-nav { display:grid; gap:5px; margin-top:12px; }
+.report-section-nav a {
+  display:flex; align-items:center; gap:10px; min-width:0; padding:9px 8px;
+  border-radius:8px; color:var(--muted); font-size:11px; line-height:1.4;
+  text-decoration:none; transition:background .18s ease,color .18s ease;
+}
+.report-section-nav a:hover { background:var(--input); color:var(--text); }
+.report-section-nav a span {
+  display:grid; flex:0 0 25px; width:25px; height:25px; place-items:center;
+  border:1px solid var(--border); border-radius:7px; color:var(--accent);
+  font-size:9px; font-variant-numeric:tabular-nums;
+}
+#workspace-report-form > .report-section { scroll-margin-top:24px; }
+.report-help-dialog {
+  width:min(560px,calc(100vw - 28px)); max-height:min(82vh,760px); padding:0;
+  overflow:hidden; border:1px solid var(--border); border-radius:16px;
+  background:var(--card); color:var(--text);
+}
+.report-help-dialog::backdrop { background:rgba(0,0,0,.62); backdrop-filter:blur(4px); }
+.report-help-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; padding:22px 24px; border-bottom:1px solid var(--border); }
+.report-help-heading h2 { margin:7px 0 0; font-size:20px; }
+.report-help-body { max-height:calc(82vh - 85px); overflow:auto; padding:22px 24px; font-size:12px; line-height:1.65; }
+.report-help-body ol { display:grid; gap:17px; padding-left:21px; margin:0 0 20px; }
+.report-help-body li strong { display:block; margin-bottom:4px; }
+.report-help-body li p,.report-help-body .notice p { margin:4px 0 0; color:var(--muted); }
+.report-help-body .notice { padding:14px; border:1px solid var(--border); border-radius:10px; }
+.report-help-body .privacy-note { margin:16px 0 0; color:var(--muted); font-size:11px; }
+@media (max-width:700px) {
+  .report-heading-actions { width:100%; }
+  .report-heading-actions > * { flex:1; justify-content:center; }
+  .report-help-heading,.report-help-body { padding:18px; }
+  .report-help-heading h2 { font-size:17px; }
+}
