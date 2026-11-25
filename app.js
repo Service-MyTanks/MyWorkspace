@@ -70,18 +70,36 @@ function syncHolidayAtmosphere() {
       [46, 56, 12], [88, 74, 24], [61, 62, 18], [79, 70, 21],
       [50, 52, 15], [94, 78, 24], [58, 60, 18], [73, 66, 21], [45, 48, 12]
     ];
+    const moon = document.createElement("div");
+    moon.className = "holiday-moon";
+    city.append(moon);
+
+    const factory = document.createElement("div");
+    factory.className = "holiday-factory";
+    factory.innerHTML = '<i class="factory-hall"></i><i class="factory-roof"></i><i class="factory-stack factory-stack-one"><b></b></i><i class="factory-stack factory-stack-two"><b></b></i><i class="factory-stack factory-stack-three"><b></b></i>';
+    city.append(factory);
+
+    const tower = document.createElement("div");
+    tower.className = "holiday-ostankino";
+    tower.innerHTML = '<i class="ostankino-antenna"></i><i class="ostankino-spire"></i><i class="ostankino-disc ostankino-disc-top"></i><i class="ostankino-disc ostankino-disc-bottom"></i><i class="ostankino-shaft"></i><i class="ostankino-base"></i>';
+    city.append(tower);
+
     let windowIndex = 0;
     for (let buildingIndex = 0; buildingIndex < buildingSpecs.length; buildingIndex++) {
       const [height, width, count] = buildingSpecs[buildingIndex];
       const building = document.createElement("div");
-      building.className = "holiday-building";
+      building.className = "holiday-building holiday-building-snow";
+      const chimney = document.createElement("i");
+      chimney.className = "holiday-chimney";
+      chimney.innerHTML = "<b></b><b></b>";
+      building.append(chimney);
       building.style.setProperty("--building-height", `${height}%`);
       building.style.setProperty("--building-width", `${width}px`);
       for (let i = 0; i < count; i++) {
         const windowLight = document.createElement("i");
         windowLight.className = "holiday-window";
-        const isPurple = windowIndex === 19 || windowIndex === 83;
-        const isGarland = [37, 61, 108, 172].includes(windowIndex);
+        const isPurple = [19, 83, 127, 156, 214, 267, 290].includes(windowIndex);
+        const isGarland = [37, 61, 108, 172, 201, 226, 248, 279, 298].includes(windowIndex);
         if (isPurple) {
           windowLight.classList.add("is-purple");
         } else if (isGarland) {
@@ -116,7 +134,7 @@ function syncHolidayAtmosphere() {
         const car = document.createElement("div");
         car.className = `holiday-traffic-car car-${color}`;
         car.innerHTML = carMarkup;
-        car.style.setProperty("--car-scale", `${.9 + Math.random() * .1}`);
+        car.style.setProperty("--car-scale", `${.92 + (index % 4) * .02}`);
         car.style.setProperty("--car-gap", `${10 + (index % 3) * 10}px`);
         sequence.append(car);
       });
