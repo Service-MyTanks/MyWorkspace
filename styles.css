@@ -1667,10 +1667,11 @@ html[data-theme="new-year"] .holiday-chimney b:nth-child(2) {
   100% { transform: translate(8px, -34px) scale(2.2); opacity: 0; }
 }
 
-/* The far factory and Ostankino tower sit behind the residential blocks. */
-html[data-theme="new-year"] .holiday-factory,
-html[data-theme="new-year"] .holiday-ostankino,
+/* Neon moon remains as the only distant sky landmark. */
 html[data-theme="new-year"] .holiday-moon {
+  position: absolute;
+  pointer-events: none;
+
   position: absolute;
   pointer-events: none;
 }
@@ -1811,12 +1812,9 @@ html[data-theme="new-year"] .holiday-moon::after {
   to { filter: brightness(1.12); box-shadow: 0 0 18px 7px #c2ccffbb, 0 0 48px 18px #879dff88, 0 0 105px 34px #647bff44; }
 }
 @media (max-width: 760px) {
-  html[data-theme="new-year"] .holiday-factory { left: 1%; transform: scale(.72); transform-origin: bottom left; }
-  html[data-theme="new-year"] .holiday-ostankino { right: 72px; transform: scale(.72); transform-origin: bottom right; }
   html[data-theme="new-year"] .holiday-moon { right: 24px; top: 9%; }
 }
 @media (prefers-reduced-motion: reduce) {
   html[data-theme="new-year"] .holiday-chimney b,
-  html[data-theme="new-year"] .factory-stack b,
   html[data-theme="new-year"] .holiday-moon { animation: none !important; }
 }
