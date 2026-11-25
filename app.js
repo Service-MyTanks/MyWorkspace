@@ -162,7 +162,7 @@ function syncHolidayAtmosphere() {
       const chosen = new Set();
       while (chosen.size < Math.min(changes, windows.length)) chosen.add(Math.floor(Math.random() * windows.length));
       for (const index of chosen) windows[index].classList.toggle("is-lit", Math.random() > .5);
-    }, 120000);
+    }, 90000);
   }
 }
 
