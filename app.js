@@ -26,7 +26,7 @@ const SERVICE_RULES_VERSION = "2026-11-25-v1";
 function serviceRulesKey() { return "myworkspace.serviceRules." + (state.session?.user?.id || "guest"); }
 function hasAcceptedServiceRules() { try { return localStorage.getItem(serviceRulesKey()) === SERVICE_RULES_VERSION; } catch { return false; } }
 function acceptServiceRules() { try { localStorage.setItem(serviceRulesKey(), SERVICE_RULES_VERSION); } catch {} }
-const state = { client: null, session: null, profile: null, renderId: 0, sanctionKind: "ban", recovery: false, theme: "mt-standard", globalTheme: "mt-standard", globalThemeChannel: null, holidayLightsTimer: null, holidayDemonTimer: null, holidayCity: null };
+const state = { client: null, session: null, profile: null, accountControls: null, renderId: 0, sanctionKind: "ban", recovery: false, theme: "mt-standard", globalTheme: "mt-standard", globalThemeChannel: null, holidayLightsTimer: null, holidayDemonTimer: null, holidayCity: null };
 
 const THEME_OPTIONS = [
   { id: "mt-standard", name: "MT Standard", description: "Исходное оформление MyWorkspace", swatch: "theme-swatch-standard" },
@@ -171,8 +171,10 @@ function syncHolidayAtmosphere() {
 }
 
 function applyTheme(theme, persist = false) {
-  const allowed = THEME_OPTIONS.some((item) => item.id === theme);
-  const safeTheme = allowed ? theme : "mt-standard";
+  const themeExists = THEME_OPTIONS.some((item) => item.id === theme);
+  const permittedThemes = state.accountControls?.allowed_themes;
+  const allowed = themeExists && (!Array.isArray(permittedThemes) || permittedThemes.includes(theme));
+  const safeTheme = allowed ? theme : (Array.isArray(permittedThemes) && permittedThemes.length ? permittedThemes[0] : "mt-standard");
   state.theme = safeTheme;
   state.theme = safeTheme;
   syncHolidayAtmosphere();
@@ -375,6 +377,10 @@ async function enterWorkspace() {
     return;
   }
   state.profile = profile;
+  if (profile) {
+    const { data: controls, error: controlsError } = await state.client.from("account_controls").select("*").eq("user_id", profile.id).maybeSingle();
+    state.accountControls = controlsError ? { allowed_themes: ["mt-standard"], can_change_nickname: false, can_change_email: false, can_upload_avatar: false, can_access_training: false } : (controls || { allowed_themes: ["mt-standard"], can_change_nickname: true, can_change_email: true, can_upload_avatar: true, can_access_training: true });
+  } else state.accountControls = null;
   if (!profile) {
     showGate({ title: "Профиль не найден", text: "Аккаунт есть, но профиль сотрудника не создан. Обратитесь к руководителю.", iconName: "i-warning" });
   } else if (profile.status === "pending") {
@@ -497,6 +503,11 @@ function newReportLink(className = "button button-primary") {
 async function render() {
   const route = parseRoute();
   if (!route || !state.profile) return;
+  if ((route.page === "training" || route.page === "training-index") && state.accountControls?.can_access_training === false) {
+    showToast("Доступ к учебному центру отключён руководителем.");
+    if (location.hash !== "#/home") location.replace("#/home");
+    return;
+  }
   const id = ++state.renderId;
   const view = $("view");
   const current = () => id === state.renderId;
@@ -1796,6 +1807,7 @@ function renderAppearanceSettings() {
     class: `theme-choice ${item.swatch}`,
     "data-theme-choice": item.id,
     "aria-pressed": String(state.theme === item.id),
+    disabled: Array.isArray(state.accountControls?.allowed_themes) && !state.accountControls.allowed_themes.includes(item.id),
     onclick: () => { applyTheme(item.id, true); showToast(`Тема «${item.name}» сохранена.`); },
   },
     h("span", { class: "theme-choice-preview", "aria-hidden": "true" }),
@@ -1837,10 +1849,11 @@ function renderAppearanceSettings() {
 async function renderAccount(view, route, current) {
   const profile = state.profile;
   const avatar = h("img", { class: "profile-avatar", src: avatarPublicUrl(profile.avatar_path), alt: "Аватар " + profile.nickname, width: 64, height: 64 });
-  const avatarInput = h("input", { type: "file", id: "avatar-file", accept: "image/png,image/jpeg,image/webp", hidden: true });
-  const uploadButton = h("button", { type: "button", class: "button button-secondary small", disabled: true }, "Загрузить аватар");
+  const avatarAllowed = state.accountControls?.can_upload_avatar !== false;
+  const avatarInput = h("input", { type: "file", id: "avatar-file", accept: "image/png,image/jpeg,image/webp", hidden: true, disabled: !avatarAllowed });
+  const uploadButton = h("button", { type: "button", class: "button button-secondary small", disabled: true || !avatarAllowed }, "Загрузить аватар");
   const removeButton = h("button", { type: "button", class: "button button-secondary small", disabled: !profile.avatar_path }, "Удалить");
-  const avatarActions = h("div", { class: "avatar-actions" }, avatarInput, h("button", { type: "button", class: "button button-secondary small", onclick: () => avatarInput.click() }, "Выбрать изображение"), uploadButton, removeButton, h("small", { class: "muted", text: "PNG, JPG или WebP. До 2 МБ после обработки; изображение будет обрезано до квадрата." }));
+  const avatarActions = h("div", { class: "avatar-actions" }, avatarInput, h("button", { type: "button", class: "button button-secondary small", disabled: !avatarAllowed, onclick: () => avatarInput.click() }, "Выбрать изображение"), uploadButton, removeButton, h("small", { class: "muted", text: "PNG, JPG или WebP. До 2 МБ после обработки; изображение будет обрезано до квадрата." }));
   avatarInput.addEventListener("change", () => {
     const file = avatarInput.files?.[0]; if (!file) return;
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type) || file.size > 8 * 1024 * 1024) { showToast("Выберите PNG, JPG или WebP размером до 8 МБ."); avatarInput.value = ""; return; }
@@ -1861,10 +1874,16 @@ async function renderAccount(view, route, current) {
 
 function openAccountSettings() {
   const email = String(state.session?.user?.email || "").trim();
-  const locked = email.toLowerCase() === "supportmytanks@gmail.com";
+  const reserved = email.toLowerCase() === "supportmytanks@gmail.com";
+  const emailDenied = state.accountControls?.can_change_email === false;
+  const nicknameDenied = state.accountControls?.can_change_nickname === false;
+  const locked = reserved || emailDenied;
   $("settings-current-email").textContent = email || "—"; $("settings-new-email").value = "";
   $("settings-new-email").disabled = locked; $("settings-email-submit").disabled = locked;
+  $("settings-email-locked").textContent = reserved ? "Служебный адрес supportmytanks@gmail.com закреплён и не может быть изменён." : "Руководитель запретил изменение электронной почты для этого аккаунта.";
   $("settings-email-locked").hidden = !locked;
+  $("settings-nickname").disabled = nicknameDenied; $("settings-nickname-submit").disabled = nicknameDenied;
+  if (nicknameDenied) $("settings-nickname-message").textContent = "Руководитель запретил изменение никнейма для этого аккаунта.";
   $("settings-email-message").hidden = true; $("settings-nickname-message").hidden = true; $("settings-password-message").hidden = true;
   $("settings-nickname").value = state.profile?.nickname || ""; $("manual-report-position").checked = Boolean(state.profile?.manual_report_position); $("account-settings-dialog").showModal();
 }
@@ -1911,6 +1930,7 @@ async function compressAvatar(file) {
 }
 
 async function uploadAvatar(file, button) {
+  if (state.accountControls?.can_upload_avatar === false) { showToast("Загрузка аватара запрещена для этого аккаунта."); return; }
   if (!file) return; setBusy(button, true, "Загружаем…");
   try { const blob = await compressAvatar(file); const path = state.session.user.id + "/avatar.webp";
     const { error: uploadError } = await state.client.storage.from("avatars").upload(path, blob, { upsert: true, contentType: "image/webp", cacheControl: "3600" }); if (uploadError) throw uploadError;
@@ -1954,12 +1974,142 @@ async function renderAdmin(view, current) {
       people.length ? h("div", { class: "people" }, ...people.map((person) => h("div", { class: "person" },
         h("img", { class: "team-avatar", src: avatarPublicUrl(person.avatar_path), alt: "Аватар " + person.nickname, width: 36, height: 36 }),
          h("div", { class: "person-text" }, h("strong", {}, person.nickname, person.is_admin ? h("span", { class: "pill", text: "руководитель" }) : null), h("small", { text: `${person.position} · ${person.email}` }), h("small", { text: `Регистрация: ${formatDateTime(person.created_at)}` })),
-        person.id === state.profile.id ? h("span", { class: "muted small-text", text: "Это вы" }) : h("div", { class: "person-actions" },
-          status !== "approved" ? statusAction(person, "approved", "Одобрить", "button-primary") : null,
-          status === "pending" ? statusAction(person, "rejected", "Отклонить", "button-secondary") : null,
-          status === "approved" ? statusAction(person, "rejected", "Отозвать доступ", "button-secondary") : null))))
+        h("div", { class: "person-actions" },
+          person.id === state.profile.id ? h("span", { class: "muted small-text", text: "Это вы" }) : null,
+          person.id !== state.profile.id && status !== "approved" ? statusAction(person, "approved", "Одобрить", "button-primary") : null,
+          person.id !== state.profile.id && status === "pending" ? statusAction(person, "rejected", "Отклонить", "button-secondary") : null,
+          person.id !== state.profile.id && status === "approved" ? statusAction(person, "rejected", "Отозвать доступ", "button-secondary") : null,
+          h("button", { type: "button", class: "icon-button account-settings-button", title: "Настройки аккаунта", "aria-label": "Настройки аккаунта " + person.nickname, onclick: () => openAccountControlPanel(person) }, "⚙")))))
         : h("p", { class: "muted small-text", text: "Нет сотрудников." }));
   })));
+}
+
+
+async function openAccountControlPanel(person) {
+  const isSelf = person.id === state.profile.id;
+  const dialog = h("dialog", { class: "account-control-dialog", "aria-labelledby": "account-control-title" });
+  const close = () => dialog.close();
+  const header = h("div", { class: "dialog-heading" },
+    h("div", {}, h("span", { class: "eyebrow", text: "УПРАВЛЕНИЕ АККАУНТОМ" }), h("h2", { id: "account-control-title", text: person.nickname })),
+    h("button", { type: "button", class: "icon-button", "aria-label": "Закрыть", onclick: close }, "×")
+  );
+  const body = h("div", { class: "dialog-body account-control-body" }, loadingBlock());
+  const footer = h("div", { class: "dialog-actions" }, h("button", { type: "button", class: "button button-secondary", onclick: close }, "Закрыть"));
+  dialog.append(header, body, footer);
+  document.body.append(dialog);
+  dialog.addEventListener("close", () => dialog.remove(), { once: true });
+  dialog.showModal();
+
+  const { data: controls, error } = await state.client.from("account_controls").select("*").eq("user_id", person.id).maybeSingle();
+  if (error) { body.replaceChildren(errorBlock(error)); return; }
+  const c = controls || { allowed_themes: THEME_OPTIONS.map(x => x.id), can_change_nickname: true, can_change_email: true, can_upload_avatar: true, can_access_training: true };
+  const toggle = (id, title, description, checked, disabled = false) => {
+    const input = h("input", { type: "checkbox", id, class: "ios-toggle-input", disabled });
+    input.checked = Boolean(checked);
+    return { input, row: h("label", { class: "ios-setting-row", for: id },
+      h("span", { class: "ios-setting-copy" }, h("strong", { text: title }), h("small", { text: description })),
+      input, h("span", { class: "ios-toggle-track", "aria-hidden": "true" }, h("span", { class: "ios-toggle-thumb" }))
+    ) };
+  };
+  const section = (title, description, children) => h("section", { class: "account-control-section" },
+    h("div", { class: "account-control-section-heading" }, h("h3", { text: title }), description ? h("p", { class: "muted", text: description }) : null),
+    ...children
+  );
+  const manager = toggle("account-manager-toggle", "Руководитель", "Полный административный доступ, включая управление аккаунтами.", person.is_admin, isSelf);
+  const flags = [
+    ["nickname", toggle("account-nickname-toggle", "Изменение никнейма", "Разрешить пользователю менять отображаемое имя.", c.can_change_nickname, isSelf)],
+    ["email", toggle("account-email-toggle", "Изменение почты", "Разрешить пользователю менять адрес электронной почты.", c.can_change_email, isSelf)],
+    ["avatar", toggle("account-avatar-toggle", "Загрузка аватара", "Разрешить загрузку и замену фотографии профиля.", c.can_upload_avatar, isSelf)],
+    ["training", toggle("account-training-toggle", "Учебный центр", "Разрешить доступ к обучающим материалам.", c.can_access_training, isSelf)]
+  ];
+  const themeToggles = THEME_OPTIONS.map(item => [item.id, toggle("account-theme-" + item.id, item.name, item.description, (c.allowed_themes || []).includes(item.id), isSelf)]);
+  const suspensionActive = c.suspended_until && new Date(c.suspended_until).getTime() > Date.now();
+  const suspensionInfo = h("p", { class: "account-control-suspension-info muted", text: suspensionActive ? "Отстранён до " + formatDateTime(c.suspended_until) + ". Причина: " + (c.suspension_reason || "не указана") : "Активного отстранения нет." });
+  const duration = h("input", { type: "number", min: "1", max: "168", step: "1", placeholder: "Часы (1–168)", disabled: isSelf });
+  const reason = h("textarea", { rows: "3", placeholder: "Обязательная причина отстранения", disabled: isSelf });
+  const suspendButton = h("button", { type: "button", class: "button button-danger small", disabled: isSelf, onclick: async () => {
+    const hours = Number(duration.value);
+    if (!Number.isInteger(hours) || hours < 1 || hours > 168 || reason.value.trim().length < 5) {
+      showToast("Укажите срок от 1 до 168 часов и причину не короче 5 символов."); return;
+    }
+    suspendButton.disabled = true;
+    const result = await state.client.rpc("admin_update_account_controls", {
+      p_target: person.id,
+      p_settings: collectSettings(),
+      p_is_manager: manager.input.checked,
+      p_suspension_hours: hours,
+      p_suspension_reason: reason.value.trim()
+    });
+    suspendButton.disabled = false;
+    if (result.error) { showToast(friendlyError(result.error)); return; }
+    showToast("Временное отстранение применено.");
+    dialog.close(); render();
+  } }, "Отстранить");
+  const clearSuspension = h("button", { type: "button", class: "button button-secondary small", disabled: isSelf || !suspensionActive, onclick: async () => {
+    clearSuspension.disabled = true;
+    const result = await state.client.rpc("admin_clear_account_suspension", { p_target: person.id });
+    if (result.error) { clearSuspension.disabled = false; showToast(friendlyError(result.error)); return; }
+    showToast("Отстранение снято."); dialog.close(); render();
+  } }, "Снять отстранение");
+  const nicknameInput = h("input", { type: "text", maxlength: "64", minlength: "2", placeholder: "Новый никнейм", disabled: isSelf });
+  const nicknameButton = h("button", { type: "button", class: "button button-secondary small", disabled: isSelf, onclick: async () => {
+    const value = nicknameInput.value.trim();
+    if (value.length < 2 || value.length > 64) { showToast("Никнейм должен содержать от 2 до 64 символов."); return; }
+    nicknameButton.disabled = true;
+    const result = await state.client.rpc("admin_update_account_nickname", { p_target: person.id, p_nickname: value });
+    nicknameButton.disabled = false;
+    if (result.error) { showToast(friendlyError(result.error)); return; }
+    showToast("Никнейм обновлён."); dialog.close(); render();
+  } }, "Изменить никнейм");
+  const emailInput = h("input", { type: "email", maxlength: "254", placeholder: "Новая электронная почта", disabled: isSelf || !c.can_change_email });
+  const passwordInput = h("input", { type: "password", minlength: "8", maxlength: "72", placeholder: "Новый пароль", autocomplete: "new-password", disabled: isSelf });
+  const credentialsButton = h("button", { type: "button", class: "button button-secondary small", disabled: isSelf, onclick: async () => {
+    const newEmail = emailInput.value.trim();
+    const newPassword = passwordInput.value;
+    if (!newEmail && !newPassword) { showToast("Укажите новую почту или пароль."); return; }
+    credentialsButton.disabled = true;
+    const { data, error: invokeError } = await state.client.functions.invoke("admin-update-account", { body: { targetId: person.id, newEmail, newPassword } });
+    credentialsButton.disabled = false;
+    if (invokeError || data?.error) { showToast(invokeError ? friendlyError(invokeError) : data.error); return; }
+    showToast("Данные учётной записи обновлены.");
+    dialog.close(); render();
+  } }, "Применить изменения");
+  const collectSettings = () => ({
+    allowed_themes: themeToggles.filter(([, item]) => item.input.checked).map(([id]) => id),
+    can_change_nickname: flags[0][1].input.checked,
+    can_change_email: flags[1][1].input.checked,
+    can_upload_avatar: flags[2][1].input.checked,
+    can_access_training: flags[3][1].input.checked
+  });
+  const save = h("button", { type: "button", class: "button button-primary", disabled: isSelf, onclick: async () => {
+    save.disabled = true;
+    const result = await state.client.rpc("admin_update_account_controls", {
+      p_target: person.id, p_settings: collectSettings(), p_is_manager: manager.input.checked,
+      p_suspension_hours: null, p_suspension_reason: null
+    });
+    save.disabled = false;
+    if (result.error) { showToast(friendlyError(result.error)); return; }
+    showToast("Настройки аккаунта сохранены."); dialog.close(); render();
+  } }, "Сохранить настройки");
+  body.replaceChildren(
+    isSelf ? h("p", { class: "muted account-control-warning", text: "Собственные права и ограничения нельзя изменять из этой панели." }) : null,
+    section("Административные права", "Назначение руководителя автоматически открывает полный доступ к административным разделам.", [manager.row]),
+    section("Разрешённые темы", "Каждая цветовая схема управляется отдельно.", themeToggles.map(x => x[1].row)),
+    section("Ограничения аккаунта", "Отключённые возможности будут недоступны пользователю.", flags.map(x => x[1].row)),
+    section("Временное отстранение", "Срок задаётся в часах: от 1 до 168. По истечении срока доступ восстановится автоматически.", [
+      suspensionInfo,
+      h("div", { class: "account-control-field" }, h("label", { text: "Срок, часов" }), duration),
+      h("div", { class: "account-control-field" }, h("label", { text: "Причина" }), reason),
+      h("div", { class: "account-control-actions" }, suspendButton, clearSuspension)
+    ]),
+    section("Принудительное изменение данных", "Пароль передаётся напрямую в Supabase Auth и не сохраняется в журнале аудита.", [
+      h("div", { class: "account-control-field" }, h("label", { text: "Новый никнейм" }), nicknameInput, nicknameButton),
+      h("div", { class: "account-control-field" }, h("label", { text: "Новая почта" }), emailInput),
+      h("div", { class: "account-control-field" }, h("label", { text: "Новый пароль" }), passwordInput),
+      credentialsButton
+    ]),
+    save
+  );
 }
 
 async function changeStatus(person, status) {
