@@ -89,10 +89,12 @@ function syncHolidayAtmosphere() {
       const [height, width, count] = buildingSpecs[buildingIndex];
       const building = document.createElement("div");
       building.className = "holiday-building holiday-building-snow";
-      const chimney = document.createElement("i");
-      chimney.className = "holiday-chimney";
-      chimney.innerHTML = "<b></b><b></b>";
-      building.append(chimney);
+      if ([1, 4, 7, 10, 13, 15].includes(buildingIndex)) {
+        const chimney = document.createElement("i");
+        chimney.className = "holiday-chimney";
+        chimney.innerHTML = "<b></b><b></b>";
+        building.append(chimney);
+      }
       building.style.setProperty("--building-height", `${height}%`);
       building.style.setProperty("--building-width", `${width}px`);
       for (let i = 0; i < count; i++) {
