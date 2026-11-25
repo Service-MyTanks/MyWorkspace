@@ -414,6 +414,7 @@ function parseRoute() {
   if (path === "/training") return { page: "training-index", crumbs: [["Учебный центр"]] };
   if (path === "/reports") return { page: "reports", crumbs: [["Отчётность"]] };
   if (path === "/reports/new") return { page: "new-report", crumbs: [["Отчётность", "#/reports"], ["Новый отчёт"]] };
+  if (path === "/reports/thanks") return { page: "report-thanks", crumbs: [["Отчётность", "#/reports"], ["Подтверждение отправки"]] };
   if (path === "/reports/mine") return { page: "my-reports", crumbs: [["Отчёты", "#/reports"], ["Мои отчёты"]] };
   if (path === "/blocks") return { page: "blocks", crumbs: [["Мониторинг игры"], ["Блокировки"]] };
   const match = path.match(/^\/blocks\/(ban|kick|mute|warning)$/);
@@ -430,7 +431,7 @@ function parseRoute() {
 }
 
 function setChrome(route) {
-  const nav = { home: "home", reports: "reports", "new-report": "reports", "my-reports": "reports", blocks: "blocks", sanctions: "blocks", account: "account", training: "training", "training-index": "training" }[route.page];
+  const nav = { home: "home", reports: "reports", "new-report": "reports", "my-reports": "reports", "report-thanks": "reports", blocks: "blocks", sanctions: "blocks", account: "account", training: "training", "training-index": "training" }[route.page];
   for (const link of document.querySelectorAll("[data-nav]")) {
     const active = link.dataset.nav === nav;
     link.classList.toggle("active", active);
@@ -453,7 +454,7 @@ function setChrome(route) {
     const node = last ? h("strong", { text: label }) : href ? h("a", { href, text: label }) : h("span", { class: "crumb", text: label });
     return index ? [h("span", { class: "crumb-sep", text: "/" }), node] : [node];
   }));
-  const titles = { home: "Главная", reports: "Отчётность", "new-report": "Новый отчёт", "my-reports": "Мои отчёты", blocks: "Блокировка", sanctions: KINDS[route.kind]?.title, account: "Личный кабинет", training: route.section, "training-index": "Учебный центр" };
+  const titles = { home: "Главная", reports: "Отчётность", "new-report": "Новый отчёт", "my-reports": "Мои отчёты", "report-thanks": "Подтверждение отправки", blocks: "Блокировка", sanctions: KINDS[route.kind]?.title, account: "Личный кабинет", training: route.section, "training-index": "Учебный центр" };
   document.title = `${titles[route.page]} · MT DOCS`;
   closeSidebar();
 }
@@ -493,7 +494,7 @@ async function render() {
   const current = () => id === state.renderId;
   setChrome(route);
   view.replaceChildren();
-  const renderers = { home: renderHome, reports: renderReports, "new-report": renderNewReport, "my-reports": renderMyReports, blocks: renderBlocks, sanctions: renderSanctions, account: renderAccount, training: renderTraining, "training-index": renderTrainingIndex };
+  const renderers = { home: renderHome, reports: renderReports, "new-report": renderNewReport, "report-thanks": renderReportThanks, "my-reports": renderMyReports, blocks: renderBlocks, sanctions: renderSanctions, account: renderAccount, training: renderTraining, "training-index": renderTrainingIndex };
   await renderers[route.page](view, route, current);
   if (current() && route.page === "training" && getTrainingViewMode() === "presentation") enhanceTrainingDeck(view, route);
   if (current()) view.focus({ preventScroll: true });
@@ -1110,13 +1111,18 @@ const REPORT_POSITION_GROUPS = [
 ];
 const reportField = (id) => document.getElementById(id);
 const reportDraftKey = () => "myworkspace.report-draft." + (state.session?.user?.id || "guest");
+const reportPendingKey = () => "myworkspace.report-pending." + (state.session?.user?.id || "guest");
 const reportLocalDate = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); };
 function reportNumberedList(text, empty) {
   const lines = String(text || "").split(/\r?\n/).map(line => line.replace(/^\s*(?:\d+[.)]\s*|[-•]\s+)/, "").trim()).filter(Boolean);
   return lines.length ? lines.map((line, i) => (i+1) + ". " + line).join("\n") : (empty || "Не проводилась");
 }
 function reportFormText(template) {
-  const get = (id, fallback) => template ? fallback : (reportField(id)?.value.trim() || fallback);
+  const get = (id, fallback) => {
+    if (template) return fallback;
+    const input = reportField(id);
+    return input && typeof input.value === "string" ? (input.value.trim() || fallback) : fallback;
+  };
   const mode = reportField("report-screenshots-group")?.checked ? "group" : reportField("report-screenshots-blocked")?.checked ? "blocked" : "";
   const shots = mode === "group" ? "Скриншоты направлены в группу «ЕЖЕДНЕВНЫЕ ОТЧЁТЫ»" : mode === "blocked" ? "Отсутствует доступ к сторонним файлообменникам" : [1,2,3].map(n => n + ". " + get("report-screenshot-" + n, "[Ссылка на скриншот " + n + "]")).join("\n");
   return [
@@ -1134,7 +1140,7 @@ function reportFormText(template) {
     "ФОРУМ:",
     template ? "1. [Ответы на обращения, размещение новых тем, объявления мероприятий]" : reportNumberedList(get("report-forum-work", "")), "",
     "7. МОИ КЛЮЧЕВЫЕ НАВЫКИ:",
-    template ? "1. [Ваш ключевой навык]" : reportNumberedList(get("report-skills", ""), "[Перечислите навыки]"), "",
+    template ? "1. [Ваш ключевой навык]" : reportNumberedList(get("report-skills-text", ""), "[Перечислите навыки]"), "",
     "8. Соответствующие ссылки:", get("report-links", "Не указаны")
   ].join("\n");
 }
@@ -1319,19 +1325,27 @@ function bindReportForm() {
     form.querySelector(link.getAttribute("href"))?.scrollIntoView({ behavior: "smooth", block: "start" });
   }));
   function updateReportProgress() {
-    const sections = [...form.querySelectorAll(".report-section")];
-    const screenshotMode = reportField("report-screenshots-group").checked || reportField("report-screenshots-blocked").checked;
-    const screenshotLinksComplete = screenshotMode || [1,2,3].every(n => isHttpUrl(reportField("report-screenshot-" + n).value.trim()));
-    const basicsFieldsComplete = ["report-date", "report-nickname", "report-position", "report-online", "report-count"].every(id => {
-      const field = reportField(id);
-      return field && field.value.trim() !== "" && field.validity.valid;
+    const groupSelected = reportField("report-screenshots-group").checked;
+    const blockedSelected = reportField("report-screenshots-blocked").checked;
+    const screenshotMode = groupSelected !== blockedSelected;
+    const screenshotLinksComplete = screenshotMode || [1, 2, 3].every(number => {
+      const input = reportField("report-screenshot-" + number);
+      return input.disabled || isHttpUrl(input.value.trim());
     });
+    const basicsFieldsComplete = ["report-date", "report-nickname", "report-position", "report-online", "report-count"].every(id => {
+      const input = reportField(id);
+      return Boolean(input && input.value.trim() && input.validity.valid);
+    });
+    const workSection = reportField("report-work");
+    const skillsSection = reportField("report-skills");
+    const links = reportField("report-links").value.split(/\r?\n/).map(value => value.trim()).filter(Boolean);
     const states = {
       basics: basicsFieldsComplete && screenshotLinksComplete,
-      work: [...sections[1].querySelectorAll("input, select, textarea")].every(input => input.validity.valid)
-        && Boolean(reportField("report-game-work").value.trim()),
-      skills: [...sections[2].querySelectorAll("input, select, textarea")].every(input => input.validity.valid)
-        && Boolean(reportField("report-skills-text").value.trim()),
+      work: Boolean(reportField("report-game-work").value.trim())
+        && [...workSection.querySelectorAll("input, select, textarea")].every(input => input.validity.valid),
+      skills: Boolean(reportField("report-skills-text").value.trim())
+        && links.every(isHttpUrl)
+        && [...skillsSection.querySelectorAll("input, select, textarea")].every(input => input.validity.valid),
       finish: reportField("report-consent").checked
     };
     Object.entries(states).forEach(([key, complete], index) => {
@@ -1399,30 +1413,124 @@ function bindReportForm() {
     showToast("Черновик очищен.");
   });
 }
-async function submitWorkspaceReport() {
-  const form = reportField("workspace-report-form"), button = reportField("report-preview-send");
-  if (!form.reportValidity()) { reportField("report-preview-dialog").close(); form.reportValidity(); return; }
-  setBusy(button, true, "Сохраняем отчёт…");
-  const mode = reportField("report-screenshots-group").checked || reportField("report-screenshots-blocked").checked;
-  const screenshots = mode ? [] : [1,2,3].map(n => reportField("report-screenshot-" + n).value.trim());
-  const date = reportField("report-date").value, nickname = reportField("report-nickname").value.trim();
-  const position = reportField("report-position").value, subject = "MT DOCS | " + nickname + " | " + formatDate(date);
-  const reportBody = reportFormText(false);
-  const { error } = await state.client.from("reports").insert({
-    report_date: date, nickname, position, online_minutes: Number(reportField("report-online").value),
-    report_count: Number(reportField("report-count").value), subject, body: reportBody, screenshots
-  });
-  setBusy(button, false);
-  if (error) { showToast(friendlyError(error)); return; }
-  try {
-    sendReportThroughStaticForms(subject, reportBody);
-  } catch (sendError) {
-    console.error("Static Forms submission failed:", sendError);
-    showToast("Отчёт сохранён, но не удалось передать его в почтовую службу.");
+function submitWorkspaceReport() {
+  const form = reportField("workspace-report-form");
+  if (!form.reportValidity()) {
+    form.reportValidity();
+    updateReportProgress();
     return;
   }
-  localStorage.removeItem(reportDraftKey()); reportField("report-preview-dialog").close();
-  showToast("Отчёт сохранён и передан в Static Forms для отправки на почту."); location.hash = "#/reports/mine";
+  const groupSelected = reportField("report-screenshots-group").checked;
+  const blockedSelected = reportField("report-screenshots-blocked").checked;
+  const screenshotMode = groupSelected !== blockedSelected;
+  const screenshots = screenshotMode ? [] : [1, 2, 3].map(number => reportField("report-screenshot-" + number).value.trim());
+  const date = reportField("report-date").value;
+  const nickname = reportField("report-nickname").value.trim();
+  const subject = "MT DOCS | " + nickname + " | " + formatDate(date);
+  const pending = {
+    user_id: state.session.user.id,
+    report_date: date,
+    nickname,
+    position: reportField("report-position").value,
+    online_minutes: Number(reportField("report-online").value),
+    report_count: Number(reportField("report-count").value),
+    subject,
+    body: reportFormText(false),
+    screenshots,
+    saved: false
+  };
+  try {
+    sessionStorage.setItem(reportPendingKey(), JSON.stringify(pending));
+  } catch {
+    showToast("Не удалось подготовить отчёт. Разрешите хранилище сайта в браузере и повторите попытку.");
+    return;
+  }
+  location.hash = "#/reports/thanks";
+}
+
+async function confirmAndSendWorkspaceReport(pending, button, status) {
+  if (!pending || pending.user_id !== state.session?.user?.id) {
+    status.textContent = "Подготовленный отчёт не найден для текущего аккаунта. Вернитесь к форме и подготовьте его ещё раз.";
+    button.disabled = true;
+    return;
+  }
+
+  const popupName = "myworkspace-staticforms-delivery";
+  let popup = null;
+  try { popup = window.open("about:blank", popupName); } catch {}
+  let targetName = popup ? popupName : "myworkspace-staticforms-frame";
+  if (!popup && !document.querySelector('iframe[name="' + targetName + '"]')) {
+    const frame = document.createElement("iframe");
+    frame.name = targetName;
+    frame.title = "Отправка отчёта";
+    frame.hidden = true;
+    document.body.append(frame);
+  }
+
+  setBusy(button, true, "Сохраняем и отправляем…");
+  status.textContent = "Сохраняем отчёт в рабочем пространстве…";
+  try {
+    if (!pending.saved) {
+      const { error } = await state.client.from("reports").insert({
+        report_date: pending.report_date,
+        nickname: pending.nickname,
+        position: pending.position,
+        online_minutes: pending.online_minutes,
+        report_count: pending.report_count,
+        subject: pending.subject,
+        body: pending.body,
+        screenshots: pending.screenshots
+      });
+      if (error) {
+        if (popup) popup.close();
+        setBusy(button, false);
+        status.textContent = friendlyError(error);
+        return;
+      }
+      pending.saved = true;
+      sessionStorage.setItem(reportPendingKey(), JSON.stringify(pending));
+    }
+
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = "https://api.staticforms.dev/submit";
+    form.target = targetName;
+    form.hidden = true;
+    const fields = {
+      apiKey: "sf_aca3770697761941dfd1a6f2",
+      redirectTo: "https://service-mytanks.github.io/MyWorkspace/?sent=1#/reports/thanks",
+      honeypot: "",
+      name: pending.nickname,
+      subject: pending.subject,
+      message: pending.body,
+      screenshot_1: pending.screenshots[0] || "",
+      screenshot_2: pending.screenshots[1] || "",
+      screenshot_3: pending.screenshots[2] || ""
+    };
+    for (const [name, value] of Object.entries(fields)) {
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = name;
+      input.value = value;
+      form.append(input);
+    }
+    document.body.append(form);
+    form.submit();
+    window.setTimeout(() => form.remove(), 60000);
+
+    localStorage.removeItem(reportDraftKey());
+    sessionStorage.removeItem(reportPendingKey());
+    setBusy(button, false);
+    button.disabled = true;
+    button.textContent = "Отчёт отправлен";
+    status.textContent = "Отчёт сохранён в MyWorkspace и передан Static Forms. В отдельной вкладке появится подтверждение почтовой службы.";
+  } catch (error) {
+    if (popup && !popup.closed) popup.close();
+    setBusy(button, false);
+    status.textContent = pending.saved
+      ? "Отчёт уже сохранён в MyWorkspace, но не удалось передать его в почтовую службу. Нажмите кнопку ещё раз, чтобы повторить только отправку письма."
+      : friendlyError(error);
+  }
 }
 
 async function renderReports(view) {
@@ -1444,6 +1552,48 @@ async function renderNewReport(view) {
   view.append(h("div", { id: "report-form-mount" }));
   $("report-form-mount").outerHTML = reportFormMarkup();
   bindReportForm();
+}
+
+function renderReportThanks(view) {
+  if (new URLSearchParams(location.search).get("sent") === "1") {
+    view.append(
+      pageHeading("ПОСЛЕДНИЙ ШАГ", "Спасибо за отчёт", "Почтовая служба подтвердила приём формы."),
+      h("section", { class: "card" },
+        h("p", { class: "notice", text: "Static Forms принял отчёт. Проверьте входящие и папку «Спам» на supportmytanks@gmail.com." }),
+        h("div", { class: "form-actions" }, h("a", { class: "button button-primary", href: "#/reports/mine" }, "Мои отчёты"))
+      )
+    );
+    return;
+  }
+
+  let pending = null;
+  try { pending = JSON.parse(sessionStorage.getItem(reportPendingKey()) || "null"); } catch {}
+  if (!pending || pending.user_id !== state.session?.user?.id || typeof pending.body !== "string") {
+    view.append(
+      pageHeading("ПОСЛЕДНИЙ ШАГ", "Отчёт не найден", "Подготовленный отчёт отсутствует или его срок хранения в этой вкладке истёк."),
+      emptyBlock("i-warning", "Вернитесь к форме", "Заполните отчёт и нажмите «Проверить отчёт», затем продолжите отправку.", newReportLink("button button-primary"))
+    );
+    return;
+  }
+
+  const status = h("p", { class: "notice", role: "status", text: "Отчёт подготовлен. Проверьте данные и подтвердите отправку на почту команды." });
+  const sendButton = h("button", {
+    type: "button",
+    class: "button button-primary",
+    onclick: () => confirmAndSendWorkspaceReport(pending, sendButton, status)
+  }, "Отправить отчёт");
+  view.append(
+    pageHeading("ПОСЛЕДНИЙ ШАГ", "Отчёт подготовлен", "Проверьте итоговый отчёт. Отправка начнётся только после вашего подтверждения."),
+    h("section", { class: "card report-thanks-card" },
+      h("div", { class: "card-heading" }, h("span", { class: "section-icon" }, icon("i-mail")), h("div", {},
+        h("h2", { text: "Подтверждение отправки" }),
+        h("p", { text: "Получатель: supportmytanks@gmail.com" })
+      )),
+      h("pre", { class: "report-preview-body", text: pending.body }),
+      status,
+      h("div", { class: "form-actions" }, sendButton, h("a", { class: "button button-secondary", href: "#/reports/new" }, "Вернуться к форме"))
+    )
+  );
 }
 
 async function renderMyReports(view, route, current) {
