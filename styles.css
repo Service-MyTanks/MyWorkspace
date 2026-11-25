@@ -1546,3 +1546,51 @@ html[data-theme="new-year"] .brand-mark {
     animation-duration: 120s;
   }
 }
+
+
+/* v31: the skyline is architectural scenery; only ordinary window lights may change. */
+html[data-theme="new-year"] .holiday-building {
+  animation: none !important;
+  transition: none !important;
+  background: linear-gradient(145deg, #152338, #0b1422 75%) !important;
+}
+html[data-theme="new-year"] .holiday-window {
+  position: relative;
+  animation: none !important;
+}
+html[data-theme="new-year"] .holiday-window.is-purple {
+  background: #b78aff;
+  opacity: .98;
+  box-shadow: 0 0 5px #b78affaa, 0 0 12px #9d62ff77;
+}
+html[data-theme="new-year"] .holiday-window.has-garland {
+  background: #172536 !important;
+  opacity: .72;
+  box-shadow: none !important;
+  border: 1px solid #9b8b68;
+  border-radius: 2px;
+}
+html[data-theme="new-year"] .holiday-window.has-garland::before {
+  content: "";
+  position: absolute;
+  left: -2px;
+  right: -2px;
+  top: -5px;
+  height: 4px;
+  border-top: 1px solid #c9b783;
+  border-radius: 50% 50% 0 0;
+  background:
+    radial-gradient(circle at 12% 1px, #f05e67 0 1.5px, transparent 2px),
+    radial-gradient(circle at 38% 2px, #f4d36c 0 1.5px, transparent 2px),
+    radial-gradient(circle at 64% 1px, #70d69a 0 1.5px, transparent 2px),
+    radial-gradient(circle at 90% 2px, #8bbdff 0 1.5px, transparent 2px);
+  filter: drop-shadow(0 0 2px #f4d36c88);
+}
+html[data-theme="new-year"] .holiday-window.has-garland::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border: 1px solid #c8b47b66;
+  border-radius: 2px;
+  pointer-events: none;
+}
