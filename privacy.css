@@ -45,6 +45,7 @@ a:hover{color:#f3d9a7}
   text-align:center;
 }
 .eyebrow{
+  margin-top:-12px;
   margin-bottom:18px;
   color:var(--muted);
   font-size:9px;
