@@ -1702,3 +1702,22 @@ html[data-theme="new-year"] .holiday-moon::after {
 @media (max-width: 760px) {
   html[data-theme="new-year"] .holiday-moon { right: 24px; top: 9%; }
 }
+
+
+/* v34: move the moon to the left and keep its edge crisp, without blurred glow. */
+html[data-theme="new-year"] .holiday-moon {
+  left: clamp(28px, 7vw, 110px);
+  right: auto;
+  box-shadow: none !important;
+  filter: none !important;
+  animation: none !important;
+}
+html[data-theme="new-year"] .holiday-moon::after {
+  filter: none !important;
+}
+@media (max-width: 760px) {
+  html[data-theme="new-year"] .holiday-moon {
+    left: 24px;
+    right: auto;
+  }
+}
