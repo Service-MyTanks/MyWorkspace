@@ -1282,6 +1282,7 @@ function reportFormMarkup() {
     </aside>
     </div>
   </section>`;
+}
 function bindReportForm() {
   const form = reportField("workspace-report-form"), today = reportLocalDate();
   reportField("report-date").value = today; reportField("report-date").max = today;
