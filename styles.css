@@ -2161,9 +2161,27 @@ html[data-theme="new-year"] .report-section .field input:disabled { color: #91a6
 /* Mandatory service rules and document-style reading window */
 .service-warning{display:grid;grid-template-columns:20px minmax(0,1fr);gap:9px 11px;margin:18px 0 20px;padding:13px 14px;border:1px solid #51452f;border-radius:9px;background:#29261f;color:#d9c9aa}
 .service-warning>svg{width:19px;height:19px;color:var(--accent)}
+.service-warning-content{min-width:0;display:grid;gap:9px}
 .service-warning p{margin:0;font-size:10px;line-height:1.75}
 .service-warning strong{color:#f0d7a5;font-weight:650}
-.service-warning a{grid-column:2;width:max-content;color:var(--accent);font-size:10px;text-decoration:underline;text-underline-offset:3px}
+.service-documents-trigger{justify-self:start;display:inline-flex;align-items:center;gap:7px;padding:0;border:0;background:transparent;color:var(--accent);font:600 10px inherit;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.service-documents-trigger span{font-size:12px;text-decoration:none}
+.service-documents-dialog{width:min(650px,calc(100vw - 28px));max-width:650px;padding:0;overflow:hidden;border:1px solid var(--border);border-radius:14px;background:var(--card);color:var(--text);box-shadow:0 30px 100px #000a}
+.service-documents-dialog::backdrop{background:#080a0de8;backdrop-filter:blur(8px)}
+.service-documents-shell{padding:24px}
+.service-documents-header{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:22px}
+.service-documents-header .eyebrow{color:var(--muted);font-size:9px;letter-spacing:2px}
+.service-documents-header h2{margin:8px 0 4px;font-size:20px;letter-spacing:-.4px}
+.service-documents-header p{margin:0;color:var(--muted);font-size:11px}
+.service-documents-close{flex:0 0 auto;width:32px;height:32px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--muted);font-size:22px;line-height:1;cursor:pointer}
+.service-documents-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.service-document-option{display:flex;min-height:190px;flex-direction:column;align-items:flex-start;padding:18px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text);text-decoration:none;transition:border-color .18s,transform .18s,background .18s}
+.service-document-option:hover{border-color:var(--accent);background:var(--card);transform:translateY(-2px)}
+.service-document-number{margin-bottom:22px;color:var(--accent);font-size:9px;font-weight:700;letter-spacing:1.2px}
+.service-document-option strong{margin-bottom:8px;font-size:14px;line-height:1.4}
+.service-document-option>span:not(.service-document-number):not(.service-document-action){color:var(--muted);font-size:10px;line-height:1.6}
+.service-document-action{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;margin-top:auto;padding-top:20px;color:var(--accent);font-size:10px;font-weight:650}
+.service-document-action b{font-size:14px}
 .workspace-footer{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 30px 19px;border-top:1px solid var(--border);color:var(--faint);font-size:10px}
 .workspace-footer a{color:var(--muted);text-decoration:underline;text-underline-offset:3px}
 .workspace-footer a:hover{color:var(--accent)}

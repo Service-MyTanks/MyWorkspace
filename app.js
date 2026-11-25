@@ -2289,6 +2289,19 @@ function finishServiceRules() {
 }
 
 function bindApp() {
+  const documentsDialog = $("service-documents-dialog");
+  $("service-documents-open").addEventListener("click", () => documentsDialog.showModal());
+  $("service-documents-close").addEventListener("click", () => documentsDialog.close());
+  $("service-documents-rules").addEventListener("click", (event) => {
+    event.preventDefault();
+    documentsDialog.close();
+    showServiceRules(false);
+  });
+  $("service-documents-privacy").addEventListener("click", () => documentsDialog.close());
+  documentsDialog.addEventListener("click", (event) => {
+    if (event.target === documentsDialog) documentsDialog.close();
+  });
+
   document.querySelectorAll("[data-open-service-rules]").forEach((link) => link.addEventListener("click", (event) => { event.preventDefault(); showServiceRules(false); }));
   $("service-rules-scroll").addEventListener("scroll", updateServiceRulesProgress, { passive: true });
   $("service-rules-continue").addEventListener("click", finishServiceRules);

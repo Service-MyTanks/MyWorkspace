@@ -13,10 +13,10 @@
   <link rel="icon" href="./favicon-16.png" type="image/png" sizes="16x16">
   <link rel="shortcut icon" href="./favicon.ico">
   <link rel="apple-touch-icon" href="./apple-touch-icon.png" sizes="180x180">
-  <link rel="stylesheet" href="./styles.css?v=50">
+  <link rel="stylesheet" href="./styles.css?v=51">
   <script src="./vendor/supabase.js?v=2.119.1" defer></script>
   <script src="./config.js?v=2" defer></script>
-  <script src="./app.js?v=50" defer></script>
+  <script src="./app.js?v=51" defer></script>
 </head>
 <body>
   <svg class="svg-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
@@ -115,7 +115,7 @@
         <form id="login-form" role="tabpanel" aria-labelledby="tab-login" novalidate>
           <h1>С возвращением<span>.</span></h1>
           <p class="muted">Войдите, чтобы открыть рабочее пространство команды.</p>
-          <div class="service-warning" role="note"><svg aria-hidden="true"><use href="#i-shield"/></svg><p><strong>Служебный доступ.</strong> Продолжая работу с сервисом, вы подтверждаете ознакомление с правилами использования и принимаете ответственность за сохранность служебной информации.</p><div class="service-warning-links" style="grid-column:2;display:grid;grid-template-columns:max-content max-content max-content;column-gap:12px;align-items:center;justify-content:start;width:max-content;max-width:100%"><a href="#service-rules" data-open-service-rules style="grid-column:auto;width:auto;margin:0">Правила использования</a><span aria-hidden="true" style="display:block;color:#9b8b70">·</span><a href="./privacy.html" target="_blank" rel="noopener" style="grid-column:auto;width:auto;margin:0">Политика конфиденциальности</a></div></div>
+          <div class="service-warning" role="note"><svg aria-hidden="true"><use href="#i-shield"/></svg><div class="service-warning-content"><p><strong>Служебный доступ.</strong> Продолжая работу с сервисом, вы подтверждаете ознакомление с документами и принимаете ответственность за сохранность служебной информации.</p><button type="button" class="service-documents-trigger" id="service-documents-open">Документы и условия доступа <span aria-hidden="true">↗</span></button></div></div>
           <div class="field"><label for="login-email">Почта <span>*</span></label><input type="email" id="login-email" maxlength="254" autocomplete="email" required></div>
           <div class="field"><label for="login-password">Пароль <span>*</span></label><input type="password" id="login-password" maxlength="72" autocomplete="current-password" required></div>
           <p class="form-message" id="login-message" role="alert" hidden></p>
@@ -282,6 +282,29 @@
     </div>
   </dialog>
 
+
+  <dialog id="service-documents-dialog" class="service-documents-dialog" aria-labelledby="service-documents-title">
+    <div class="service-documents-shell">
+      <header class="service-documents-header">
+        <div><span class="eyebrow">MYTANKS TEAM WORKSPACE</span><h2 id="service-documents-title">Документы и условия доступа</h2><p>Выберите документ для ознакомления</p></div>
+        <button type="button" class="service-documents-close" id="service-documents-close" aria-label="Закрыть окно">×</button>
+      </header>
+      <div class="service-documents-options">
+        <a class="service-document-option" href="#service-rules" id="service-documents-rules">
+          <span class="service-document-number">01 / TERMS</span>
+          <strong>Правила использования</strong>
+          <span>Условия работы с внутренним сервисом MyTanks</span>
+          <span class="service-document-action">Открыть документ <b aria-hidden="true">↗</b></span>
+        </a>
+        <a class="service-document-option" href="./privacy.html" id="service-documents-privacy" target="_blank" rel="noopener">
+          <span class="service-document-number">02 / PRIVACY</span>
+          <strong>Политика конфиденциальности</strong>
+          <span>Обработка и защита персональных данных</span>
+          <span class="service-document-action">Открыть документ <b aria-hidden="true">↗</b></span>
+        </a>
+      </div>
+    </div>
+  </dialog>
 
   <dialog id="service-rules-dialog" class="service-rules-dialog" aria-labelledby="service-rules-title">
     <div class="service-rules-shell">
