@@ -1636,14 +1636,27 @@ async function renderMyReports(view, route, current) {
     body.replaceChildren(emptyBlock("i-doc", "Отчётов пока нет", "После отправки первого отчёта он появится в этом списке.", newReportLink("button button-secondary")));
     return;
   }
-  body.replaceChildren(h("div", { class: "table" },
-    h("div", { class: "table-head", "aria-hidden": "true" }, h("span", { text: "Дата" }), h("span", { text: "Должность" }), h("span", { text: "Онлайн" }), h("span", { text: "Репорты" }), h("span")),
-    ...data.map((report) => h("button", { type: "button", class: "table-row", onclick: () => openReport(report) },
+  body.replaceChildren(h("div", { class: "table report-table" },
+    h("div", { class: "table-head", "aria-hidden": "true" }, h("span", { text: "Дата" }), h("span", { text: "Должность" }), h("span", { text: "Онлайн" }), h("span", { text: "Репорты" }), h("span"), h("span")),
+    ...data.map((report) => h("div", { class: "table-row report-table-row" },
       h("span", { class: "cell-strong", "data-label": "Дата", text: formatDate(report.report_date) }),
       h("span", { "data-label": "Должность", text: report.position }),
       h("span", { "data-label": "Онлайн", text: `${report.online_minutes} мин` }),
       h("span", { "data-label": "Репорты", text: String(report.report_count) }),
-      icon("i-chevron", "row-arrow")))));
+      h("button", { type: "button", class: "report-open-button", "aria-label": `Открыть отчёт за ${formatDate(report.report_date)}`, onclick: () => openReport(report) }, icon("i-chevron", "row-arrow")),
+      h("button", { type: "button", class: "report-delete-button", "aria-label": `Удалить отчёт за ${formatDate(report.report_date)}`, title: "Удалить отчёт", onclick: () => deleteReport(report) }, icon("i-trash"))))));
+}
+
+async function deleteReport(report) {
+  if (!await confirmAction("Удалить отчёт?", `Отчёт за ${formatDate(report.report_date)} будет удалён без возможности восстановления.`, "Удалить")) return;
+  const { data, error } = await state.client.from("reports").delete()
+    .eq("id", report.id).eq("user_id", state.session.user.id).select("id");
+  if (error || !data?.length) {
+    showToast(error ? friendlyError(error) : "Отчёт не удалён: запись не найдена или недостаточно прав.");
+    return;
+  }
+  showToast("Отчёт удалён.");
+  render();
 }
 
 function openReport(report) {
@@ -2035,6 +2048,29 @@ function bindAuthForms() {
 function bindApp() {
   window.addEventListener("hashchange", () => { if (!$("app-view").hidden) { if (parseRoute()) render(); else location.replace("#/home"); } });
   $("sidebar-logout").addEventListener("click", logout);
+  const accountButton = $("topbar-account-button");
+  const accountMenu = $("topbar-account-menu");
+  const closeAccountMenu = () => {
+    accountMenu.hidden = true;
+    accountButton.setAttribute("aria-expanded", "false");
+  };
+  accountButton.addEventListener("click", (event) => {
+    event.stopPropagation();
+    const opening = accountMenu.hidden;
+    accountMenu.hidden = !opening;
+    accountButton.setAttribute("aria-expanded", String(opening));
+  });
+  accountMenu.addEventListener("click", (event) => {
+    if (event.target.closest("a")) closeAccountMenu();
+  });
+  $("topbar-logout").addEventListener("click", () => { closeAccountMenu(); logout(); });
+  document.addEventListener("click", (event) => {
+    if (!event.target.closest(".topbar-account")) closeAccountMenu();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !accountMenu.hidden) { closeAccountMenu(); accountButton.focus(); }
+  });
+  window.addEventListener("hashchange", closeAccountMenu);
   $("menu-button").addEventListener("click", () => document.body.classList.contains("sidebar-open") ? closeSidebar() : openSidebar());
   $("sidebar-backdrop").addEventListener("click", closeSidebar);
   document.addEventListener("keydown", (event) => { if (event.key === "Escape" && document.body.classList.contains("sidebar-open")) closeSidebar(); });
