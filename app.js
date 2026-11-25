@@ -1186,10 +1186,10 @@ function populateReportPositions() {
 }
 let reportScreenshotModeState = "";
 let reportPreservedScreenshotLinks = null;
-function reportScreenshotMode(changedControl = null) {
+function reportScreenshotMode(changedId = "") {
   const group = reportField("report-screenshots-group"), blocked = reportField("report-screenshots-blocked");
-  if (changedControl === group && group.checked) blocked.checked = false;
-  else if (changedControl === blocked && blocked.checked) group.checked = false;
+  if (changedId === "report-screenshots-group" && group.checked) blocked.checked = false;
+  else if (changedId === "report-screenshots-blocked" && blocked.checked) group.checked = false;
   else if (group.checked && blocked.checked) blocked.checked = false;
   const mode = group.checked ? "group" : blocked.checked ? "blocked" : "";
   if (!reportScreenshotModeState && mode) reportPreservedScreenshotLinks = [1,2,3].map(n => reportField("report-screenshot-" + n).value);
@@ -1294,6 +1294,20 @@ function bindReportForm() {
   reportField("report-nickname").value = state.profile?.nickname || "";
   reportScreenshotModeState = ""; reportPreservedScreenshotLinks = null;
   populateReportPositions(); restoreReportDraft();
+  const groupScreenshotOption = reportField("report-screenshots-group");
+  const blockedScreenshotOption = reportField("report-screenshots-blocked");
+  groupScreenshotOption.addEventListener("change", () => {
+    if (groupScreenshotOption.checked) blockedScreenshotOption.checked = false;
+    reportScreenshotMode("report-screenshots-group");
+    saveReportDraft();
+    updateReportProgress();
+  });
+  blockedScreenshotOption.addEventListener("change", () => {
+    if (blockedScreenshotOption.checked) groupScreenshotOption.checked = false;
+    reportScreenshotMode("report-screenshots-blocked");
+    saveReportDraft();
+    updateReportProgress();
+  });
   updateReportProgress();
   let draftTimer;
   const helpDialog = reportField("report-help-dialog");
@@ -1339,10 +1353,7 @@ function bindReportForm() {
     reportField("report-preview-dialog").showModal();
   });
   form.addEventListener("input", () => { reportField("report-draft-status").textContent = "Сохраняем черновик…"; clearTimeout(draftTimer); draftTimer = setTimeout(saveReportDraft, 350); });
-  form.addEventListener("change", event => {
-    if (event.target.id === "report-screenshots-group" || event.target.id === "report-screenshots-blocked") {
-      reportScreenshotMode(event.target);
-    }
+  form.addEventListener("change", () => {
     saveReportDraft();
     updateReportProgress();
   });
