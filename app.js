@@ -1186,10 +1186,11 @@ function populateReportPositions() {
 }
 let reportScreenshotModeState = "";
 let reportPreservedScreenshotLinks = null;
-function reportScreenshotMode() {
+function reportScreenshotMode(changedControl = null) {
   const group = reportField("report-screenshots-group"), blocked = reportField("report-screenshots-blocked");
-  if (group.checked) blocked.checked = false;
-  if (blocked.checked) group.checked = false;
+  if (changedControl === group && group.checked) blocked.checked = false;
+  else if (changedControl === blocked && blocked.checked) group.checked = false;
+  else if (group.checked && blocked.checked) blocked.checked = false;
   const mode = group.checked ? "group" : blocked.checked ? "blocked" : "";
   if (!reportScreenshotModeState && mode) reportPreservedScreenshotLinks = [1,2,3].map(n => reportField("report-screenshot-" + n).value);
   if (reportScreenshotModeState && !mode && reportPreservedScreenshotLinks) {
@@ -1198,7 +1199,9 @@ function reportScreenshotMode() {
   }
   for (let n=1;n<=3;n++) {
     const input = reportField("report-screenshot-" + n);
-    input.disabled = Boolean(mode); input.required = !mode;
+    input.disabled = Boolean(mode);
+    input.required = !mode;
+    input.setCustomValidity("");
     if (mode) input.value = "";
   }
   reportScreenshotModeState = mode;
@@ -1256,7 +1259,7 @@ function reportFormMarkup() {
       </div></section>
       <section class="report-section" id="report-finish"><div class="report-section-heading"><span>04</span><div><h2>Проверка и отправка</h2><p>Проверьте отчёт перед отправкой.</p></div></div><div class="report-section-body">
         <label class="checkbox report-consent"><input type="checkbox" id="report-consent" name="report-consent" required><span>Подтверждаю достоверность данных и согласен с сохранением отчёта в рабочем пространстве MyTanks.</span></label>
-        <div class="report-form-actions"><button type="button" class="text-button" id="report-clear">Очистить черновик</button><button type="submit" class="button button-primary" id="report-review">Проверить отчёт <svg aria-hidden="true"><use href="#i-chevron"/></svg></button></div>
+        <div class="report-form-actions"><button type="button" class="text-button" id="report-clear">Очистить черновик</button><button type="button" class="button button-primary" id="report-review">Проверить отчёт <svg aria-hidden="true"><use href="#i-chevron"/></svg></button></div>
       </div></section>
     </form>
     <aside class="report-aside" aria-label="Состояние отчёта">
@@ -1303,10 +1306,18 @@ function bindReportForm() {
   }));
   function updateReportProgress() {
     const sections = [...form.querySelectorAll(".report-section")];
+    const screenshotMode = reportField("report-screenshots-group").checked || reportField("report-screenshots-blocked").checked;
+    const screenshotLinksComplete = screenshotMode || [1,2,3].every(n => isHttpUrl(reportField("report-screenshot-" + n).value.trim()));
+    const basicsFieldsComplete = ["report-date", "report-nickname", "report-position", "report-online", "report-count"].every(id => {
+      const field = reportField(id);
+      return field && field.value.trim() !== "" && field.validity.valid;
+    });
     const states = {
-      basics: [...sections[0].querySelectorAll("input, select, textarea")].every(input => input.validity.valid),
-      work: [...sections[1].querySelectorAll("input, select, textarea")].every(input => input.validity.valid),
-      skills: [...sections[2].querySelectorAll("input, select, textarea")].every(input => input.validity.valid),
+      basics: basicsFieldsComplete && screenshotLinksComplete,
+      work: [...sections[1].querySelectorAll("input, select, textarea")].every(input => input.validity.valid)
+        && Boolean(reportField("report-game-work").value.trim()),
+      skills: [...sections[2].querySelectorAll("input, select, textarea")].every(input => input.validity.valid)
+        && Boolean(reportField("report-skills").value.trim()),
       finish: reportField("report-consent").checked
     };
     Object.entries(states).forEach(([key, complete], index) => {
@@ -1328,24 +1339,40 @@ function bindReportForm() {
     reportField("report-preview-dialog").showModal();
   });
   form.addEventListener("input", () => { reportField("report-draft-status").textContent = "Сохраняем черновик…"; clearTimeout(draftTimer); draftTimer = setTimeout(saveReportDraft, 350); });
-  form.addEventListener("change", event => { if (event.target.id.startsWith("report-screenshots-")) reportScreenshotMode(); saveReportDraft(); });
-  form.addEventListener("submit", event => {
+  form.addEventListener("change", event => {
+    if (event.target.id === "report-screenshots-group" || event.target.id === "report-screenshots-blocked") {
+      reportScreenshotMode(event.target);
+    }
+    saveReportDraft();
+    updateReportProgress();
+  });
+  function openReportReview(event) {
     event.preventDefault();
-    const mode = reportField("report-screenshots-group").checked || reportField("report-screenshots-blocked").checked;
-    const invalidShot = mode ? "" : [1,2,3].map(n => reportField("report-screenshot-" + n).value.trim()).find(url => !isHttpUrl(url));
-    const links = reportField("report-links").value.split(/\r?\n/).map(x => x.trim()).filter(Boolean);
-    if (invalidShot) { showToast("Укажите три корректные ссылки на скриншоты или выберите способ их передачи."); reportField("report-screenshot-1").focus(); return; }
+    const screenshotMode = reportField("report-screenshots-group").checked || reportField("report-screenshots-blocked").checked;
+    for (let n = 1; n <= 3; n++) {
+      const input = reportField("report-screenshot-" + n);
+      const valid = screenshotMode || isHttpUrl(input.value.trim());
+      input.setCustomValidity(valid ? "" : "Укажите полную ссылку, начинающуюся с http:// или https://.");
+    }
     for (const id of ["report-nickname", "report-position", "report-game-work", "report-skills"]) {
       const input = reportField(id);
       input.setCustomValidity(input.value.trim() ? "" : "Заполните поле содержательным текстом.");
     }
-    if (links.some(url => !isHttpUrl(url))) { showToast("Дополнительные ссылки должны начинаться с http:// или https://."); reportField("report-links").focus(); return; }
-    if (!form.reportValidity()) return;
+    const linksField = reportField("report-links");
+    const links = linksField.value.split(/\\r?\\n/).map(x => x.trim()).filter(Boolean);
+    linksField.setCustomValidity(links.every(isHttpUrl) ? "" : "Дополнительные ссылки должны начинаться с http:// или https://.");
+    if (!form.reportValidity()) {
+      updateReportProgress();
+      return;
+    }
+    updateReportProgress();
     reportField("report-preview-title").textContent = "Проверка отчёта";
     reportField("report-preview-body").textContent = reportFormText(false);
     reportField("report-preview-send").hidden = false;
     reportField("report-preview-dialog").showModal();
-  });
+  }
+  reportField("report-review").addEventListener("click", openReportReview);
+  form.addEventListener("submit", openReportReview);
   reportField("report-template-button").addEventListener("click", () => {
     reportField("report-preview-title").textContent = "Шаблон ежедневного отчёта";
     reportField("report-preview-body").textContent = reportFormText(true);
