@@ -1359,7 +1359,7 @@ function bindReportForm() {
       input.setCustomValidity(input.value.trim() ? "" : "Заполните поле содержательным текстом.");
     }
     const linksField = reportField("report-links");
-    const links = linksField.value.split(/\\r?\\n/).map(x => x.trim()).filter(Boolean);
+    const links = linksField.value.split(/\r?\n/).map(x => x.trim()).filter(Boolean);
     linksField.setCustomValidity(links.every(isHttpUrl) ? "" : "Дополнительные ссылки должны начинаться с http:// или https://.");
     if (!form.reportValidity()) {
       updateReportProgress();
