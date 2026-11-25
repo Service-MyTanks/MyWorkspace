@@ -396,14 +396,17 @@ async function enterWorkspace() {
   }
 }
 
-function avatarPublicUrl(path) {
+function avatarPublicUrl(path, updatedAt = "") {
   if (!path) return "./mytanks-avatar.jpg";
   const result = state.client.storage.from("avatars").getPublicUrl(path);
-  return result.data.publicUrl + "?v=" + encodeURIComponent(state.profile?.updated_at || Date.now());
+  return result.data.publicUrl + "?v=" + encodeURIComponent(updatedAt || path);
 }
 function updateAvatarImages() {
-  const src = avatarPublicUrl(state.profile?.avatar_path);
-  document.querySelectorAll(".team-avatar, .topbar-avatar").forEach((image) => { image.src = src; });
+  const src = avatarPublicUrl(state.profile?.avatar_path, state.profile?.updated_at);
+  document.querySelectorAll(".team-avatar, .topbar-avatar").forEach((image) => {
+    image.onerror = () => { image.onerror = null; image.src = "./mytanks-avatar.jpg"; };
+    image.src = src;
+  });
 }
 async function refreshPendingBadge() {
   const badge = $("pending-badge");
@@ -1940,7 +1943,7 @@ async function renderAdmin(view, current) {
     h("div", { class: "card-heading" }, h("span", { class: "section-icon" }, icon("i-user")), h("div", {}, h("h2", { text: "Сотрудники и заявки" }), h("p", { text: "Одобрение регистраций и управление доступом" }))),
     loadingBlock());
   view.append(section);
-  const { data, error } = await state.client.from("profiles").select("id, email, nickname, position, status, is_admin, created_at").order("created_at", { ascending: false });
+  const { data, error } = await state.client.from("profiles").select("id, email, nickname, position, status, is_admin, created_at, avatar_path, updated_at").order("created_at", { ascending: false });
   if (!current()) return;
   if (error) { section.lastChild.replaceWith(errorBlock(error, render)); return; }
   const groups = [["pending", "Ожидают одобрения"], ["approved", "Активные"], ["rejected", "Отклонённые и отозванные"]];
@@ -1949,7 +1952,8 @@ async function renderAdmin(view, current) {
     const people = data.filter((person) => person.status === status);
     return h("div", { class: "admin-group" }, h("h3", {}, title, h("span", { class: "count", text: String(people.length) })),
       people.length ? h("div", { class: "people" }, ...people.map((person) => h("div", { class: "person" },
-        h("div", { class: "person-text" }, h("strong", {}, person.nickname, person.is_admin ? h("span", { class: "pill", text: "руководитель" }) : null), h("small", { text: `${person.position} · ${person.email}` }), h("small", { text: `Регистрация: ${formatDateTime(person.created_at)}` })),
+        h("img", { class: "team-avatar", src: avatarPublicUrl(person.avatar_path, person.updated_at), alt: "Аватар " + person.nickname, width: 36, height: 36 }),
+         h("div", { class: "person-text" }, h("strong", {}, person.nickname, person.is_admin ? h("span", { class: "pill", text: "руководитель" }) : null), h("small", { text: `${person.position} · ${person.email}` }), h("small", { text: `Регистрация: ${formatDateTime(person.created_at)}` })),
         person.id === state.profile.id ? h("span", { class: "muted small-text", text: "Это вы" }) : h("div", { class: "person-actions" },
           status !== "approved" ? statusAction(person, "approved", "Одобрить", "button-primary") : null,
           status === "pending" ? statusAction(person, "rejected", "Отклонить", "button-secondary") : null,
