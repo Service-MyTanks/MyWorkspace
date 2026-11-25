@@ -1231,7 +1231,10 @@ function restoreReportDraft() {
 function reportFormMarkup() {
   return `
   <section class="report-builder">
+    <div class="report-page-heading"><div><div class="eyebrow"><span></span>ЕЖЕДНЕВНАЯ ОТЧЁТНОСТЬ</div><h1>Хорошая работа. <br class="mobile-break">Хороший отчёт<span>.</span></h1><p>Соберите итоги дня — всё остальное мы упорядочим.</p></div><a class="button button-secondary" href="#/reports/mine"><svg aria-hidden="true"><use href="#i-doc"/></svg>Мои отчёты</a></div>
+    <div class="report-intro-strip"><div><span class="report-intro-icon"><svg aria-hidden="true"><use href="#i-doc"/></svg></span><span><strong>Ежедневный отчёт</strong><small>Единый шаблон для команды проекта</small></span></div><span class="report-time-estimate"><svg aria-hidden="true"><use href="#i-clock"/></svg>~ 5 минут</span></div>
     <div class="report-builder-toolbar"><span class="report-draft-status" id="report-draft-status">Новый черновик</span><button type="button" class="text-button" id="report-template-button">Посмотреть шаблон</button></div>
+    <div class="report-content-grid">
     <form id="workspace-report-form" novalidate>
       <section class="report-section"><div class="report-section-heading"><span>01</span><div><h2>Основная информация</h2><p>Расскажите, кто вы и как прошёл ваш день.</p></div></div>
         <div class="report-section-body">
@@ -1257,15 +1260,63 @@ function reportFormMarkup() {
         <div class="report-form-actions"><button type="button" class="text-button" id="report-clear">Очистить черновик</button><button type="submit" class="button button-primary" id="report-review">Проверить отчёт <svg aria-hidden="true"><use href="#i-chevron"/></svg></button></div>
       </div></section>
     </form>
+    <aside class="report-aside" aria-label="Состояние отчёта">
+      <div class="report-aside-card report-progress-card">
+        <div class="report-aside-heading"><h3>Ваш отчёт</h3><span class="report-draft-badge">Черновик</span></div>
+        <div class="report-progress-summary"><span>Готовность к отправке</span><strong id="report-progress-value">0%</strong></div>
+        <progress id="workspace-report-progress" max="4" value="0" aria-label="Готовность отчёта"></progress>
+        <ol class="report-checklist">
+          <li data-report-check="basics"><span class="report-check-circle">1</span><div>Основная информация<small>Данные и 3 скриншота</small></div></li>
+          <li data-report-check="work"><span class="report-check-circle">2</span><div>Проделанная работа<small>Итоги вашего дня</small></div></li>
+          <li data-report-check="skills"><span class="report-check-circle">3</span><div>Навыки и ссылки<small>Важные подробности</small></div></li>
+          <li data-report-check="finish"><span class="report-check-circle">4</span><div>Подтверждение<small>Проверка данных</small></div></li>
+        </ol>
+        <button type="button" class="button button-secondary report-preview-button" id="report-sidebar-preview"><svg aria-hidden="true"><use href="#i-doc"/></svg>Предпросмотр</button>
+      </div>
+      <div class="report-aside-card report-delivery-card">
+        <span class="report-delivery-icon"><svg aria-hidden="true"><use href="#i-mail"/></svg></span><h3>Прямо в нужные руки</h3>
+        <p>Отчёт будет сохранён в рабочем пространстве и отправлен на почту руководителя.</p>
+        <span class="report-recipient">supportmytanks@gmail.com</span>
+        <div class="report-delivery-note">Перед отправкой вы сможете проверить содержание отчёта.</div>
+      </div>
+      <div class="report-local-note"><svg aria-hidden="true"><use href="#i-shield"/></svg><p>Черновик автоматически сохраняется в этом браузере. Вы сможете вернуться к заполнению позже.</p></div>
+    </aside>
+    </div>
   </section>`;
-}
 function bindReportForm() {
   const form = reportField("workspace-report-form"), today = reportLocalDate();
   reportField("report-date").value = today; reportField("report-date").max = today;
   reportField("report-nickname").value = state.profile?.nickname || "";
   reportScreenshotModeState = ""; reportPreservedScreenshotLinks = null;
   populateReportPositions(); restoreReportDraft();
+  updateReportProgress();
   let draftTimer;
+  function updateReportProgress() {
+    const sections = [...form.querySelectorAll(".report-section")];
+    const states = {
+      basics: [...sections[0].querySelectorAll("input, select, textarea")].every(input => input.validity.valid),
+      work: [...sections[1].querySelectorAll("input, select, textarea")].every(input => input.validity.valid),
+      skills: [...sections[2].querySelectorAll("input, select, textarea")].every(input => input.validity.valid),
+      finish: reportField("report-consent").checked
+    };
+    Object.entries(states).forEach(([key, complete], index) => {
+      const item = form.parentElement.querySelector(`[data-report-check="${key}"]`);
+      if (!item) return;
+      item.classList.toggle("complete", complete);
+      item.querySelector(".report-check-circle").textContent = complete ? "✓" : String(index + 1);
+    });
+    const completed = Object.values(states).filter(Boolean).length;
+    reportField("workspace-report-progress").value = completed;
+    reportField("report-progress-value").textContent = `${completed * 25}%`;
+  }
+  form.addEventListener("input", updateReportProgress);
+  form.addEventListener("change", updateReportProgress);
+  reportField("report-sidebar-preview").addEventListener("click", () => {
+    reportField("report-preview-title").textContent = "Предпросмотр отчёта";
+    reportField("report-preview-body").textContent = reportFormText(false);
+    reportField("report-preview-send").hidden = true;
+    reportField("report-preview-dialog").showModal();
+  });
   form.addEventListener("input", () => { reportField("report-draft-status").textContent = "Сохраняем черновик…"; clearTimeout(draftTimer); draftTimer = setTimeout(saveReportDraft, 350); });
   form.addEventListener("change", event => { if (event.target.id.startsWith("report-screenshots-")) reportScreenshotMode(); saveReportDraft(); });
   form.addEventListener("submit", event => {
@@ -1342,10 +1393,7 @@ async function renderReports(view) {
 }
 
 async function renderNewReport(view) {
-  view.append(
-    pageHeading("ЕЖЕДНЕВНАЯ ОТЧЁТНОСТЬ", "Новый отчёт", "Соберите итоги дня — отчёт сохранится в вашем рабочем пространстве.",
-      h("a", { class: "button button-secondary", href: "#/reports/mine" }, icon("i-doc"), "Мои отчёты")),
-    h("div", { id: "report-form-mount" }));
+  view.append(h("div", { id: "report-form-mount" }));
   $("report-form-mount").outerHTML = reportFormMarkup();
   bindReportForm();
 }
