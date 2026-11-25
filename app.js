@@ -63,19 +63,37 @@ function syncHolidayAtmosphere() {
     city.className = "holiday-cityscape";
     city.setAttribute("aria-hidden", "true");
     const windows = [];
-    for (let buildingIndex = 0; buildingIndex < 17; buildingIndex++) {
+    const garlandWindows = [];
+    const buildingSpecs = [
+      [48, 54, 12], [71, 66, 18], [43, 48, 12], [82, 72, 21],
+      [57, 58, 15], [91, 76, 24], [52, 50, 15], [76, 68, 21],
+      [46, 56, 12], [88, 74, 24], [61, 62, 18], [79, 70, 21],
+      [50, 52, 15], [94, 78, 24], [58, 60, 18], [73, 66, 21], [45, 48, 12]
+    ];
+    let windowIndex = 0;
+    for (let buildingIndex = 0; buildingIndex < buildingSpecs.length; buildingIndex++) {
+      const [height, width, count] = buildingSpecs[buildingIndex];
       const building = document.createElement("div");
       building.className = "holiday-building";
-      building.style.setProperty("--building-height", `${38 + Math.floor(Math.random() * 58)}%`);
-      building.style.setProperty("--building-width", `${42 + Math.floor(Math.random() * 34)}px`);
-      const count = 8 + Math.floor(Math.random() * 16);
+      building.style.setProperty("--building-height", `${height}%`);
+      building.style.setProperty("--building-width", `${width}px`);
       for (let i = 0; i < count; i++) {
         const windowLight = document.createElement("i");
         windowLight.className = "holiday-window";
-        windowLight.classList.toggle("is-lit", Math.random() > .58);
-        windowLight.style.setProperty("--light-delay", `${Math.random() * 4}s`);
+        const isPurple = windowIndex === 19 || windowIndex === 83;
+        const isGarland = [37, 61, 108, 172].includes(windowIndex);
+        if (isPurple) {
+          windowLight.classList.add("is-purple");
+        } else if (isGarland) {
+          windowLight.classList.add("has-garland");
+          garlandWindows.push(windowLight);
+        } else {
+          windowLight.classList.toggle("is-lit", (windowIndex * 7 + buildingIndex * 3) % 11 < 6);
+          windows.push(windowLight);
+        }
+        windowLight.style.setProperty("--light-delay", `${(windowIndex % 8) * .37}s`);
         building.append(windowLight);
-        windows.push(windowLight);
+        windowIndex++;
       }
       city.append(building);
     }
@@ -128,6 +146,7 @@ function syncHolidayAtmosphere() {
     document.body.append(city);
     state.holidayCity = city;
     state.holidayCityWindows = windows;
+    state.holidayGarlandWindows = garlandWindows;
   }
   if (!state.holidayLightsTimer) {
     state.holidayLightsTimer = setInterval(() => {
