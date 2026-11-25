@@ -2061,7 +2061,7 @@ async function openAccountControlPanel(person) {
     if (result.error) { showToast(friendlyError(result.error)); return; }
     showToast("Никнейм обновлён."); dialog.close(); render();
   } }, "Изменить никнейм");
-  const emailInput = h("input", { type: "email", maxlength: "254", placeholder: "Новая электронная почта", disabled: isSelf || !c.can_change_email });
+  const emailInput = h("input", { type: "email", maxlength: "254", placeholder: "Новая электронная почта", disabled: isSelf });
   const passwordInput = h("input", { type: "password", minlength: "8", maxlength: "72", placeholder: "Новый пароль", autocomplete: "new-password", disabled: isSelf });
   const credentialsButton = h("button", { type: "button", class: "button button-secondary small", disabled: isSelf, onclick: async () => {
     const newEmail = emailInput.value.trim();
@@ -2092,7 +2092,7 @@ async function openAccountControlPanel(person) {
     showToast("Настройки аккаунта сохранены."); dialog.close(); render();
   } }, "Сохранить настройки");
   body.replaceChildren(
-    isSelf ? h("p", { class: "muted account-control-warning", text: "Собственные права и ограничения нельзя изменять из этой панели." }) : null,
+    ...(isSelf ? [h("p", { class: "muted account-control-warning", text: "Собственные права и ограничения нельзя изменять из этой панели." })] : []),
     section("Административные права", "Назначение руководителя автоматически открывает полный доступ к административным разделам.", [manager.row]),
     section("Разрешённые темы", "Каждая цветовая схема управляется отдельно.", themeToggles.map(x => x[1].row)),
     section("Ограничения аккаунта", "Отключённые возможности будут недоступны пользователю.", flags.map(x => x[1].row)),

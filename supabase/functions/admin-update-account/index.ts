@@ -28,6 +28,7 @@ Deno.serve(async (req: Request) => {
     if (authError || !authData.user) return json({ error: "Недействительная сессия" }, 401);
     const { data: manager, error: managerError } = await userClient.rpc("is_admin");
     if (managerError || manager !== true) return json({ error: "Недостаточно прав" }, 403);
+
     const body = await req.json();
     const targetId = String(body?.targetId || "");
     const newEmail = typeof body?.newEmail === "string" ? body.newEmail.trim().toLowerCase() : "";
@@ -36,16 +37,15 @@ Deno.serve(async (req: Request) => {
     if (!newEmail && !newPassword) return json({ error: "Укажите новую почту или пароль" }, 400);
     if (newEmail && (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(newEmail) || newEmail.length > 254)) return json({ error: "Укажите корректный адрес электронной почты" }, 400);
     if (newPassword && (newPassword.length < 8 || newPassword.length > 72)) return json({ error: "Пароль должен содержать от 8 до 72 символов" }, 400);
+
     const { data: target, error: targetError } = await userClient.from("profiles").select("id,email").eq("id", targetId).maybeSingle();
     if (targetError || !target) return json({ error: "Аккаунт не найден" }, 404);
     if (String(target.email || "").toLowerCase() === "supportmytanks@gmail.com") return json({ error: "Служебный аккаунт нельзя изменять через панель управления" }, 403);
-    const { data: controls, error: controlsError } = await userClient.from("account_controls").select("can_change_email").eq("user_id", targetId).maybeSingle();
-    if (controlsError) return json({ error: controlsError.message }, 400);
-    if (newEmail && controls?.can_change_email === false) return json({ error: "Для этого аккаунта запрещено изменение электронной почты" }, 403);
+    if (newEmail && newEmail === "supportmytanks@gmail.com") return json({ error: "Этот адрес закреплён за служебным аккаунтом" }, 409);
+
     const adminClient = createClient(url, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
     const updates: Record<string, unknown> = {};
     if (newEmail) {
-      if (newEmail === "supportmytanks@gmail.com") return json({ error: "Этот адрес закреплён за служебным аккаунтом" }, 409);
       updates.email = newEmail;
       updates.email_confirm = true;
     }
