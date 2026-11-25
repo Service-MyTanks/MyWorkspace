@@ -1254,7 +1254,7 @@ function reportFormMarkup() {
         <div class="field"><label for="report-forum-work">Форум</label><p class="field-description">Ответы на обращения, новые темы и объявления мероприятий.</p><textarea id="report-forum-work" name="report-forum-work" rows="3" maxlength="8000" placeholder="Какие задачи на форуме вы выполнили?"></textarea><small>Если работы в соцсетях или на форуме не было, оставьте поля пустыми.</small></div>
       </div></section>
       <section class="report-section" id="report-skills"><div class="report-section-heading"><span>03</span><div><h2>Навыки и ссылки</h2><p>Дополните отчёт важными деталями.</p></div></div><div class="report-section-body">
-        <div class="field"><label for="report-skills">Мои ключевые навыки <span>*</span></label><textarea id="report-skills" name="report-skills" rows="3" maxlength="4000" required placeholder="Знание правил проекта&#10;Разрешение конфликтов&#10;Работа с обращениями игроков"></textarea><small>По одному навыку на строку.</small></div>
+        <div class="field"><label for="report-skills-text">Мои ключевые навыки <span>*</span></label><textarea id="report-skills-text" name="report-skills" rows="3" maxlength="4000" required placeholder="Знание правил проекта&#10;Разрешение конфликтов&#10;Работа с обращениями игроков"></textarea><small>По одному навыку на строку.</small></div>
         <div class="field"><label for="report-links">Дополнительные ссылки</label><textarea id="report-links" name="report-links" rows="3" maxlength="6000" placeholder="Вставьте ссылки на темы форума или другие материалы"></textarea><small>По одной полной ссылке http:// или https:// на строку.</small></div>
       </div></section>
       <section class="report-section" id="report-finish"><div class="report-section-heading"><span>04</span><div><h2>Проверка и отправка</h2><p>Проверьте отчёт перед отправкой.</p></div></div><div class="report-section-body">
@@ -1331,7 +1331,7 @@ function bindReportForm() {
       work: [...sections[1].querySelectorAll("input, select, textarea")].every(input => input.validity.valid)
         && Boolean(reportField("report-game-work").value.trim()),
       skills: [...sections[2].querySelectorAll("input, select, textarea")].every(input => input.validity.valid)
-        && Boolean(reportField("report-skills").value.trim()),
+        && Boolean(reportField("report-skills-text").value.trim()),
       finish: reportField("report-consent").checked
     };
     Object.entries(states).forEach(([key, complete], index) => {
@@ -1365,7 +1365,7 @@ function bindReportForm() {
       const valid = screenshotMode || isHttpUrl(input.value.trim());
       input.setCustomValidity(valid ? "" : "Укажите полную ссылку, начинающуюся с http:// или https://.");
     }
-    for (const id of ["report-nickname", "report-position", "report-game-work", "report-skills"]) {
+    for (const id of ["report-nickname", "report-position", "report-game-work", "report-skills-text"]) {
       const input = reportField(id);
       input.setCustomValidity(input.value.trim() ? "" : "Заполните поле содержательным текстом.");
     }
