@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="./styles.css?v=45">
   <script src="./vendor/supabase.js?v=2.119.1" defer></script>
   <script src="./config.js?v=2" defer></script>
-  <script src="./app.js?v=46" defer></script>
+  <script src="./app.js?v=47" defer></script>
 </head>
 <body>
   <svg class="svg-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
@@ -221,6 +221,12 @@
     </form>
   </dialog>
 
+  <dialog id="report-preview-dialog" aria-labelledby="report-preview-title">
+    <div class="dialog-heading"><div><span class="eyebrow">ПРЕДПРОСМОТР</span><h2 id="report-preview-title">Проверка отчёта</h2></div><button type="button" class="icon-button" data-close aria-label="Закрыть"><svg><use href="#i-close"/></svg></button></div>
+    <div class="dialog-body"><pre id="report-preview-body" class="report-preview-body"></pre></div>
+    <div class="dialog-actions"><button type="button" class="button button-secondary" data-close>Вернуться к форме</button><button type="button" class="button button-primary" id="report-preview-send">Сохранить отчёт</button></div>
+  </dialog>
+
   <dialog id="report-dialog" aria-labelledby="report-dialog-title">
     <div class="dialog-heading"><div><span class="eyebrow" id="report-dialog-date"></span><h2 id="report-dialog-title">Отчёт</h2></div><button type="button" class="icon-button" data-close aria-label="Закрыть"><svg><use href="#i-close"/></svg></button></div>
     <div class="dialog-body"><pre id="report-dialog-body"></pre><div class="link-list" id="report-dialog-links"></div></div>
@@ -254,6 +260,10 @@
           <div class="form-actions"><button type="submit" id="settings-email-submit" class="button button-primary">Отправить подтверждение</button></div>
         </form>
         <small class="settings-hint">Почта обновится только после подтверждения нового адреса.</small>
+      </section>
+      <section class="settings-section">
+        <h3>Отчётность</h3>
+        <label class="checkbox settings-toggle"><input type="checkbox" id="manual-report-position"><span><strong>Вручную выбирать должность</strong><small>По умолчанию в новый отчёт подставляется должность из вашего профиля. Включите опцию, чтобы выбирать её отдельно для каждого отчёта.</small></span></label>
       </section>
       <section class="settings-section">
         <h3>Пароль</h3>
