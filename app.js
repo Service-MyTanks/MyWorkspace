@@ -1053,13 +1053,14 @@ async function renderHome(view) {
     h("h3", { class: "home-admin-group-title", text: title }),
     h("div", { class: "row-list" }, ...items.map(externalRow))
   );
-  const block = (modifier, title, subtitle, iconName, content) => h("section", {
+  const block = (modifier, title, subtitle, iconName, content) => h("details", {
     class: `card home-block home-block-${modifier}`,
     "aria-label": title
   },
-    h("div", { class: "card-heading home-block-heading" },
+    h("summary", { class: "card-heading home-block-heading" },
       h("span", { class: "section-icon" }, icon(iconName)),
-      h("div", {}, h("h2", { text: title }), h("p", { text: subtitle }))
+      h("div", {}, h("h2", { text: title }), h("p", { text: subtitle })),
+      icon("i-chevron", "home-block-chevron")
     ),
     content,
     h("div", { class: "home-block-snow", "aria-hidden": "true" })
@@ -1087,7 +1088,7 @@ async function renderHome(view) {
       block("complaints", "Апелляционный центр", "Жалобы, апелляции и обжалования", "i-shield",
         h("div", { class: "row-list" },
           externalRow(links.complaints),
-          ...(POSITIONS.indexOf(state.profile?.position) >= POSITIONS.indexOf("Главный администратор") ? [externalRow(links.appeals)] : []),
+          ...(isSupportAccount() || POSITIONS.indexOf(state.profile?.position) >= POSITIONS.indexOf("Главный администратор") ? [externalRow(links.appeals)] : []),
           externalRow(links.objections)
         )
       )
