@@ -2058,3 +2058,7 @@ button svg, .button svg { width:18px; height:18px; }
 .home-action-arrow { flex-basis:18px; }
 .training-tree-toggle svg { width:16px; height:16px; }
 .home-block-chevron { width:18px; height:18px; flex-basis:18px; }
+
+
+/* Accent the opening phrase in the report help title */
+.report-help-heading h2 > span { color:var(--accent); }
