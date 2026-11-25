@@ -2259,3 +2259,7 @@ main#view { flex: 1 0 auto; }
 .admin-refresh-button:disabled { cursor: wait; opacity: .65; }
 .admin-refresh-button.is-loading svg { animation: admin-refresh-spin .8s linear infinite; }
 @keyframes admin-refresh-spin { to { transform: rotate(360deg); } }
+
+
+/* Additional-device permission shown only when enabled for the account. */
+.account-device-card .card-note { margin: 12px 0 0; line-height: 1.7; }

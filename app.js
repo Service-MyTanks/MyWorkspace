@@ -419,12 +419,12 @@ async function ensureDeviceSession() {
           await state.client.auth.signOut({ scope: "local" });
           state.session = null;
           showScreen("login");
-          setMessage("login-message", "Сессия этого устройства была передана другому аккаунту. Войдите заново.", "error");
+          setMessage("login-message", "Сессия завершена: аккаунт открыт на другом устройстве. Войдите заново.", "error");
         }
       } catch (heartbeatError) {
         console.warn("Device session heartbeat failed:", heartbeatError);
       }
-    }, 60_000);
+    }, 15_000);
     return true;
   } catch (error) {
     state.deviceSessionVerified = false;
@@ -454,7 +454,7 @@ async function enterWorkspace() {
   state.profile = profile;
   if (profile) {
     const { data: controls, error: controlsError } = await state.client.from("account_controls").select("*").eq("user_id", profile.id).maybeSingle();
-    state.accountControls = controlsError ? { allowed_themes: ["mt-standard"], can_change_nickname: false, can_change_email: false, can_upload_avatar: false, can_access_training: false } : (controls || { allowed_themes: ["mt-standard"], can_change_nickname: true, can_change_email: true, can_upload_avatar: true, can_access_training: true });
+    state.accountControls = controlsError ? { allowed_themes: ["mt-standard"], can_change_nickname: false, can_change_email: false, can_upload_avatar: false, can_access_training: false, can_use_additional_device: false } : (controls || { allowed_themes: ["mt-standard"], can_change_nickname: true, can_change_email: true, can_upload_avatar: true, can_access_training: true, can_use_additional_device: false });
   } else state.accountControls = null;
   if (!profile) {
     showGate({ title: "Профиль не найден", text: "Аккаунт есть, но профиль сотрудника не создан. Обратитесь к руководителю.", iconName: "i-warning" });
@@ -1954,6 +1954,12 @@ async function renderAccount(view, route, current) {
     h("section", { class: "card" }, h("div", { class: "profile-head" }, avatar, h("div", { class: "profile-identity" }, h("h2", { text: profile.nickname }), h("p", { class: "muted", text: profile.position }), avatarActions), h("span", { class: "pill pill-success", text: profile.is_admin ? "Руководитель" : "Доступ открыт" })),
       h("div", { class: "info-grid" }, info("Почта", state.session.user.email || profile.email), info("Должность", profile.position), info("Аккаунт создан", formatDateTime(profile.created_at)), info("Одобрен", profile.reviewed_at ? formatDateTime(profile.reviewed_at) : "—")),
       h("p", { class: "card-note", text: "Никнейм, почту и пароль можно изменить в настройках аккаунта. Должность и права доступа изменяются только руководителем." })));
+  if (state.accountControls?.can_use_additional_device === true) {
+    view.append(h("section", { class: "card account-device-card" },
+      h("div", { class: "card-heading" }, h("div", {}, h("h2", { text: "Дополнительное устройство" }), h("p", { class: "muted", text: "Для вашего аккаунта разрешено подключение второго устройства." }))),
+      h("p", { class: "card-note", text: "Чтобы привязать телефон или компьютер, откройте MyWorkspace на нём и войдите в этот аккаунт. Устройство будет добавлено автоматически. Одновременно можно использовать не более двух устройств." })
+    ));
+  }
   view.append(renderAppearanceSettings());
   if (profile.is_admin) await renderAdmin(view, current);
 }
@@ -2150,7 +2156,7 @@ async function openAccountControlPanel(person) {
   dialog.addEventListener("close", () => dialog.remove(), { once: true });
   dialog.showModal();
 
-  const c = controls || { allowed_themes: THEME_OPTIONS.map(x => x.id), can_change_nickname: true, can_change_email: true, can_upload_avatar: true, can_access_training: true };
+  const c = controls || { allowed_themes: THEME_OPTIONS.map(x => x.id), can_change_nickname: true, can_change_email: true, can_upload_avatar: true, can_access_training: true, can_use_additional_device: false };
   const toggle = (id, title, description, checked, disabled = false) => {
     const input = h("input", { type: "checkbox", id, class: "ios-toggle-input", disabled });
     input.checked = Boolean(checked);
@@ -2171,6 +2177,7 @@ async function openAccountControlPanel(person) {
     ["training", toggle("account-training-toggle", "Учебный центр", "Разрешить доступ к обучающим материалам.", c.can_access_training, isSelf)]
   ];
   const themeToggles = THEME_OPTIONS.map(item => [item.id, toggle("account-theme-" + item.id, item.name, item.description, (c.allowed_themes || []).includes(item.id), isSelf)]);
+  const additionalDevice = toggle("account-additional-device-toggle", "Дополнительное устройство", "Разрешить этому аккаунту одновременно использовать ещё одно устройство. По умолчанию выключено.", c.can_use_additional_device, isSelf);
   const suspensionActive = c.suspended_until && new Date(c.suspended_until).getTime() > Date.now();
   const suspensionInfo = h("p", { class: "account-control-suspension-info muted", text: suspensionActive ? "Отстранён до " + formatDateTime(c.suspended_until) + ". Причина: " + (c.suspension_reason || "не указана") : "Активного отстранения нет." });
   const duration = h("input", { type: "number", min: "1", max: "168", step: "1", placeholder: "Часы (1–168)", disabled: isSelf });
@@ -2248,7 +2255,8 @@ async function openAccountControlPanel(person) {
     can_change_nickname: flags[0][1].input.checked,
     can_change_email: flags[1][1].input.checked,
     can_upload_avatar: flags[2][1].input.checked,
-    can_access_training: flags[3][1].input.checked
+    can_access_training: flags[3][1].input.checked,
+    can_use_additional_device: additionalDevice.input.checked
   });
   const save = h("button", { type: "button", class: "button button-primary", disabled: isSelf, onclick: async () => {
     save.disabled = true;
@@ -2270,6 +2278,7 @@ async function openAccountControlPanel(person) {
     section("Административные права", "Назначение руководителя автоматически открывает полный доступ к административным разделам.", [manager.row]),
     section("Разрешённые темы", "Каждая цветовая схема управляется отдельно.", themeToggles.map(x => x[1].row)),
     section("Ограничения аккаунта", "Отключённые возможности будут недоступны пользователю.", flags.map(x => x[1].row)),
+    section("Лимит устройств", "По умолчанию аккаунт может быть активен только на одном устройстве. Разрешение увеличивает лимит до двух.", [additionalDevice.row]),
     section("Временное отстранение от должности", "Срок задаётся в часах: от 1 до 168. По истечении срока доступ восстановится автоматически.", [
       suspensionInfo,
       h("div", { class: "account-control-field" }, h("label", { text: "Срок, часов" }), duration),
