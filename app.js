@@ -1452,6 +1452,8 @@ function submitWorkspaceReport() {
     showToast("Не удалось подготовить отчёт. Разрешите хранилище сайта в браузере и повторите попытку.");
     return;
   }
+  const previewDialog = reportField("report-preview-dialog");
+  if (previewDialog?.open) previewDialog.close();
   location.hash = "#/reports/thanks";
 }
 
