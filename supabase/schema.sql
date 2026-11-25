@@ -20,6 +20,7 @@ create table public.profiles (
   )),
   status public.account_status not null default 'pending',
   is_admin boolean not null default false,
+  manual_report_position boolean not null default false,
   created_at timestamptz not null default now(),
   reviewed_at timestamptz,
   reviewed_by uuid references auth.users (id) on delete set null
@@ -86,6 +87,15 @@ create trigger on_auth_user_created
 after insert on auth.users
 for each row execute function public.handle_new_user();
 
+create function public.set_own_manual_report_position(enabled boolean)
+returns void language plpgsql security definer set search_path = '' as $
+begin
+  if auth.uid() is null then raise exception 'Требуется авторизация' using errcode = '42501'; end if;
+  update public.profiles set manual_report_position = coalesce(enabled, false) where id = auth.uid();
+  if not found then raise exception 'Профиль не найден' using errcode = 'P0002'; end if;
+end;
+$;
+
 create function public.set_account_status(target uuid, new_status public.account_status) returns void
 language plpgsql security definer set search_path = '' as $$
 begin
@@ -129,9 +139,11 @@ grant select, insert on public.reports to authenticated;
 grant select, insert, delete on public.sanctions to authenticated;
 
 revoke all on function public.is_approved(), public.is_admin(), public.handle_new_user(),
-  public.set_account_status(uuid, public.account_status) from public, anon, authenticated;
+  public.set_account_status(uuid, public.account_status),
+  public.set_own_manual_report_position(boolean) from public, anon, authenticated;
 grant execute on function public.is_approved(), public.is_admin(),
-  public.set_account_status(uuid, public.account_status) to authenticated;
+  public.set_account_status(uuid, public.account_status),
+  public.set_own_manual_report_position(boolean) to authenticated;
 
 -- After registering your own account on the site, make it the first administrator
 -- (replace the email):
