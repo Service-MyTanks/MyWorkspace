@@ -1039,7 +1039,9 @@ async function countRows(table, filters = {}) {
 async function renderHome(view) {
   const links = {
     news: { title: "Новости проекта", text: "Последние объявления и новости MyTanks", href: "https://forum.mytanks.net/index.php?forums/%D0%9D%D0%BE%D0%B2%D0%BE%D1%81%D1%82%D0%B8.37/", iconName: "i-book-open" },
-    complaints: { title: "Жалобы", text: "Раздел обращений и жалоб игроков", href: "https://forum.mytanks.net/index.php?forums/Жалобы.38/", iconName: "i-warning" },
+    complaints: { title: "Жалобы", text: "Раздел жалоб на действия игроков", href: "https://forum.mytanks.net/index.php?forums/%D0%96%D0%B0%D0%BB%D0%BE%D0%B1%D1%8B.38/", iconName: "i-warning" },
+    appeals: { title: "Апелляции", text: "Раздел апелляций — доступен Главному Администратору и выше", href: "https://forum.mytanks.net/index.php?forums/%D0%90%D0%BF%D0%B5%D0%BB%D0%BB%D1%8F%D1%86%D0%B8%D0%B8.52/", iconName: "i-shield" },
+    objections: { title: "Обжалования", text: "Раздел обжалований", href: "https://forum.mytanks.net/index.php?forums/%D0%9E%D0%B1%D0%B6%D0%B0%D0%BB%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5.56/", iconName: "i-message" },
     inactivity: { title: "Заявление об уходе в неактив", text: "Оформление временного ухода", href: "https://forum.mytanks.net/index.php?threads/%D0%A8%D0%B0%D0%B1%D0%BB%D0%BE%D0%BD-%D0%B7%D0%B0%D1%8F%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F-%D0%BE%D0%B1-%D1%83%D1%85%D0%BE%D0%B4%D0%B5-%D0%B2-%D0%BD%D0%B5%D0%B0%D0%BA%D1%82%D0%B8%D0%B2.1301/", iconName: "i-clock" },
     meetingAbsence: { title: "Прошение о пропуске собрания", text: "Пропуск еженедельного обзвона", href: "https://forum.mytanks.net/index.php?threads/%D0%A8%D0%B0%D0%B1%D0%BB%D0%BE%D0%BD-%D0%B7%D0%B0%D1%8F%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F-%D0%BD%D0%B0-%D0%BF%D1%80%D0%BE%D0%BF%D1%83%D1%81%D0%BA-%D0%B5%D0%B6%D0%B5%D0%BD%D0%B5%D0%B4%D0%B5%D0%BB%D1%8C%D0%BD%D0%BE%D0%B3%D0%BE-%D0%BE%D0%B1%D0%B7%D0%B2%D0%BE%D0%BD%D0%B0.1317/", iconName: "i-clock" },
     meetingMove: { title: "Прошение о переносе собрания", text: "Запрос на перенос собрания", href: "https://forum.mytanks.net/index.php?threads/%D0%A8%D0%B0%D0%B1%D0%BB%D0%BE%D0%BD-%D0%BF%D1%80%D0%BE%D1%88%D0%B5%D0%BD%D0%B8%D1%8F-%D0%BE-%D0%BF%D0%B5%D1%80%D0%B5%D0%BD%D0%BE%D1%81%D0%B5-%D1%81%D0%BE%D0%B1%D1%80%D0%B0%D0%BD%D0%B8%D1%8F.1318/", iconName: "i-refresh" },
@@ -1082,8 +1084,12 @@ async function renderHome(view) {
           adminGroup("Шаблоны", [links.dailyTemplate, links.sanctionTemplate])
         )
       ),
-      block("complaints", "Отработка обращений", "Работа с жалобами игроков", "i-warning",
-        h("div", { class: "row-list" }, externalRow(links.complaints))
+      block("complaints", "Апелляционный центр", "Жалобы, апелляции и обжалования", "i-shield",
+        h("div", { class: "row-list" },
+          externalRow(links.complaints),
+          ...(POSITIONS.indexOf(state.profile?.position) >= POSITIONS.indexOf("Главный администратор") ? [externalRow(links.appeals)] : []),
+          externalRow(links.objections)
+        )
       )
     )
   );
