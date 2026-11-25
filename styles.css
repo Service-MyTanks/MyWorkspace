@@ -2209,8 +2209,10 @@ main#view { flex: 1 0 auto; }
 /* Account control panel */
 .person-actions { align-items: center; }
 .account-settings-button { flex: 0 0 34px; width: 34px; height: 34px; font-size: 18px; }
-.account-control-dialog { width: min(760px, calc(100% - 28px)); max-height: 92vh; }
-.account-control-body { display: grid; gap: 22px; }
+.account-control-dialog { position: fixed; inset: 0; margin: auto; width: min(760px, calc(100% - 28px)); height: min(88dvh, 900px); max-height: 92dvh; overflow: hidden; }
+.account-control-dialog[open] { display: flex; flex-direction: column; }
+.account-control-dialog::backdrop { background: #090c11bd; backdrop-filter: blur(4px); }
+.account-control-body { display: grid; gap: 22px; overflow-y: auto; overscroll-behavior: contain; }
 .account-control-section { display: grid; gap: 10px; }
 .account-control-section + .account-control-section { border-top: 1px solid var(--border); padding-top: 18px; }
 .account-control-section-heading h3 { margin: 0; font-size: 14px; }

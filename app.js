@@ -2006,6 +2006,16 @@ async function renderAdmin(view, current) {
 
 
 async function openAccountControlPanel(person) {
+  let controls;
+  try {
+    const result = await state.client.from("account_controls").select("*").eq("user_id", person.id).maybeSingle();
+    if (result.error) throw result.error;
+    controls = result.data;
+  } catch (error) {
+    showToast("Не удалось загрузить настройки аккаунта: " + friendlyError(error));
+    return;
+  }
+
   const isSelf = person.id === state.profile.id;
   const dialog = h("dialog", { class: "account-control-dialog", "aria-labelledby": "account-control-title" });
   const close = () => dialog.close();
@@ -2020,8 +2030,6 @@ async function openAccountControlPanel(person) {
   dialog.addEventListener("close", () => dialog.remove(), { once: true });
   dialog.showModal();
 
-  const { data: controls, error } = await state.client.from("account_controls").select("*").eq("user_id", person.id).maybeSingle();
-  if (error) { body.replaceChildren(errorBlock(error)); return; }
   const c = controls || { allowed_themes: THEME_OPTIONS.map(x => x.id), can_change_nickname: true, can_change_email: true, can_upload_avatar: true, can_access_training: true };
   const toggle = (id, title, description, checked, disabled = false) => {
     const input = h("input", { type: "checkbox", id, class: "ios-toggle-input", disabled });
@@ -2053,33 +2061,49 @@ async function openAccountControlPanel(person) {
       showToast("Укажите срок от 1 до 168 часов и причину не короче 5 символов."); return;
     }
     suspendButton.disabled = true;
-    const result = await state.client.rpc("admin_update_account_controls", {
-      p_target: person.id,
-      p_settings: collectSettings(),
-      p_is_manager: manager.input.checked,
-      p_suspension_hours: hours,
-      p_suspension_reason: reason.value.trim()
-    });
-    suspendButton.disabled = false;
-    if (result.error) { showToast(friendlyError(result.error)); return; }
-    showToast("Временное отстранение применено.");
-    dialog.close(); render();
+    try {
+      const result = await state.client.rpc("admin_update_account_controls", {
+        p_target: person.id,
+        p_settings: collectSettings(),
+        p_is_manager: manager.input.checked,
+        p_suspension_hours: hours,
+        p_suspension_reason: reason.value.trim()
+      });
+      if (result.error) throw result.error;
+      showToast("Временное отстранение применено.");
+      dialog.close(); render();
+    } catch (error) {
+      showToast("Не удалось применить отстранение: " + friendlyError(error));
+    } finally {
+      suspendButton.disabled = false;
+    }
   } }, "Отстранить");
   const clearSuspension = h("button", { type: "button", class: "button button-secondary small", disabled: isSelf || !suspensionActive, onclick: async () => {
     clearSuspension.disabled = true;
-    const result = await state.client.rpc("admin_clear_account_suspension", { p_target: person.id });
-    if (result.error) { clearSuspension.disabled = false; showToast(friendlyError(result.error)); return; }
-    showToast("Отстранение снято."); dialog.close(); render();
+    try {
+      const result = await state.client.rpc("admin_clear_account_suspension", { p_target: person.id });
+      if (result.error) throw result.error;
+      showToast("Отстранение снято."); dialog.close(); render();
+    } catch (error) {
+      showToast("Не удалось снять отстранение: " + friendlyError(error));
+    } finally {
+      clearSuspension.disabled = false;
+    }
   } }, "Снять отстранение");
   const nicknameInput = h("input", { type: "text", maxlength: "64", minlength: "2", placeholder: "Новый никнейм", disabled: isSelf });
   const nicknameButton = h("button", { type: "button", class: "button button-secondary small", disabled: isSelf, onclick: async () => {
     const value = nicknameInput.value.trim();
     if (value.length < 2 || value.length > 64) { showToast("Никнейм должен содержать от 2 до 64 символов."); return; }
     nicknameButton.disabled = true;
-    const result = await state.client.rpc("admin_update_account_nickname", { p_target: person.id, p_nickname: value });
-    nicknameButton.disabled = false;
-    if (result.error) { showToast(friendlyError(result.error)); return; }
-    showToast("Никнейм обновлён."); dialog.close(); render();
+    try {
+      const result = await state.client.rpc("admin_update_account_nickname", { p_target: person.id, p_nickname: value });
+      if (result.error) throw result.error;
+      showToast("Никнейм обновлён."); dialog.close(); render();
+    } catch (error) {
+      showToast("Не удалось изменить никнейм: " + friendlyError(error));
+    } finally {
+      nicknameButton.disabled = false;
+    }
   } }, "Изменить никнейм");
   const emailInput = h("input", { type: "email", maxlength: "254", placeholder: "Новая электронная почта", disabled: isSelf });
   const passwordInput = h("input", { type: "password", minlength: "8", maxlength: "72", placeholder: "Новый пароль", autocomplete: "new-password", disabled: isSelf });
@@ -2088,11 +2112,16 @@ async function openAccountControlPanel(person) {
     const newPassword = passwordInput.value;
     if (!newEmail && !newPassword) { showToast("Укажите новую почту или пароль."); return; }
     credentialsButton.disabled = true;
-    const { data, error: invokeError } = await state.client.functions.invoke("admin-update-account", { body: { targetId: person.id, newEmail, newPassword } });
-    credentialsButton.disabled = false;
-    if (invokeError || data?.error) { showToast(invokeError ? friendlyError(invokeError) : data.error); return; }
-    showToast("Данные учётной записи обновлены.");
-    dialog.close(); render();
+    try {
+      const { data, error: invokeError } = await state.client.functions.invoke("admin-update-account", { body: { targetId: person.id, newEmail, newPassword } });
+      if (invokeError || data?.error) throw new Error(invokeError ? friendlyError(invokeError) : data.error);
+      showToast("Данные учётной записи обновлены.");
+      dialog.close(); render();
+    } catch (error) {
+      showToast("Не удалось изменить данные: " + friendlyError(error));
+    } finally {
+      credentialsButton.disabled = false;
+    }
   } }, "Применить изменения");
   const collectSettings = () => ({
     allowed_themes: themeToggles.filter(([, item]) => item.input.checked).map(([id]) => id),
@@ -2103,13 +2132,18 @@ async function openAccountControlPanel(person) {
   });
   const save = h("button", { type: "button", class: "button button-primary", disabled: isSelf, onclick: async () => {
     save.disabled = true;
-    const result = await state.client.rpc("admin_update_account_controls", {
-      p_target: person.id, p_settings: collectSettings(), p_is_manager: manager.input.checked,
-      p_suspension_hours: null, p_suspension_reason: null
-    });
-    save.disabled = false;
-    if (result.error) { showToast(friendlyError(result.error)); return; }
-    showToast("Настройки аккаунта сохранены."); dialog.close(); render();
+    try {
+      const result = await state.client.rpc("admin_update_account_controls", {
+        p_target: person.id, p_settings: collectSettings(), p_is_manager: manager.input.checked,
+        p_suspension_hours: null, p_suspension_reason: null
+      });
+      if (result.error) throw result.error;
+      showToast("Настройки аккаунта сохранены."); dialog.close(); render();
+    } catch (error) {
+      showToast("Не удалось сохранить настройки: " + friendlyError(error));
+    } finally {
+      save.disabled = false;
+    }
   } }, "Сохранить настройки");
   body.replaceChildren(
     ...(isSelf ? [h("p", { class: "muted account-control-warning", text: "Собственные права и ограничения нельзя изменять из этой панели." })] : []),
