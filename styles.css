@@ -2199,3 +2199,9 @@ html[data-theme="new-year"] .report-section .field input:disabled { color: #91a6
 .workspace { display: flex; flex-direction: column; min-height: 100vh; }
 main#view { flex: 1 0 auto; }
 .workspace-footer { margin-top: auto; }
+
+
+/* Privacy policy links in the workspace footer and pre-login notice. */
+.workspace-footer-links{display:flex;align-items:center;justify-content:flex-end;gap:18px;flex-wrap:wrap}
+@media(max-width:700px){.workspace-footer{align-items:flex-start;flex-direction:column;gap:9px}.workspace-footer-links{justify-content:flex-start;gap:14px}}
+.service-warning a+a{margin-top:2px}
