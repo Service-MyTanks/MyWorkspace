@@ -170,17 +170,13 @@ function syncHolidayAtmosphere() {
   }
 }
 
-function applyTheme(theme, persist = false) {
+function applyTheme(theme) {
   const themeExists = THEME_OPTIONS.some((item) => item.id === theme);
   const permittedThemes = state.accountControls?.allowed_themes;
   const allowed = themeExists && (!Array.isArray(permittedThemes) || permittedThemes.includes(theme));
   const safeTheme = allowed ? theme : (Array.isArray(permittedThemes) && permittedThemes.length ? permittedThemes[0] : "mt-standard");
   state.theme = safeTheme;
-  state.theme = safeTheme;
   syncHolidayAtmosphere();
-  if (persist) {
-    try { localStorage.setItem(themeStorageKey(), safeTheme); } catch {}
-  }
   document.querySelectorAll("[data-theme-choice]").forEach((button) => {
     const selected = button.dataset.themeChoice === safeTheme;
     button.classList.toggle("is-selected", selected);
@@ -189,9 +185,22 @@ function applyTheme(theme, persist = false) {
 }
 
 function restoreTheme() {
-  let saved = "mt-standard";
-  try { saved = localStorage.getItem(themeStorageKey()) || "mt-standard"; } catch {}
-  applyTheme(saved);
+  applyTheme(state.accountControls?.preferred_theme || "mt-standard");
+}
+
+async function setOwnTheme(theme) {
+  if (!THEME_OPTIONS.some((item) => item.id === theme)) return;
+  const permittedThemes = state.accountControls?.allowed_themes;
+  if (Array.isArray(permittedThemes) && !permittedThemes.includes(theme)) {
+    showToast("Эта цветовая схема недоступна для вашего аккаунта.");
+    return;
+  }
+  const { error } = await state.client.rpc("set_own_theme", { p_theme: theme });
+  if (error) { showToast(friendlyError(error)); return; }
+  state.accountControls = { ...(state.accountControls || {}), preferred_theme: theme };
+  applyTheme(theme);
+  const option = THEME_OPTIONS.find((item) => item.id === theme);
+  showToast(`Тема «${option?.name || theme}» сохранена.`);
 }
 
 async function loadGlobalTheme() {
@@ -507,6 +516,9 @@ async function render() {
   if (!route || !state.profile) return;
   const { data: latestControls } = await state.client.from("account_controls").select("*").eq("user_id", state.profile.id).maybeSingle();
   if (latestControls) state.accountControls = latestControls;
+  if (Array.isArray(state.accountControls?.allowed_themes) && !state.accountControls.allowed_themes.includes(state.theme)) {
+    applyTheme(state.accountControls.preferred_theme || state.accountControls.allowed_themes[0] || "mt-standard");
+  }
   if (state.accountControls?.suspended_until && new Date(state.accountControls.suspended_until).getTime() > Date.now()) {
     showGate({ title: "Временное отстранение от должности", text: `Доступ временно ограничен до ${formatDateTime(state.accountControls.suspended_until)}. Причина: ${state.accountControls.suspension_reason || "не указана"}`, iconName: "i-ban" });
     return;
@@ -1816,7 +1828,7 @@ function renderAppearanceSettings() {
     "data-theme-choice": item.id,
     "aria-pressed": String(state.theme === item.id),
     disabled: Array.isArray(state.accountControls?.allowed_themes) && !state.accountControls.allowed_themes.includes(item.id),
-    onclick: () => { applyTheme(item.id, true); showToast(`Тема «${item.name}» сохранена.`); },
+    onclick: () => setOwnTheme(item.id),
   },
     h("span", { class: "theme-choice-preview", "aria-hidden": "true" }),
     h("span", { class: "theme-choice-copy" }, h("strong", { text: item.name }), h("small", { text: item.description })),
