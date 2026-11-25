@@ -1241,6 +1241,10 @@ function bindReportForm() {
     const invalidShot = mode ? "" : [1,2,3].map(n => reportField("report-screenshot-" + n).value.trim()).find(url => !isHttpUrl(url));
     const links = reportField("report-links").value.split(/\r?\n/).map(x => x.trim()).filter(Boolean);
     if (invalidShot) { showToast("Укажите три корректные ссылки на скриншоты или выберите способ их передачи."); reportField("report-screenshot-1").focus(); return; }
+    for (const id of ["report-nickname", "report-position", "report-game-work", "report-skills"]) {
+      const input = reportField(id);
+      input.setCustomValidity(input.value.trim() ? "" : "Заполните поле содержательным текстом.");
+    }
     if (links.some(url => !isHttpUrl(url))) { showToast("Дополнительные ссылки должны начинаться с http:// или https://."); reportField("report-links").focus(); return; }
     if (!form.reportValidity()) return;
     reportField("report-preview-title").textContent = "Проверка отчёта";
