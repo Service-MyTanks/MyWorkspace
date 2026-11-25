@@ -387,6 +387,8 @@ async function enterWorkspace() {
     showGate({ title: "Заявка на рассмотрении", text: `${profile.nickname}, ваша заявка на должность «${profile.position}» отправлена. Доступ откроется после одобрения руководителем.` });
   } else if (profile.status === "rejected") {
     showGate({ title: "Доступ закрыт", text: "Руководитель отклонил заявку или отозвал доступ. Если это ошибка, свяжитесь с руководством проекта.", iconName: "i-ban" });
+  } else if (state.accountControls?.suspended_until && new Date(state.accountControls.suspended_until).getTime() > Date.now()) {
+    showGate({ title: "Временное отстранение от должности", text: `Доступ временно ограничен до ${formatDateTime(state.accountControls.suspended_until)}. Причина: ${state.accountControls.suspension_reason || "не указана"}`, iconName: "i-ban" });
   } else {
     restoreTheme();
     await loadGlobalTheme();
@@ -503,6 +505,12 @@ function newReportLink(className = "button button-primary") {
 async function render() {
   const route = parseRoute();
   if (!route || !state.profile) return;
+  const { data: latestControls } = await state.client.from("account_controls").select("*").eq("user_id", state.profile.id).maybeSingle();
+  if (latestControls) state.accountControls = latestControls;
+  if (state.accountControls?.suspended_until && new Date(state.accountControls.suspended_until).getTime() > Date.now()) {
+    showGate({ title: "Временное отстранение от должности", text: `Доступ временно ограничен до ${formatDateTime(state.accountControls.suspended_until)}. Причина: ${state.accountControls.suspension_reason || "не указана"}`, iconName: "i-ban" });
+    return;
+  }
   if ((route.page === "training" || route.page === "training-index") && state.accountControls?.can_access_training === false) {
     showToast("Доступ к учебному центру отключён руководителем.");
     if (location.hash !== "#/home") location.replace("#/home");
@@ -2096,7 +2104,7 @@ async function openAccountControlPanel(person) {
     section("Административные права", "Назначение руководителя автоматически открывает полный доступ к административным разделам.", [manager.row]),
     section("Разрешённые темы", "Каждая цветовая схема управляется отдельно.", themeToggles.map(x => x[1].row)),
     section("Ограничения аккаунта", "Отключённые возможности будут недоступны пользователю.", flags.map(x => x[1].row)),
-    section("Временное отстранение", "Срок задаётся в часах: от 1 до 168. По истечении срока доступ восстановится автоматически.", [
+    section("Временное отстранение от должности", "Срок задаётся в часах: от 1 до 168. По истечении срока доступ восстановится автоматически.", [
       suspensionInfo,
       h("div", { class: "account-control-field" }, h("label", { text: "Срок, часов" }), duration),
       h("div", { class: "account-control-field" }, h("label", { text: "Причина" }), reason),
