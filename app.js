@@ -86,20 +86,27 @@ function syncHolidayAtmosphere() {
     traffic.className = "holiday-traffic";
     const carMarkup = '<i class="traffic-car-body"></i><i class="traffic-car-cabin"></i><i class="traffic-car-window"></i><i class="traffic-car-wheel traffic-wheel-front"></i><i class="traffic-car-wheel traffic-wheel-back"></i><i class="traffic-headlight traffic-headlight-front"></i><i class="traffic-headlight traffic-headlight-rear"></i>';
     const colors = ["red", "blue", "silver", "green", "gold", "red", "blue"];
-    const makeTrafficRow = (rowName, rowIndex) => {
+    const makeTrafficRow = (rowName) => {
       const row = document.createElement("div");
       row.className = `holiday-traffic-row ${rowName}`;
-      colors.forEach((color, index) => {
+      const track = document.createElement("div");
+      track.className = "holiday-traffic-track";
+      const sequence = document.createElement("div");
+      sequence.className = "holiday-traffic-sequence";
+      const queueColors = Array.from({ length: 18 }, (_, index) => colors[index % colors.length]);
+      queueColors.forEach((color, index) => {
         const car = document.createElement("div");
         car.className = `holiday-traffic-car car-${color}`;
         car.innerHTML = carMarkup;
-        car.style.setProperty("--car-scale", `${.82 + Math.random() * .14}`);
-        car.style.setProperty("--queue-delay", `${index * (rowIndex ? .58 : .46)}s`);
-        row.append(car);
+        car.style.setProperty("--car-scale", `${.9 + Math.random() * .1}`);
+        car.style.setProperty("--car-gap", `${10 + (index % 3) * 10}px`);
+        sequence.append(car);
       });
+      track.append(sequence, sequence.cloneNode(true));
+      row.append(track);
       return row;
     };
-    traffic.append(makeTrafficRow("traffic-row-back", 1), makeTrafficRow("traffic-row-front", 0));
+    traffic.append(makeTrafficRow("traffic-row-back"), makeTrafficRow("traffic-row-front"));
     street.append(traffic);
 
     const streetlamps = document.createElement("div");
