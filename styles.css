@@ -2213,6 +2213,7 @@ main#view { flex: 1 0 auto; }
 .account-control-dialog[open] { display: flex; flex-direction: column; }
 .account-control-dialog::backdrop { background: #090c11bd; backdrop-filter: blur(4px); }
 .account-control-body { display: grid; gap: 22px; overflow-y: auto; overscroll-behavior: contain; }
+.account-control-body .ios-setting-row { position: relative; }
 .account-control-section { display: grid; gap: 10px; }
 .account-control-section + .account-control-section { border-top: 1px solid var(--border); padding-top: 18px; }
 .account-control-section-heading h3 { margin: 0; font-size: 14px; }
