@@ -1219,7 +1219,14 @@ function reportScreenshotMode(changedId = "") {
 function saveReportDraft() {
   const form = reportField("workspace-report-form"); if (!form) return;
   try {
-    localStorage.setItem(reportDraftKey(), JSON.stringify(Object.fromEntries(new FormData(form).entries())));
+    const draft = Object.fromEntries(new FormData(form).entries());
+    const mode = reportField("report-screenshots-group").checked ? "group"
+      : reportField("report-screenshots-blocked").checked ? "blocked" : "";
+    draft.screenshotMode = mode;
+    if (mode && reportPreservedScreenshotLinks) {
+      [1, 2, 3].forEach(number => { draft["report-screenshot-" + number] = reportPreservedScreenshotLinks[number - 1]; });
+    }
+    localStorage.setItem(reportDraftKey(), JSON.stringify(draft));
     reportField("report-draft-status").textContent = "Черновик сохранён";
   } catch { reportField("report-draft-status").textContent = "Автосохранение недоступно"; }
 }
@@ -1523,7 +1530,7 @@ async function confirmAndSendWorkspaceReport(pending, button, status) {
     setBusy(button, false);
     button.disabled = true;
     button.textContent = "Отчёт отправлен";
-    status.textContent = "Отчёт сохранён в MyWorkspace и передан Static Forms. В отдельной вкладке появится подтверждение почтовой службы.";
+    status.textContent = popup ? "Отчёт сохранён в MyWorkspace и передан Static Forms. В отдельной вкладке появится подтверждение почтовой службы." : "Отчёт сохранён в MyWorkspace и передан Static Forms. Всплывающие окна заблокированы, поэтому отправка выполнена в фоновой вкладке.";
   } catch (error) {
     if (popup && !popup.closed) popup.close();
     setBusy(button, false);
