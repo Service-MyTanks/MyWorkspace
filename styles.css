@@ -2049,3 +2049,12 @@ button svg, .button svg { width:18px; height:18px; }
   .report-help-steps li { grid-template-columns:34px minmax(0,1fr); gap:12px; }
   .report-step-icon { width:34px; height:34px; }
 }
+
+
+/* Complete the +2px pass for remaining icon-specific overrides */
+.gate-icon svg { width:28px; height:28px; }
+.nav-toggle .chevron { width:16px; height:16px; }
+.row-arrow, .home-action-arrow { width:18px; height:18px; }
+.home-action-arrow { flex-basis:18px; }
+.training-tree-toggle svg { width:16px; height:16px; }
+.home-block-chevron { width:18px; height:18px; flex-basis:18px; }
