@@ -2011,3 +2011,6 @@ html[data-theme="new-year"] .holiday-chimney b:nth-child(2) {
   .report-help-heading,.report-help-body { padding:18px; }
   .report-help-heading h2 { font-size:17px; }
 }
+
+.report-toolbar-actions { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+@media (max-width:700px) { .report-builder-toolbar { align-items:flex-start; flex-direction:column; } .report-toolbar-actions { width:100%; justify-content:space-between; } }
