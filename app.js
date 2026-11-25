@@ -70,10 +70,6 @@ function syncHolidayAtmosphere() {
       [46, 56, 12], [88, 74, 24], [61, 62, 18], [79, 70, 21],
       [50, 52, 15], [94, 78, 24], [58, 60, 18], [73, 66, 21], [45, 48, 12]
     ];
-    const moon = document.createElement("div");
-    moon.className = "holiday-moon";
-    city.append(moon);
-
     let windowIndex = 0;
     for (let buildingIndex = 0; buildingIndex < buildingSpecs.length; buildingIndex++) {
       const [height, width, count] = buildingSpecs[buildingIndex];
