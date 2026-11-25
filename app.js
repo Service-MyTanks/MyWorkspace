@@ -1230,6 +1230,7 @@ function bindReportForm() {
   const form = reportField("workspace-report-form"), today = reportLocalDate();
   reportField("report-date").value = today; reportField("report-date").max = today;
   reportField("report-nickname").value = state.profile?.nickname || "";
+  reportScreenshotModeState = ""; reportPreservedScreenshotLinks = null;
   populateReportPositions(); restoreReportDraft();
   let draftTimer;
   form.addEventListener("input", () => { reportField("report-draft-status").textContent = "Сохраняем черновик…"; clearTimeout(draftTimer); draftTimer = setTimeout(saveReportDraft, 350); });
