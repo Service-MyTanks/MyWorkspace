@@ -384,6 +384,7 @@ async function enterWorkspace() {
     $("sidebar-position").textContent = profile.position;
     updateAvatarImages();
     $("topbar-nickname").textContent = profile.nickname;
+    if (!hasAcceptedServiceRules()) { showServiceRules(true); return; }
     showScreen("app");
     if (location.hash !== "#/home") location.replace("#/home");
     else render();
