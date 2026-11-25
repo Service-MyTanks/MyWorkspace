@@ -1230,12 +1230,12 @@ function restoreReportDraft() {
 function reportFormMarkup() {
   return `
   <section class="report-builder">
-    <div class="report-page-heading"><div><div class="eyebrow"><span></span>ЕЖЕДНЕВНАЯ ОТЧЁТНОСТЬ</div><h1>Хорошая работа. <br class="mobile-break">Хороший отчёт<span>.</span></h1><p>Соберите итоги дня — всё остальное мы упорядочим.</p></div><a class="button button-secondary" href="#/reports/mine"><svg aria-hidden="true"><use href="#i-doc"/></svg>Мои отчёты</a></div>
+    <div class="report-page-heading"><div><div class="eyebrow"><span></span>ЕЖЕДНЕВНАЯ ОТЧЁТНОСТЬ</div><h1>Хорошая работа? <br class="mobile-break">Хороший отчёт<span>!</span></h1><p>Соберите итоги дня — всё остальное мы упорядочим.</p></div><div class="report-heading-actions"><button type="button" class="button button-secondary" id="report-help-open"><svg aria-hidden="true"><use href="#i-help"/></svg>Инструкция</button><a class="button button-secondary" href="#/reports/mine"><svg aria-hidden="true"><use href="#i-doc"/></svg>Мои отчёты</a></div></div>
     <div class="report-intro-strip"><div><span class="report-intro-icon"><svg aria-hidden="true"><use href="#i-doc"/></svg></span><span><strong>Ежедневный отчёт</strong><small>Единый шаблон для команды проекта</small></span></div><span class="report-time-estimate"><svg aria-hidden="true"><use href="#i-clock"/></svg>~ 5 минут</span></div>
     <div class="report-builder-toolbar"><span class="report-draft-status" id="report-draft-status">Новый черновик</span><button type="button" class="text-button" id="report-template-button">Посмотреть шаблон</button></div>
     <div class="report-content-grid">
     <form id="workspace-report-form" novalidate>
-      <section class="report-section"><div class="report-section-heading"><span>01</span><div><h2>Основная информация</h2><p>Расскажите, кто вы и как прошёл ваш день.</p></div></div>
+      <section class="report-section" id="report-basics"><div class="report-section-heading"><span>01</span><div><h2>Основная информация</h2><p>Расскажите, кто вы и как прошёл ваш день.</p></div></div>
         <div class="report-section-body">
           <div class="field-row"><div class="field"><label for="report-date">Дата отчёта <span>*</span></label><input type="date" id="report-date" name="report-date" required></div><div class="field"><label for="report-nickname">Игровой никнейм <span>*</span></label><input type="text" id="report-nickname" name="report-nickname" maxlength="64" required></div></div>
           <div class="field"><label for="report-position">Должность <span>*</span></label><select id="report-position" name="report-position" required></select><small id="report-position-hint"></small></div>
@@ -1245,21 +1245,22 @@ function reportFormMarkup() {
           </div>
         </div>
       </section>
-      <section class="report-section"><div class="report-section-heading"><span>02</span><div><h2>Проделанная работа</h2><p>Зафиксируйте результаты по каждому направлению.</p></div></div><div class="report-section-body">
+      <section class="report-section" id="report-work"><div class="report-section-heading"><span>02</span><div><h2>Проделанная работа</h2><p>Зафиксируйте результаты по каждому направлению.</p></div></div><div class="report-section-body">
         <div class="field"><label for="report-game-work">Игровой процесс <span>*</span></label><p class="field-description">Баны, муты, кики, предупреждения, помощь и информирование игроков.</p><textarea id="report-game-work" name="report-game-work" rows="4" maxlength="8000" required placeholder="Выдал 3 предупреждения за нарушение правил&#10;Ответил на вопросы игроков&#10;Проверил жалобы на нарушения"></textarea><small>Каждый пункт — с новой строки. Нумерацию добавим автоматически.</small></div>
         <div class="field"><label for="report-community-work">Работа с сообществом</label><p class="field-description">Активность и модерация во ВКонтакте, Telegram и Discord.</p><textarea id="report-community-work" name="report-community-work" rows="3" maxlength="8000" placeholder="Что вы сделали для сообщества?"></textarea></div>
         <div class="field"><label for="report-forum-work">Форум</label><p class="field-description">Ответы на обращения, новые темы и объявления мероприятий.</p><textarea id="report-forum-work" name="report-forum-work" rows="3" maxlength="8000" placeholder="Какие задачи на форуме вы выполнили?"></textarea><small>Если работы в соцсетях или на форуме не было, оставьте поля пустыми.</small></div>
       </div></section>
-      <section class="report-section"><div class="report-section-heading"><span>03</span><div><h2>Навыки и ссылки</h2><p>Дополните отчёт важными деталями.</p></div></div><div class="report-section-body">
+      <section class="report-section" id="report-skills"><div class="report-section-heading"><span>03</span><div><h2>Навыки и ссылки</h2><p>Дополните отчёт важными деталями.</p></div></div><div class="report-section-body">
         <div class="field"><label for="report-skills">Мои ключевые навыки <span>*</span></label><textarea id="report-skills" name="report-skills" rows="3" maxlength="4000" required placeholder="Знание правил проекта&#10;Разрешение конфликтов&#10;Работа с обращениями игроков"></textarea><small>По одному навыку на строку.</small></div>
         <div class="field"><label for="report-links">Дополнительные ссылки</label><textarea id="report-links" name="report-links" rows="3" maxlength="6000" placeholder="Вставьте ссылки на темы форума или другие материалы"></textarea><small>По одной полной ссылке http:// или https:// на строку.</small></div>
       </div></section>
-      <section class="report-section"><div class="report-section-heading"><span>04</span><div><h2>Всё готово?</h2><p>Проверьте отчёт перед отправкой.</p></div></div><div class="report-section-body">
+      <section class="report-section" id="report-finish"><div class="report-section-heading"><span>04</span><div><h2>Проверка и отправка</h2><p>Проверьте отчёт перед отправкой.</p></div></div><div class="report-section-body">
         <label class="checkbox report-consent"><input type="checkbox" id="report-consent" name="report-consent" required><span>Подтверждаю достоверность данных и согласен с сохранением отчёта в рабочем пространстве MyTanks.</span></label>
         <div class="report-form-actions"><button type="button" class="text-button" id="report-clear">Очистить черновик</button><button type="submit" class="button button-primary" id="report-review">Проверить отчёт <svg aria-hidden="true"><use href="#i-chevron"/></svg></button></div>
       </div></section>
     </form>
     <aside class="report-aside" aria-label="Состояние отчёта">
+      <div class="report-aside-card report-section-nav-card"><div class="report-aside-heading"><h3>В этом отчёте</h3></div><nav class="report-section-nav" aria-label="Разделы отчёта"><a href="#report-basics"><span>01</span>Основная информация</a><a href="#report-work"><span>02</span>Проделанная работа</a><a href="#report-skills"><span>03</span>Навыки и ссылки</a><a href="#report-finish"><span>04</span>Проверка и отправка</a></nav></div>
       <div class="report-aside-card report-progress-card">
         <div class="report-aside-heading"><h3>Ваш отчёт</h3><span class="report-draft-badge">Черновик</span></div>
         <div class="report-progress-summary"><span>Готовность к отправке</span><strong id="report-progress-value">0%</strong></div>
@@ -1281,6 +1282,7 @@ function reportFormMarkup() {
       <div class="report-local-note"><svg aria-hidden="true"><use href="#i-shield"/></svg><p>Черновик автоматически сохраняется в этом браузере. Вы сможете вернуться к заполнению позже.</p></div>
     </aside>
     </div>
+    <dialog id="report-help-dialog" class="report-help-dialog" aria-labelledby="report-help-title"><div class="report-help-heading"><div><span class="eyebrow">ВСЁ ПРОСТО</span><h2 id="report-help-title">Один день. Один отчёт.</h2></div><button type="button" class="icon-button" id="report-help-close" aria-label="Закрыть инструкцию">×</button></div><div class="report-help-body"><ol><li><strong>Заполните основные данные</strong><p>Выберите дату, укажите никнейм, должность, минуты онлайна и число ответов на репорты.</p></li><li><strong>Добавьте 3 ссылки на скриншоты</strong><p>Сначала загрузите изображения в файловое хранилище и откройте доступ получателю отчёта. Затем вставьте три ссылки.</p></li><li><strong>Подведите итоги</strong><p>Каждую выполненную задачу и навык напишите с новой строки. Если игровой работы не было, укажите это явно. Необязательные разделы можно оставить пустыми.</p></li><li><strong>Проверьте и отправьте</strong><p>Откройте предпросмотр и подтвердите отправку отчёта через рабочее пространство MyTanks.</p></li></ol><div class="notice"><strong>Получатель отчётов</strong><p>Отчёты сохраняются в рабочем пространстве и отправляются на почту руководителя: supportmytanks@gmail.com.</p></div><p class="privacy-note">Сами отчёты не публикуются на GitHub. Ссылки на скриншоты должны открываться у получателя. Черновик автоматически сохраняется в этом браузере: на общем компьютере очищайте его после работы.</p></div></dialog>
   </section>`;
 }
 function bindReportForm() {
@@ -1291,6 +1293,13 @@ function bindReportForm() {
   populateReportPositions(); restoreReportDraft();
   updateReportProgress();
   let draftTimer;
+  const helpDialog = reportField("report-help-dialog");
+  reportField("report-help-open").addEventListener("click", () => helpDialog.showModal());
+  reportField("report-help-close").addEventListener("click", () => helpDialog.close());
+  form.parentElement.querySelectorAll(".report-section-nav a").forEach(link => link.addEventListener("click", event => {
+    event.preventDefault();
+    form.querySelector(link.getAttribute("href"))?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }));
   function updateReportProgress() {
     const sections = [...form.querySelectorAll(".report-section")];
     const states = {
