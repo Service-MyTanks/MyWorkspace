@@ -16,7 +16,7 @@ const KINDS = {
 const POSITIONS = Object.freeze([
   "Младший Хелпер", "Хелпер",
   "Младший модератор", "Модератор", "Старший модератор", "Администратор", "Старший администратор",
-  "Тестировщик", "Медиа-продакшн", "Технический специалист", "Следящий за форумом", "Старший следящий за форумом", "Следящий за битвами", "Старший следящий за битвами",
+  "Тестировщик", "Медиа-продакшн", "Технический специалист", "Техническая поддержка", "Следящий за форумом", "Старший следящий за форумом", "Следящий за битвами", "Старший следящий за битвами",
   "Зам.куратора технических специалистов", "Куратор технических специалистов", "Зам куратора администрации", "Куратор администрации", "Заместитель Куратора Агентов Поддержки", "Куратор Агентов Поддержки",
   "Заместитель главного администратора", "Главный администратор",
   "Заместитель Специального Администратора", "Специальный Администратор",
@@ -1105,7 +1105,7 @@ const REPORT_POSITION_GROUPS = [
   ["1. Младший состав", ["Младший Хелпер", "Хелпер"]],
   ["2. Средний состав", ["Младший модератор", "Модератор", "Старший модератор", "Администратор", "Старший администратор"]],
   ["3. Старший состав — на выбор", ["Тестировщик", "Медиа-продакшн", "Технический специалист", "Следящий за форумом", "Старший следящий за форумом", "Следящий за битвами", "Старший следящий за битвами"]],
-  ["4. Старший и Технический состав", ["Зам.куратора технических специалистов", "Куратор технических специалистов", "Зам куратора администрации", "Куратор администрации", "Заместитель Куратора Агентов Поддержки", "Куратор Агентов Поддержки"]],
+  ["4. Старший и Технический состав", ["Техническая поддержка", "Зам.куратора технических специалистов", "Куратор технических специалистов", "Зам куратора администрации", "Куратор администрации", "Заместитель Куратора Агентов Поддержки", "Куратор Агентов Поддержки"]],
   ["5. Высший Административный Состав", ["Заместитель главного администратора", "Главный администратор"]],
   ["6. Специальный состав", ["Заместитель Специального Администратора", "Специальный Администратор"]]
 ];
@@ -1176,6 +1176,7 @@ function sendReportThroughStaticForms(subject, message) {
   form.submit();
   window.setTimeout(() => { form.remove(); }, 60000);
 }
+const REPORT_POSITIONS = new Set(REPORT_POSITION_GROUPS.flatMap(([, positions]) => positions));
 function populateReportPositions() {
   const select = reportField("report-position");
   select.replaceChildren(new Option("Выберите должность", ""));
@@ -1184,11 +1185,16 @@ function populateReportPositions() {
     positions.forEach(position => group.append(new Option(position, position)));
     select.append(group);
   }
-  select.value = state.profile?.position || "";
-  select.disabled = !state.profile?.manual_report_position;
+  const profilePosition = String(state.profile?.position || "").trim();
+  const profilePositionSupported = REPORT_POSITIONS.has(profilePosition);
+  select.value = profilePositionSupported ? profilePosition : "";
+  select.disabled = !state.profile?.manual_report_position && profilePositionSupported;
+  select.setCustomValidity("");
   reportField("report-position-hint").textContent = select.disabled
     ? "Должность подставлена из вашего профиля. Ручной выбор отключён в настройках личного кабинета."
-    : "Вы можете выбрать должность для этого отчёта вручную.";
+    : profilePosition && !profilePositionSupported
+      ? `Должность «${profilePosition}» не найдена в списке. Выберите актуальную должность вручную.`
+      : "Вы можете выбрать должность для этого отчёта вручную.";
 }
 let reportScreenshotModeState = "";
 let reportPreservedScreenshotLinks = null;
@@ -1422,11 +1428,19 @@ function bindReportForm() {
 }
 function submitWorkspaceReport() {
   const form = reportField("workspace-report-form");
-  if (!form.reportValidity()) {
-    form.reportValidity();
-    updateReportProgress();
+  const positionInput = reportField("report-position");
+  const position = String(positionInput?.value || "").trim();
+  if (!REPORT_POSITIONS.has(position)) {
+    if (positionInput) {
+      positionInput.disabled = false;
+      positionInput.setCustomValidity("Выберите должность из списка.");
+      positionInput.reportValidity();
+      positionInput.setCustomValidity("");
+      positionInput.focus();
+    }
     return;
   }
+  if (!form.reportValidity()) return;
   const groupSelected = reportField("report-screenshots-group").checked;
   const blockedSelected = reportField("report-screenshots-blocked").checked;
   const screenshotMode = groupSelected !== blockedSelected;
@@ -1438,7 +1452,7 @@ function submitWorkspaceReport() {
     user_id: state.session.user.id,
     report_date: date,
     nickname,
-    position: reportField("report-position").value,
+    position,
     online_minutes: Number(reportField("report-online").value),
     report_count: Number(reportField("report-count").value),
     subject,
@@ -1461,6 +1475,12 @@ async function confirmAndSendWorkspaceReport(pending, button, status) {
   if (!pending || pending.user_id !== state.session?.user?.id) {
     status.textContent = "Подготовленный отчёт не найден для текущего аккаунта. Вернитесь к форме и подготовьте его ещё раз.";
     button.disabled = true;
+    return;
+  }
+
+  if (!REPORT_POSITIONS.has(String(pending.position || "").trim())) {
+    status.textContent = "В отчёте не указана допустимая должность. Вернитесь к форме и выберите её перед отправкой.";
+    button.disabled = false;
     return;
   }
 
