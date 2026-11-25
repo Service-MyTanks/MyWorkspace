@@ -713,14 +713,14 @@ async function renderTraining(view, route) {
       ),
       content
     );
-    const infoRow = (id, title, iconName, label, content) => h("div", { class: "training-info-item" },
+    const infoRow = (id, title, iconName, label, ...content) => h("div", { class: "training-info-item" },
       h("button", { type: "button", class: "training-info-trigger", popovertarget: id, "aria-label": `Открыть раздел: ${title}` },
         h("span", { class: "section-icon" }, icon(iconName)),
         h("span", { class: "row-text" }, h("strong", { text: label || title })),
         icon("i-chevron", "row-arrow")
       ),
       h("div", { id, popover: "auto", class: "training-content-popover", role: "dialog", "aria-label": title },
-        h("div", { class: "training-report-body" }, content)
+        h("div", { class: "training-report-body" }, ...content)
       )
     );
     const socialRow = (id, platform, links, explanation) => h("div", { class: "training-social-row" },
@@ -747,8 +747,8 @@ async function renderTraining(view, route) {
               h("strong", { text: "Социальные сети" }), ", ", h("strong", { text: "Игровой чат" }), " и ", h("strong", { text: "Форум" }), "."),
             h("p", { text: "Следующие блоки информации подробнее познакомят тебя с конкретными ссылками на тематические игровые чаты, группы и социальные сети, где они расположены." })
           ),
-          h("div", { class: "training-info-item training-social-container" },
-            h("div", { class: "training-info-trigger training-social-heading" },
+          h("details", { class: "training-info-item training-social-container" },
+            h("summary", { class: "training-info-trigger training-social-heading" },
               h("span", { class: "section-icon" }, icon("i-users")),
               h("span", { class: "row-text" }, h("strong", { text: "Социальные сети" })),
               icon("i-chevron", "row-arrow")
@@ -757,15 +757,15 @@ async function renderTraining(view, route) {
               socialRow("community-vk-popover", "ВКонтакте", [
                 ["Группа", "https://vk.ru/mytanksnet"],
                 ["Чат", "https://vk.me/join/qo641OM6_tTNBRtrMPBs8b7R94xDD1Os4k0="]
-              ], "ВКонтакте — основная платформа проекта, где происходит коммуникация между администрацией, разработчиками и игровым сообществом (игроками)."),
+              ], "Основная платформа проекта, где происходит коммуникация между администрацией, разработчиками и игровым сообществом (игроками)."),
               socialRow("community-telegram-popover", "Telegram", [
                 ["Канал 1", "https://t.me/mytanks_ru"],
                 ["Канал 2", "https://t.me/mytanksnet"],
                 ["Чат", "https://t.me/mytanks_chat"]
-              ], "Telegram — альтернативная платформа проекта для тех, у кого нет ВКонтакте или кто им не пользуется, а также для тех, кто хочет быть всегда и везде в курсе событий."),
+              ], "Альтернативная платформа проекта для тех, у кого нет ВКонтакте или кто им не пользуется, а также для тех, кто хочет быть всегда и везде в курсе событий."),
               socialRow("community-discord-popover", "Discord", [
                 ["Игровой канал", "https://discord.com/invite/c3sxErTNwd"]
-              ], "Discord — ещё одна площадка проекта. Она может служить альтернативой или дополнением к нашим основным социальным сетям.")
+              ], "Ещё одна площадка проекта. Она может служить альтернативой или дополнением к нашим основным социальным сетям.")
             )
           ),
           infoRow("community-game-chat-popover", "Игровой чат", "i-message",
