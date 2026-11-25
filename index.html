@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="./styles.css?v=45">
   <script src="./vendor/supabase.js?v=2.119.1" defer></script>
   <script src="./config.js?v=2" defer></script>
-  <script src="./app.js?v=45" defer></script>
+  <script src="./app.js?v=46" defer></script>
 </head>
 <body>
   <svg class="svg-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
@@ -64,6 +64,19 @@
     <symbol id="i-file-plus" viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6"/><path d="M12 12v6M9 15h6"/></symbol>
     <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 7 9-7"/></symbol>
     <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.7 2.9-.2-.1a1.7 1.7 0 0 0-1.9.3l-.1.1h-3.4l-.1-.2a1.7 1.7 0 0 0-1.6-1.1 1.7 1.7 0 0 0-.9.3l-.2.1L6.8 17l.1-.2a1.7 1.7 0 0 0-.3-1.9l-.1-.1v-3.4l.2-.1a1.7 1.7 0 0 0 1.1-1.6 1.7 1.7 0 0 0-.3-.9l-.1-.2 2.9-1.7.2.1a1.7 1.7 0 0 0 1.9-.3l.1-.1h3.4l.1.2a1.7 1.7 0 0 0 1.6 1.1 1.7 1.7 0 0 0 .9-.3l.2-.1 1.7 2.9-.1.2a1.7 1.7 0 0 0 .3 1.9l.1.1v3.4z"/></symbol>
+      <symbol id="i-layout-dashboard" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="5" rx="1.5"/><rect x="13" y="10" width="8" height="11" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/></symbol>
+    <symbol id="i-graduation-cap" viewBox="0 0 24 24"><path d="m2 9 10-5 10 5-10 5L2 9Z"/><path d="M6 11v5c3.5 3 8.5 3 12 0v-5M22 9v6"/></symbol>
+    <symbol id="i-zap" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 10-13h-7l1-7Z"/></symbol>
+    <symbol id="i-newspaper" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h5v5H7zM15 8h3M15 11h3M7 16h11"/></symbol>
+    <symbol id="i-briefcase" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18M10 12v2h4v-2"/></symbol>
+    <symbol id="i-alert-triangle" viewBox="0 0 24 24"><path d="m10.3 3.9-7.9 14a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3l-7.9-14a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/></symbol>
+    <symbol id="i-message-circle" viewBox="0 0 24 24"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8A8.5 8.5 0 0 1 12.5 3h.5a8.5 8.5 0 0 1 8 8v.5Z"/></symbol>
+    <symbol id="i-calendar-clock" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/><circle cx="12" cy="15" r="3"/><path d="M12 13v2l1.5 1"/></symbol>
+    <symbol id="i-calendar-x" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18m6 4 4 4m0-4-4 4"/></symbol>
+    <symbol id="i-calendar-sync" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M8 15a4 4 0 0 1 7-2M15 13v-2h-2M16 17a4 4 0 0 1-7 2M9 19v2h2"/></symbol>
+    <symbol id="i-file-text" viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h8"/></symbol>
+    <symbol id="i-gavel" viewBox="0 0 24 24"><path d="m14 7 3-3 4 4-3 3M3 21l9-9M7 3l14 14M4 6l3-3 8 8-3 3zM14 17l4 4"/></symbol>
+    <symbol id="i-gamepad" viewBox="0 0 24 24"><path d="M6 9h12a4 4 0 0 1 3.8 5l-1 4a2 2 0 0 1-3.2 1l-3.1-2.3h-5L6.4 19a2 2 0 0 1-3.2-1l-1-4A4 4 0 0 1 6 9Z"/><path d="M7 12v4M5 14h4M16 13h.01M18 15h.01"/></symbol>
   </defs></svg>
 
   <div class="boot" id="boot-view" role="status"><span class="brand-mark">M<span>T</span></span><span>Загружаем рабочее пространство…</span></div>
@@ -141,29 +154,29 @@
       <a class="brand" href="#/home" aria-label="MT DOCS — главная"><span class="brand-logo-wrap"><span class="brand-mark">M<span>T</span></span><span class="brand-gifts" aria-hidden="true"><i></i><i></i><i></i></span></span><span>MT <strong>DOCS</strong><small>MYTANKS TEAM WORKSPACE</small></span></a>
       <nav class="primary-nav" aria-label="Основная навигация">
         <div class="workspace-label">РАБОЧЕЕ ПРОСТРАНСТВО</div>
-        <a class="nav-item" href="#/home" data-nav="home"><svg><use href="#i-monitor"/></svg>Главная</a>
+        <a class="nav-item" href="#/home" data-nav="home"><svg><use href="#i-layout-dashboard"/></svg>Главная</a>
         <a class="nav-item" href="#/reports" data-nav="reports"><svg><use href="#i-doc"/></svg>Отчёты</a>
         <div class="nav-group">
-          <button type="button" class="nav-item nav-toggle" id="monitoring-toggle" aria-expanded="false" aria-controls="monitoring-items"><svg><use href="#i-monitor"/></svg>Мониторинг игры<svg class="chevron"><use href="#i-chevron"/></svg></button>
+          <button type="button" class="nav-item nav-toggle" id="monitoring-toggle" aria-expanded="false" aria-controls="monitoring-items"><svg><use href="#i-crosshair"/></svg>Мониторинг игры<svg class="chevron"><use href="#i-chevron"/></svg></button>
           <div class="nav-sub" id="monitoring-items" hidden>
             <a class="nav-item" href="#/blocks" data-nav="blocks"><svg><use href="#i-lock"/></svg>Блокировки</a>
           </div>
         </div>
         <div class="nav-group">
           <div class="nav-group-heading">
-            <a class="nav-item" href="#/training" data-nav="training"><svg><use href="#i-book-open"/></svg>Учебный центр</a>
+            <a class="nav-item" href="#/training" data-nav="training"><svg><use href="#i-graduation-cap"/></svg>Учебный центр</a>
             <button type="button" class="training-tree-toggle" id="training-toggle" aria-label="Открыть список курсов" aria-expanded="false" aria-controls="training-items"><svg><use href="#i-chevron"/></svg></button>
           </div>
           <div class="nav-sub" id="training-items" hidden>
-            <a class="nav-item" href="#/training/gameplay" data-training-nav="gameplay"><svg><use href="#i-monitor"/></svg>Игровой процесс</a>
-            <a class="nav-item" href="#/training/community" data-training-nav="community"><svg><use href="#i-user"/></svg>Работа с сообществом</a>
-            <a class="nav-item" href="#/training/forum" data-training-nav="forum"><svg><use href="#i-doc"/></svg>Работа с форумом</a>
-            <a class="nav-item" href="#/training/administration" data-training-nav="administration"><svg><use href="#i-shield"/></svg>Административный аппарат</a>
+            <a class="nav-item" href="#/training/gameplay" data-training-nav="gameplay"><svg><use href="#i-gamepad"/></svg>Игровой процесс</a>
+            <a class="nav-item" href="#/training/community" data-training-nav="community"><svg><use href="#i-users"/></svg>Работа с сообществом</a>
+            <a class="nav-item" href="#/training/forum" data-training-nav="forum"><svg><use href="#i-messages"/></svg>Работа с форумом</a>
+            <a class="nav-item" href="#/training/administration" data-training-nav="administration"><svg><use href="#i-briefcase"/></svg>Административный аппарат</a>
           </div>
         </div>
-        <a class="nav-item" href="https://forum.mytanks.net/index.php" target="_blank" rel="noopener noreferrer"><svg><use href="#i-message"/></svg>Форум<svg class="chevron"><use href="#i-external"/></svg></a>
+        <a class="nav-item" href="https://forum.mytanks.net/index.php" target="_blank" rel="noopener noreferrer"><svg><use href="#i-messages"/></svg>Форум<svg class="chevron"><use href="#i-external"/></svg></a>
         <div class="sidebar-divider"></div>
-        <a class="nav-item" href="#/account" data-nav="account"><svg><use href="#i-user"/></svg>Личный кабинет<span class="nav-badge" id="pending-badge" hidden></span></a>
+        <a class="nav-item" href="#/account" data-nav="account"><svg><use href="#i-id-card"/></svg>Личный кабинет<span class="nav-badge" id="pending-badge" hidden></span></a>
       </nav>
       <div class="sidebar-bottom">
         <img class="team-avatar" src="./mytanks-avatar.jpg" alt="" width="36" height="36">
