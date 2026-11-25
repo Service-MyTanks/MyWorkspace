@@ -1666,3 +1666,98 @@ html[data-theme="new-year"] .holiday-chimney b:nth-child(2) {
   18% { opacity: .42; }
   100% { transform: translate(8px, -34px) scale(2.2); opacity: 0; }
 }
+
+
+/* Rare festive Wasp M1 + Smoky M1 cameo in the traffic. */
+html[data-theme="new-year"] .holiday-traffic-tank {
+  flex-basis: 94px;
+  width: 94px;
+  height: 34px;
+  min-width: 94px;
+  position: relative;
+  overflow: visible;
+  filter: drop-shadow(0 2px 3px #000b);
+}
+.tank-track {
+  position: absolute;
+  bottom: 1px;
+  height: 10px;
+  border: 2px solid #26313c;
+  border-radius: 7px;
+  background: repeating-linear-gradient(90deg,#65717d 0 5px,#303b48 5px 8px);
+  box-shadow: inset 0 0 0 1px #aab4bd66;
+}
+.tank-track-top { left: 7px; width: 80px; }
+.tank-track-bottom { left: 11px; width: 72px; bottom: 3px; height: 6px; opacity: .9; }
+.tank-hull {
+  position: absolute;
+  left: 13px;
+  bottom: 9px;
+  width: 68px;
+  height: 13px;
+  border: 1px solid #b4c1b0;
+  border-radius: 5px 7px 3px 3px;
+  background: linear-gradient(180deg,#a5b69a,#536d58 70%,#344a3c);
+  clip-path: polygon(8% 0,90% 0,100% 100%,0 100%);
+}
+.tank-turret {
+  position: absolute;
+  left: 34px;
+  bottom: 19px;
+  width: 27px;
+  height: 10px;
+  border: 1px solid #c1c9ad;
+  border-radius: 7px 8px 3px 3px;
+  background: linear-gradient(180deg,#b5c4a7,#637b63);
+}
+.tank-barrel {
+  position: absolute;
+  z-index: 2;
+  left: 55px;
+  bottom: 24px;
+  width: 25px;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(#d6d9ce,#6d796d);
+  box-shadow: 0 0 2px #fff8;
+}
+.tank-garland {
+  position: absolute;
+  z-index: 4;
+  pointer-events: none;
+  border: 1px solid transparent;
+  border-bottom-color: #f7d77a;
+  filter: drop-shadow(0 0 2px #f8d56b);
+}
+.tank-garland-hull {
+  left: 14px;
+  bottom: 12px;
+  width: 66px;
+  height: 12px;
+  border-radius: 0 0 45% 45%;
+  transform: rotate(-4deg);
+}
+.tank-garland-turret {
+  left: 35px;
+  bottom: 20px;
+  width: 25px;
+  height: 8px;
+  border-radius: 50%;
+  border-bottom-color: #e8a6ff;
+  transform: rotate(9deg);
+}
+.tank-garland-bulbs {
+  position: absolute;
+  z-index: 5;
+  left: 17px;
+  bottom: 11px;
+  width: 59px;
+  height: 9px;
+  background: radial-gradient(circle at 5% 20%,#ff5b68 0 2px,transparent 2.5px),radial-gradient(circle at 24% 80%,#6ee7ff 0 2px,transparent 2.5px),radial-gradient(circle at 44% 18%,#ffe477 0 2px,transparent 2.5px),radial-gradient(circle at 65% 78%,#9cff9b 0 2px,transparent 2.5px),radial-gradient(circle at 88% 18%,#f69cff 0 2px,transparent 2.5px);
+  filter: drop-shadow(0 0 3px #ffe68a);
+  animation: tank-garland-twinkle 1.8s ease-in-out infinite alternate;
+}
+@keyframes tank-garland-twinkle {
+  from { opacity: .62; filter: brightness(.85) drop-shadow(0 0 2px #ffe68a); }
+  to { opacity: 1; filter: brightness(1.35) drop-shadow(0 0 5px #fff0a8); }
+}
