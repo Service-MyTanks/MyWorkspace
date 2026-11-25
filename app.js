@@ -1232,7 +1232,7 @@ function reportFormMarkup() {
   <section class="report-builder">
     <div class="report-page-heading"><div><div class="eyebrow"><span></span>ЕЖЕДНЕВНАЯ ОТЧЁТНОСТЬ</div><h1>Хорошая работа? <br class="mobile-break">Хороший отчёт<span>!</span></h1><p>Соберите итоги дня — всё остальное мы упорядочим.</p></div><div class="report-heading-actions"><button type="button" class="button button-secondary" id="report-help-open"><svg aria-hidden="true"><use href="#i-help"/></svg>Инструкция</button><a class="button button-secondary" href="#/reports/mine"><svg aria-hidden="true"><use href="#i-doc"/></svg>Мои отчёты</a></div></div>
     <div class="report-intro-strip"><div><span class="report-intro-icon"><svg aria-hidden="true"><use href="#i-doc"/></svg></span><span><strong>Ежедневный отчёт</strong><small>Единый шаблон для команды проекта</small></span></div><span class="report-time-estimate"><svg aria-hidden="true"><use href="#i-clock"/></svg>~ 5 минут</span></div>
-    <div class="report-builder-toolbar"><span class="report-draft-status" id="report-draft-status">Новый черновик</span><button type="button" class="text-button" id="report-template-button">Посмотреть шаблон</button></div>
+    <div class="report-builder-toolbar"><span class="report-draft-status" id="report-draft-status">Новый черновик</span><div class="report-toolbar-actions"><button type="button" class="text-button" id="report-how-open">Как это работает?</button><button type="button" class="text-button" id="report-template-button">Посмотреть шаблон</button></div></div>
     <div class="report-content-grid">
     <form id="workspace-report-form" novalidate>
       <section class="report-section" id="report-basics"><div class="report-section-heading"><span>01</span><div><h2>Основная информация</h2><p>Расскажите, кто вы и как прошёл ваш день.</p></div></div>
@@ -1295,6 +1295,7 @@ function bindReportForm() {
   let draftTimer;
   const helpDialog = reportField("report-help-dialog");
   reportField("report-help-open").addEventListener("click", () => helpDialog.showModal());
+  reportField("report-how-open").addEventListener("click", () => helpDialog.showModal());
   reportField("report-help-close").addEventListener("click", () => helpDialog.close());
   form.parentElement.querySelectorAll(".report-section-nav a").forEach(link => link.addEventListener("click", event => {
     event.preventDefault();
