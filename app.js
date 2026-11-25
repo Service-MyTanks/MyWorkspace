@@ -1138,6 +1138,38 @@ function reportFormText(template) {
     "8. Соответствующие ссылки:", get("report-links", "Не указаны")
   ].join("\n");
 }
+function sendReportThroughStaticForms(subject, message) {
+  const targetName = "mytanks-staticforms-target";
+  let frame = document.querySelector('iframe[name="' + targetName + '"]');
+  if (!frame) {
+    frame = document.createElement("iframe");
+    frame.name = targetName;
+    frame.title = "Отправка отчёта";
+    frame.hidden = true;
+    document.body.append(frame);
+  }
+  const form = document.createElement("form");
+  form.method = "POST";
+  form.action = "https://api.staticforms.dev/submit";
+  form.target = targetName;
+  form.hidden = true;
+  const fields = {
+    apiKey: "sf_aca3770697761941dfd1a6f2",
+    subject,
+    message,
+    honeypot: ""
+  };
+  for (const [name, value] of Object.entries(fields)) {
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = name;
+    input.value = value;
+    form.append(input);
+  }
+  document.body.append(form);
+  form.submit();
+  window.setTimeout(() => { form.remove(); }, 60000);
+}
 function populateReportPositions() {
   const select = reportField("report-position");
   select.replaceChildren(new Option("Выберите должность", ""));
@@ -1275,14 +1307,22 @@ async function submitWorkspaceReport() {
   const screenshots = mode ? [] : [1,2,3].map(n => reportField("report-screenshot-" + n).value.trim());
   const date = reportField("report-date").value, nickname = reportField("report-nickname").value.trim();
   const position = reportField("report-position").value, subject = "MT DOCS | " + nickname + " | " + formatDate(date);
+  const reportBody = reportFormText(false);
   const { error } = await state.client.from("reports").insert({
     report_date: date, nickname, position, online_minutes: Number(reportField("report-online").value),
-    report_count: Number(reportField("report-count").value), subject, body: reportFormText(false), screenshots
+    report_count: Number(reportField("report-count").value), subject, body: reportBody, screenshots
   });
   setBusy(button, false);
   if (error) { showToast(friendlyError(error)); return; }
+  try {
+    sendReportThroughStaticForms(subject, reportBody);
+  } catch (sendError) {
+    console.error("Static Forms submission failed:", sendError);
+    showToast("Отчёт сохранён, но не удалось передать его в почтовую службу.");
+    return;
+  }
   localStorage.removeItem(reportDraftKey()); reportField("report-preview-dialog").close();
-  showToast("Отчёт сохранён в рабочем пространстве."); location.hash = "#/reports/mine";
+  showToast("Отчёт сохранён и передан в Static Forms для отправки на почту."); location.hash = "#/reports/mine";
 }
 
 async function renderReports(view, route, current) {
