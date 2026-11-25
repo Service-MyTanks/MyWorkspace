@@ -26,7 +26,7 @@ const SERVICE_RULES_VERSION = "2026-11-25-v1";
 function serviceRulesKey() { return "myworkspace.serviceRules." + (state.session?.user?.id || "guest"); }
 function hasAcceptedServiceRules() { try { return localStorage.getItem(serviceRulesKey()) === SERVICE_RULES_VERSION; } catch { return false; } }
 function acceptServiceRules() { try { localStorage.setItem(serviceRulesKey(), SERVICE_RULES_VERSION); } catch {} }
-const state = { client: null, session: null, profile: null, accountControls: null, renderId: 0, sanctionKind: "ban", recovery: false, theme: "mt-standard", globalTheme: "mt-standard", globalThemeChannel: null, holidayLightsTimer: null, holidayDemonTimer: null, holidayCity: null };
+const state = { client: null, session: null, profile: null, accountControls: null, renderId: 0, sanctionKind: "ban", recovery: false, theme: "mt-standard", globalTheme: "mt-standard", globalThemeChannel: null, holidayLightsTimer: null, holidayDemonTimer: null, holidayCity: null, deviceSessionVerified: false, deviceHeartbeatTimer: null };
 
 const THEME_OPTIONS = [
   { id: "mt-standard", name: "MT Standard", description: "Исходное оформление MyWorkspace", swatch: "theme-swatch-standard" },
@@ -369,6 +369,71 @@ function selectTab(name) {
   setMessage("register-message", "");
 }
 
+const DEVICE_ID_KEY = "myworkspace.device-id.v1";
+function getDeviceId() {
+  try {
+    let id = localStorage.getItem(DEVICE_ID_KEY);
+    if (!id || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)) {
+      id = crypto.randomUUID();
+      localStorage.setItem(DEVICE_ID_KEY, id);
+    }
+    return id;
+  } catch {
+    return crypto.randomUUID();
+  }
+}
+function stopDeviceHeartbeat() {
+  if (state.deviceHeartbeatTimer) clearInterval(state.deviceHeartbeatTimer);
+  state.deviceHeartbeatTimer = null;
+}
+async function ensureDeviceSession() {
+  if (state.deviceSessionVerified) return true;
+  if (!state.session) return false;
+  try {
+    const { data, error } = await state.client.functions.invoke("device-session", {
+      body: { action: "claim", deviceId: getDeviceId() },
+    });
+    if (error) throw error;
+    if (data?.conflict) {
+      stopDeviceHeartbeat();
+      state.deviceSessionVerified = false;
+      await state.client.auth.signOut({ scope: "local" });
+      state.session = null;
+      showScreen("login");
+      setMessage("login-message", "Это устройство уже используется под другим аккаунтом. Сначала выйдите из него, затем войдите в нужный аккаунт.", "error");
+      return false;
+    }
+    if (data?.ok !== true) throw new Error(data?.error || "Не удалось подтвердить устройство.");
+    state.deviceSessionVerified = true;
+    stopDeviceHeartbeat();
+    state.deviceHeartbeatTimer = setInterval(async () => {
+      if (!state.session || !state.deviceSessionVerified) return;
+      try {
+        const result = await state.client.functions.invoke("device-session", {
+          body: { action: "heartbeat", deviceId: getDeviceId() },
+        });
+        if (result.error) throw result.error;
+        if (result.data?.ok === false) {
+          stopDeviceHeartbeat();
+          state.deviceSessionVerified = false;
+          await state.client.auth.signOut({ scope: "local" });
+          state.session = null;
+          showScreen("login");
+          setMessage("login-message", "Сессия этого устройства была передана другому аккаунту. Войдите заново.", "error");
+        }
+      } catch (heartbeatError) {
+        console.warn("Device session heartbeat failed:", heartbeatError);
+      }
+    }, 60_000);
+    return true;
+  } catch (error) {
+    state.deviceSessionVerified = false;
+    showScreen("login");
+    setMessage("login-message", "Не удалось проверить активное устройство. Повторите вход немного позже. " + friendlyError(error), "error");
+    return false;
+  }
+}
+
 async function loadProfile() {
   const { data, error } = await state.client.from("profiles").select("*").eq("id", state.session.user.id).maybeSingle();
   if (error) throw error;
@@ -378,6 +443,7 @@ async function loadProfile() {
 async function enterWorkspace() {
   if (!state.session) { showScreen("login"); return; }
   if (state.recovery) { showScreen("recovery"); return; }
+  if (!await ensureDeviceSession()) return;
   let profile;
   try {
     profile = await loadProfile();
@@ -2177,6 +2243,12 @@ async function changeStatus(person, status) {
 }
 
 async function logout() {
+  stopDeviceHeartbeat();
+  if (state.session) {
+    try { await state.client.functions.invoke("device-session", { body: { action: "release", deviceId: getDeviceId() } }); }
+    catch (error) { console.warn("Device session release failed:", error); }
+  }
+  state.deviceSessionVerified = false;
   const { error } = await state.client.auth.signOut();
   if (error) await state.client.auth.signOut({ scope: "local" });
   state.session = null;
@@ -2383,9 +2455,17 @@ async function start() {
   const authError = readAuthError();
   state.client = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } });
   state.client.auth.onAuthStateChange((event, session) => {
+    const previousUserId = state.session?.user?.id;
     state.session = session;
+    if (session?.user?.id && previousUserId && session.user.id !== previousUserId) {
+      stopDeviceHeartbeat();
+      state.deviceSessionVerified = false;
+      setTimeout(() => enterWorkspace(), 0);
+    }
     if (event === "PASSWORD_RECOVERY") { state.recovery = true; setTimeout(() => showScreen("recovery"), 0); }
     if (event === "SIGNED_OUT") {
+      stopDeviceHeartbeat();
+      state.deviceSessionVerified = false;
       state.profile = null;
       state.globalTheme = "mt-standard";
       if (state.globalThemeChannel) { state.client.removeChannel(state.globalThemeChannel); state.globalThemeChannel = null; }
