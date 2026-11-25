@@ -1135,8 +1135,23 @@ html[data-theme="new-year"] .card-heading { padding-right: 62px; }
   align-items: stretch;
   gap: 18px;
 }
-.home-block { min-width: 0; margin: 0; }
-.home-block-heading { min-height: 82px; }
+.home-block { min-width: 0; margin: 0; align-self: start; overflow: hidden; }
+.home-block-heading {
+  min-height: 82px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  cursor: pointer;
+  list-style: none;
+}
+.home-block-heading::-webkit-details-marker { display: none; }
+.home-block-heading::marker { content: ""; }
+.home-block-heading > div { flex: 1; min-width: 0; }
+.home-block-chevron { width: 16px; height: 16px; flex: 0 0 16px; color: var(--muted); transition: transform .2s ease; }
+.home-block[open] .home-block-chevron { transform: rotate(180deg); }
+.home-block > .row-list, .home-block > .home-admin-content { padding-bottom: 8px; }
+.home-block:not([open]) > .home-block-snow { display: none; }
 .home-block-admin { grid-column: 1 / -1; grid-row: 2; }
 .home-block-complaints { grid-column: 2; grid-row: 1; }
 .home-admin-content { padding: 2px 0 12px; }
