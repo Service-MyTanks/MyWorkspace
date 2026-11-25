@@ -1152,16 +1152,24 @@ function populateReportPositions() {
     ? "Должность подставлена из вашего профиля. Ручной выбор отключён в настройках личного кабинета."
     : "Вы можете выбрать должность для этого отчёта вручную.";
 }
+let reportScreenshotModeState = "";
+let reportPreservedScreenshotLinks = null;
 function reportScreenshotMode() {
   const group = reportField("report-screenshots-group"), blocked = reportField("report-screenshots-blocked");
   if (group.checked) blocked.checked = false;
   if (blocked.checked) group.checked = false;
   const mode = group.checked ? "group" : blocked.checked ? "blocked" : "";
+  if (!reportScreenshotModeState && mode) reportPreservedScreenshotLinks = [1,2,3].map(n => reportField("report-screenshot-" + n).value);
+  if (reportScreenshotModeState && !mode && reportPreservedScreenshotLinks) {
+    [1,2,3].forEach(n => { reportField("report-screenshot-" + n).value = reportPreservedScreenshotLinks[n-1]; });
+    reportPreservedScreenshotLinks = null;
+  }
   for (let n=1;n<=3;n++) {
     const input = reportField("report-screenshot-" + n);
     input.disabled = Boolean(mode); input.required = !mode;
     if (mode) input.value = "";
   }
+  reportScreenshotModeState = mode;
   reportField("report-upload-hint").textContent = mode === "group"
     ? "Скриншоты направьте в группу «ЕЖЕДНЕВНЫЕ ОТЧЁТЫ». Ссылки добавлять не нужно."
     : mode === "blocked" ? "В отчёт будет добавлена причина отсутствия ссылок."
@@ -1248,7 +1256,7 @@ function bindReportForm() {
   reportField("report-preview-send").addEventListener("click", submitWorkspaceReport);
   reportField("report-clear").addEventListener("click", async () => {
     if (!await confirmAction("Очистить черновик?", "Все данные текущего отчёта будут удалены.", "Очистить")) return;
-    localStorage.removeItem(reportDraftKey()); form.reset();
+    localStorage.removeItem(reportDraftKey()); form.reset(); reportScreenshotModeState = ""; reportPreservedScreenshotLinks = null;
     reportField("report-date").value = today; reportField("report-nickname").value = state.profile?.nickname || "";
     populateReportPositions(); reportScreenshotMode(); reportField("report-draft-status").textContent = "Новый черновик";
     showToast("Черновик очищен.");
