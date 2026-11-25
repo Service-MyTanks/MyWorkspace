@@ -741,7 +741,7 @@ async function renderTraining(view, route) {
       pageHeading("ОБУЧЕНИЕ СОТРУДНИКОВ", route.section, "Знакомство с площадками проекта, правилами коммуникации и обработкой обращений игроков."),
       communityStageCard("1. Начальный этап — Социальные сети и игровой чат", "Узнай, где находится игровое сообщество и через какие площадки с ним взаимодействовать.", "i-users",
         h("div", { class: "row-list training-info-list" },
-          infoRow("community-everywhere-popover", "Мы — везде!", "i-globe",
+          infoRow("community-everywhere-popover", "Мы — везде!", "i-users",
             "Мы — везде!",
             h("p", {}, "Основополагающим принципом работы с сообществом является знание мест, где расположены чаты для возможности коммуникации с игровым сообществом. Таких мест три (3): ",
               h("strong", { text: "Социальные сети" }), ", ", h("strong", { text: "Игровой чат" }), " и ", h("strong", { text: "Форум" }), "."),
@@ -749,7 +749,7 @@ async function renderTraining(view, route) {
           ),
           h("div", { class: "training-info-item training-social-container" },
             h("div", { class: "training-info-trigger training-social-heading" },
-              h("span", { class: "section-icon" }, icon("i-share")),
+              h("span", { class: "section-icon" }, icon("i-users")),
               h("span", { class: "row-text" }, h("strong", { text: "Социальные сети" })),
               icon("i-chevron", "row-arrow")
             ),
@@ -774,7 +774,7 @@ async function renderTraining(view, route) {
           )
         )
       ),
-      communityStageCard("2. Промежуточный этап — Как правильно работать с игровым сообществом?", "Основные принципы общения, информирования и соблюдения делового стиля.", "i-message-circle",
+      communityStageCard("2. Промежуточный этап — Как правильно работать с игровым сообществом?", "Основные принципы общения, информирования и соблюдения делового стиля.", "i-message",
         h("div", { class: "row-list training-info-list" },
           infoRow("community-work-rules-popover", "Как правильно работать с игровым сообществом?", "i-users",
             "Как правильно работать с игровым сообществом?",
