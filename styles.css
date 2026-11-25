@@ -1668,30 +1668,3 @@ html[data-theme="new-year"] .holiday-chimney b:nth-child(2) {
 }
 
 
-/* Rare festive tank sprite in the holiday traffic. */
-html[data-theme="new-year"] .holiday-traffic-tank {
-  flex: 0 0 100px;
-  width: 100px;
-  height: 36px;
-  min-width: 100px;
-  position: relative;
-  overflow: visible;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  filter: drop-shadow(0 2px 3px #000b);
-}
-html[data-theme="new-year"] .holiday-tank-sprite {
-  display: block;
-  width: 100px;
-  height: auto;
-  max-height: 36px;
-  object-fit: contain;
-  pointer-events: none;
-  user-select: none;
-  animation: tank-garland-twinkle 1.8s ease-in-out infinite alternate;
-}
-@keyframes tank-garland-twinkle {
-  from { opacity: .84; filter: brightness(.9) drop-shadow(0 0 2px #ffe68a); }
-  to { opacity: 1; filter: brightness(1.18) drop-shadow(0 0 5px #fff0a8); }
-}
