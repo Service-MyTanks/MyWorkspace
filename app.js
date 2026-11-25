@@ -22,6 +22,10 @@ const POSITIONS = Object.freeze([
   "Заместитель Специального Администратора", "Специальный Администратор",
 ]);
 
+const SERVICE_RULES_VERSION = "2026-11-25-v1";
+function serviceRulesKey() { return "myworkspace.serviceRules." + (state.session?.user?.id || "guest"); }
+function hasAcceptedServiceRules() { try { return localStorage.getItem(serviceRulesKey()) === SERVICE_RULES_VERSION; } catch { return false; } }
+function acceptServiceRules() { try { localStorage.setItem(serviceRulesKey(), SERVICE_RULES_VERSION); } catch {} }
 const state = { client: null, session: null, profile: null, renderId: 0, sanctionKind: "ban", recovery: false, theme: "mt-standard", globalTheme: "mt-standard", globalThemeChannel: null, holidayLightsTimer: null, holidayDemonTimer: null, holidayCity: null };
 
 const THEME_OPTIONS = [
@@ -2046,7 +2050,42 @@ function bindAuthForms() {
   $("gate-logout").addEventListener("click", logout);
 }
 
+function showServiceRules(required = false) {
+  const dialog = $("service-rules-dialog");
+  dialog.dataset.required = String(required);
+  const scroll = $("service-rules-scroll");
+  const button = $("service-rules-continue");
+  scroll.scrollTop = 0;
+  button.disabled = true;
+  button.textContent = required ? "Прочитал. Вернуться на главную" : "Закрыть документ";
+  $("service-rules-progress").textContent = "Прокрутите документ до конца, чтобы продолжить.";
+  if (!dialog.open) dialog.showModal();
+  requestAnimationFrame(updateServiceRulesProgress);
+}
+function updateServiceRulesProgress() {
+  const scroll = $("service-rules-scroll");
+  const reachedEnd = scroll.scrollTop + scroll.clientHeight >= scroll.scrollHeight - 8;
+  $("service-rules-continue").disabled = !reachedEnd;
+  $("service-rules-progress").textContent = reachedEnd ? "Документ прочитан полностью. Теперь можно продолжить." : "Прокрутите документ до конца, чтобы продолжить.";
+}
+function finishServiceRules() {
+  const dialog = $("service-rules-dialog");
+  if (dialog.dataset.required === "true") {
+    acceptServiceRules();
+    dialog.close();
+    showScreen("app");
+    if (location.hash !== "#/home") location.replace("#/home");
+    else render();
+    refreshPendingBadge();
+  } else dialog.close();
+}
+
 function bindApp() {
+  document.querySelectorAll("[data-open-service-rules]").forEach((link) => link.addEventListener("click", (event) => { event.preventDefault(); showServiceRules(false); }));
+  $("service-rules-scroll").addEventListener("scroll", updateServiceRulesProgress, { passive: true });
+  $("service-rules-continue").addEventListener("click", finishServiceRules);
+  $("service-rules-dialog").addEventListener("cancel", (event) => event.preventDefault());
+  $("service-rules-dialog").addEventListener("click", (event) => { if (event.target === $("service-rules-dialog")) event.preventDefault(); });
   window.addEventListener("hashchange", () => { if (!$("app-view").hidden) { if (parseRoute()) render(); else location.replace("#/home"); } });
   $("sidebar-logout").addEventListener("click", logout);
   const accountButton = $("topbar-account-button");
