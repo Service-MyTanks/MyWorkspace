@@ -123,7 +123,7 @@ function syncHolidayAtmosphere() {
         const vehicle = document.createElement("div");
         vehicle.className = isHolidayTank ? "holiday-traffic-car holiday-traffic-tank" : `holiday-traffic-car car-${color}`;
         vehicle.innerHTML = isHolidayTank
-          ? '<i class="tank-track tank-track-top"></i><i class="tank-track tank-track-bottom"></i><i class="tank-hull"></i><i class="tank-turret"></i><i class="tank-barrel"></i><i class="tank-garland tank-garland-hull"></i><i class="tank-garland tank-garland-turret"></i><i class="tank-garland-bulbs"></i>'
+          ? '<img class="holiday-tank-sprite" src="./holiday-wasp-smoky.webp" alt="" draggable="false">'
           : carMarkup;
         vehicle.style.setProperty("--car-scale", `${.92 + (index % 4) * .02}`);
         vehicle.style.setProperty("--car-gap", `${10 + (index % 3) * 10}px`);
