@@ -412,7 +412,8 @@ function parseRoute() {
   const path = location.hash.replace(/^#/, "");
   if (path === "/home") return { page: "home", crumbs: [["Главная"]] };
   if (path === "/training") return { page: "training-index", crumbs: [["Учебный центр"]] };
-  if (path === "/reports") return { page: "reports", crumbs: [["Отчёты"]] };
+  if (path === "/reports") return { page: "reports", crumbs: [["Отчётность"]] };
+  if (path === "/reports/new") return { page: "new-report", crumbs: [["Отчётность", "#/reports"], ["Новый отчёт"]] };
   if (path === "/reports/mine") return { page: "my-reports", crumbs: [["Отчёты", "#/reports"], ["Мои отчёты"]] };
   if (path === "/blocks") return { page: "blocks", crumbs: [["Мониторинг игры"], ["Блокировки"]] };
   const match = path.match(/^\/blocks\/(ban|kick|mute|warning)$/);
@@ -429,7 +430,7 @@ function parseRoute() {
 }
 
 function setChrome(route) {
-  const nav = { home: "home", reports: "reports", "my-reports": "reports", blocks: "blocks", sanctions: "blocks", account: "account", training: "training", "training-index": "training" }[route.page];
+  const nav = { home: "home", reports: "reports", "new-report": "reports", "my-reports": "reports", blocks: "blocks", sanctions: "blocks", account: "account", training: "training", "training-index": "training" }[route.page];
   for (const link of document.querySelectorAll("[data-nav]")) {
     const active = link.dataset.nav === nav;
     link.classList.toggle("active", active);
@@ -452,7 +453,7 @@ function setChrome(route) {
     const node = last ? h("strong", { text: label }) : href ? h("a", { href, text: label }) : h("span", { class: "crumb", text: label });
     return index ? [h("span", { class: "crumb-sep", text: "/" }), node] : [node];
   }));
-  const titles = { home: "Главная", reports: "Отчётность", "my-reports": "Мои отчёты", blocks: "Блокировка", sanctions: KINDS[route.kind]?.title, account: "Личный кабинет", training: route.section, "training-index": "Учебный центр" };
+  const titles = { home: "Главная", reports: "Отчётность", "new-report": "Новый отчёт", "my-reports": "Мои отчёты", blocks: "Блокировка", sanctions: KINDS[route.kind]?.title, account: "Личный кабинет", training: route.section, "training-index": "Учебный центр" };
   document.title = `${titles[route.page]} · MT DOCS`;
   closeSidebar();
 }
@@ -481,7 +482,7 @@ function emptyBlock(iconName, title, text, action) {
 }
 
 function newReportLink(className = "button button-primary") {
-  return h("a", { class: className, href: "#/reports" }, icon("i-plus"), "Новый отчёт");
+  return h("a", { class: className, href: "#/reports/new" }, icon("i-plus"), "Новый отчёт");
 }
 
 async function render() {
@@ -492,7 +493,7 @@ async function render() {
   const current = () => id === state.renderId;
   setChrome(route);
   view.replaceChildren();
-  const renderers = { home: renderHome, reports: renderReports, "my-reports": renderMyReports, blocks: renderBlocks, sanctions: renderSanctions, account: renderAccount, training: renderTraining, "training-index": renderTrainingIndex };
+  const renderers = { home: renderHome, reports: renderReports, "new-report": renderNewReport, "my-reports": renderMyReports, blocks: renderBlocks, sanctions: renderSanctions, account: renderAccount, training: renderTraining, "training-index": renderTrainingIndex };
   await renderers[route.page](view, route, current);
   if (current() && route.page === "training" && getTrainingViewMode() === "presentation") enhanceTrainingDeck(view, route);
   if (current()) view.focus({ preventScroll: true });
@@ -1325,7 +1326,22 @@ async function submitWorkspaceReport() {
   showToast("Отчёт сохранён и передан в Static Forms для отправки на почту."); location.hash = "#/reports/mine";
 }
 
-async function renderReports(view, route, current) {
+async function renderReports(view) {
+  view.append(
+    pageHeading("РАБОЧЕЕ ПРОСТРАНСТВО", "Отчётность", "Создание и история ваших ежедневных отчётов."),
+    h("section", { class: "card report-hub" },
+      h("div", { class: "card-heading" }, h("span", { class: "section-icon" }, icon("i-doc")), h("div", {},
+        h("h2", { text: "Ежедневная отчётность" }),
+        h("p", { text: "Выберите, что хотите сделать." }))),
+      h("div", { class: "row-list" },
+        rowLink({ href: "#/reports/new", iconName: "i-plus", title: "Новый отчёт", text: "Перейти к странице составления нового отчёта." }),
+        rowLink({ href: "#/reports/mine", iconName: "i-folder", title: "Мои отчёты", text: "Просмотреть ранее сохранённые отчёты." })
+      )
+    )
+  );
+}
+
+async function renderNewReport(view) {
   view.append(
     pageHeading("ЕЖЕДНЕВНАЯ ОТЧЁТНОСТЬ", "Новый отчёт", "Соберите итоги дня — отчёт сохранится в вашем рабочем пространстве.",
       h("a", { class: "button button-secondary", href: "#/reports/mine" }, icon("i-doc"), "Мои отчёты")),
