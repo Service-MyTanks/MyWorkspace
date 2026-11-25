@@ -1745,3 +1745,40 @@ html[data-theme="new-year"] .holiday-chimney b:nth-child(2) {
   .report-form-actions { align-items:stretch; flex-direction:column-reverse; }
   .report-form-actions .button { width:100%; justify-content:center; }
 }
+
+
+/* Report navigation and deliberate spacing between every form block */
+#workspace-report-form {
+  display: grid;
+  gap: 22px;
+}
+#workspace-report-form > .report-section {
+  margin: 0;
+}
+.report-section-body {
+  row-gap: 24px;
+}
+.report-section-body > .field,
+.report-section-body > .field-row,
+.report-section-body > .report-screenshot-options,
+.report-section-body > .report-screenshot-fields {
+  margin: 0;
+}
+.report-section-body .field-row {
+  column-gap: 18px;
+  row-gap: 18px;
+}
+.report-section-body .field + .field,
+.report-section-body .field-row + .field,
+.report-section-body .field + .field-row {
+  margin-top: 0;
+}
+.report-hub .row-list {
+  display: grid;
+  gap: 12px;
+}
+@media (max-width: 700px) {
+  #workspace-report-form { gap: 16px; }
+  .report-section-body { row-gap: 20px; }
+  .report-section-body .field-row { row-gap: 16px; }
+}
