@@ -950,7 +950,7 @@ html[data-theme="new-year"] .home-block-snow { display: none; }
   border-radius: 1px;
   background: #27384a;
   opacity: .45;
-  transition: background .8s ease, opacity .8s ease, box-shadow .8s ease;
+  transition: background 2.4s ease-in-out, opacity 2.4s ease-in-out, box-shadow 2.4s ease-in-out;
 }
 .holiday-window.is-lit {
   background: #e5c985;
