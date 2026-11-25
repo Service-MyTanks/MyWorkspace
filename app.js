@@ -119,12 +119,15 @@ function syncHolidayAtmosphere() {
       sequence.className = "holiday-traffic-sequence";
       const queueColors = Array.from({ length: 18 }, (_, index) => colors[index % colors.length]);
       queueColors.forEach((color, index) => {
-        const car = document.createElement("div");
-        car.className = `holiday-traffic-car car-${color}`;
-        car.innerHTML = carMarkup;
-        car.style.setProperty("--car-scale", `${.92 + (index % 4) * .02}`);
-        car.style.setProperty("--car-gap", `${10 + (index % 3) * 10}px`);
-        sequence.append(car);
+        const isHolidayTank = Math.random() < 0.05;
+        const vehicle = document.createElement("div");
+        vehicle.className = isHolidayTank ? "holiday-traffic-car holiday-traffic-tank" : `holiday-traffic-car car-${color}`;
+        vehicle.innerHTML = isHolidayTank
+          ? '<i class="tank-track tank-track-top"></i><i class="tank-track tank-track-bottom"></i><i class="tank-hull"></i><i class="tank-turret"></i><i class="tank-barrel"></i><i class="tank-garland tank-garland-hull"></i><i class="tank-garland tank-garland-turret"></i><i class="tank-garland-bulbs"></i>'
+          : carMarkup;
+        vehicle.style.setProperty("--car-scale", `${.92 + (index % 4) * .02}`);
+        vehicle.style.setProperty("--car-gap", `${10 + (index % 3) * 10}px`);
+        sequence.append(vehicle);
       });
       track.append(sequence, sequence.cloneNode(true));
       row.append(track);
