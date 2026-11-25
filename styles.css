@@ -2014,3 +2014,38 @@ html[data-theme="new-year"] .holiday-chimney b:nth-child(2) {
 
 .report-toolbar-actions { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
 @media (max-width:700px) { .report-builder-toolbar { align-items:flex-start; flex-direction:column; } .report-toolbar-actions { width:100%; justify-content:space-between; } }
+
+
+/* Icon legibility pass: slightly larger, cleaner symbols */
+svg { width:22px; height:22px; }
+button svg, .button svg { width:18px; height:18px; }
+.nav-item svg { width:19px; height:19px; }
+.section-icon svg, .row-icon svg { width:20px; height:20px; }
+.record-meta svg, .attachment-chip svg { width:15px; height:15px; }
+.empty-state > svg { width:32px; height:32px; }
+.training-help-button svg { width:20px; height:20px; }
+.training-subsection-chevron { width:18px; height:18px; }
+.home-action-icon svg { width:21px; height:21px; }
+.training-course-open svg { width:16px; height:16px; }
+.training-back-link svg { width:17px; height:17px; }
+.training-settings-trigger svg { width:19px; height:19px; }
+.theme-choice-check svg { width:14px; height:14px; }
+.report-intro-icon svg { width:20px; height:20px; }
+.report-time-estimate svg, .report-local-note svg { width:16px; height:16px; }
+.report-preview-button svg { width:16px; height:16px; }
+.report-delivery-icon svg { width:19px; height:19px; }
+.report-help-dialog { width:min(720px,calc(100vw - 28px)); max-width:720px; }
+.report-help-body { max-height:calc(82vh - 85px); }
+.report-help-steps { display:grid; gap:20px; list-style:none; counter-reset:none; padding:0; margin:0 0 25px; }
+.report-help-steps li { display:grid; grid-template-columns:40px minmax(0,1fr); align-items:start; gap:15px; padding:0; margin:0; }
+.report-help-steps li::before { display:none; content:none; }
+.report-step-icon { display:block; width:40px; height:40px; flex:0 0 40px; fill:none; stroke:var(--accent); stroke-width:1.2; stroke-linecap:round; stroke-linejoin:round; }
+.report-step-icon text { fill:var(--accent); stroke:none; font-family:inherit; font-size:11px; font-weight:650; letter-spacing:.2px; }
+.report-help-steps li > div { min-width:0; padding-top:1px; }
+.report-help-steps strong { display:block; font-size:13px; font-weight:600; }
+.report-help-steps li p { margin:5px 0 0; font-size:12px; line-height:1.8; color:var(--muted); }
+@media (max-width:700px) {
+  .report-help-dialog { width:calc(100vw - 28px); max-width:none; }
+  .report-help-steps li { grid-template-columns:34px minmax(0,1fr); gap:12px; }
+  .report-step-icon { width:34px; height:34px; }
+}
