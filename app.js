@@ -1196,7 +1196,7 @@ function restoreReportDraft() {
   } catch {}
 }
 function reportFormMarkup() {
-  return \`
+  return `
   <section class="report-builder">
     <div class="report-builder-toolbar"><span class="report-draft-status" id="report-draft-status">Новый черновик</span><button type="button" class="text-button" id="report-template-button">Посмотреть шаблон</button></div>
     <form id="workspace-report-form" novalidate>
@@ -1224,7 +1224,7 @@ function reportFormMarkup() {
         <div class="report-form-actions"><button type="button" class="text-button" id="report-clear">Очистить черновик</button><button type="submit" class="button button-primary" id="report-review">Проверить отчёт <svg aria-hidden="true"><use href="#i-chevron"/></svg></button></div>
       </div></section>
     </form>
-  </section>\`;
+  </section>`;
 }
 function bindReportForm() {
   const form = reportField("workspace-report-form"), today = reportLocalDate();
