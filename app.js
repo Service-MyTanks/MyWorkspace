@@ -521,10 +521,10 @@ function setTrainingViewMode(mode) {
 
 function renderTrainingIndex(view) {
   const courses = [
-    ["gameplay", "Игровой процесс", "Дежурство, игровой чат, режим наблюдателя и мониторинг битв.", "i-monitor"],
+    ["gameplay", "Игровой процесс", "Дежурство, игровой чат, режим наблюдателя и мониторинг битв.", "i-gamepad"],
     ["community", "Работа с сообществом", "Социальные сети, игровой чат и работа с обращениями игроков.", "i-users"],
     ["forum", "Работа с форумом", "Права доступа, административные разделы и работа с обращениями.", "i-messages"],
-    ["administration", "Административный аппарат", "Структура команды, обязанности, регламенты и нормативы.", "i-shield"]
+    ["administration", "Административный аппарат", "Структура команды, обязанности, регламенты и нормативы.", "i-briefcase"]
   ];
   view.append(
     pageHeading("УЧЕБНЫЙ ЦЕНТР", "Учебный центр", "Выберите курс. Материалы открываются в формате последовательной презентации."),
@@ -1038,12 +1038,12 @@ async function countRows(table, filters = {}) {
 
 async function renderHome(view) {
   const links = {
-    news: { title: "Новости проекта", text: "Последние объявления и новости MyTanks", href: "https://forum.mytanks.net/index.php?forums/%D0%9D%D0%BE%D0%B2%D0%BE%D1%81%D1%82%D0%B8.37/", iconName: "i-book-open" },
-    complaints: { title: "Жалобы", text: "Раздел жалоб на действия игроков", href: "https://forum.mytanks.net/index.php?forums/%D0%96%D0%B0%D0%BB%D0%BE%D0%B1%D1%8B.38/", iconName: "i-warning" },
-    appeals: { title: "Апелляции", text: "Раздел апелляций", href: "https://forum.mytanks.net/index.php?forums/%D0%90%D0%BF%D0%B5%D0%BB%D0%BB%D1%8F%D1%86%D0%B8%D0%B8.52/", iconName: "i-shield" },
-    objections: { title: "Обжалования", text: "Раздел обжалований", href: "https://forum.mytanks.net/index.php?forums/%D0%9E%D0%B1%D0%B6%D0%B0%D0%BB%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5.56/", iconName: "i-message" },
-    inactivity: { title: "Заявление об уходе в неактив", text: "Оформление временного ухода", href: "https://forum.mytanks.net/index.php?threads/%D0%A8%D0%B0%D0%B1%D0%BB%D0%BE%D0%BD-%D0%B7%D0%B0%D1%8F%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F-%D0%BE%D0%B1-%D1%83%D1%85%D0%BE%D0%B4%D0%B5-%D0%B2-%D0%BD%D0%B5%D0%B0%D0%BA%D1%82%D0%B8%D0%B2.1301/", iconName: "i-clock" },
-    meetingAbsence: { title: "Прошение о пропуске собрания", text: "Пропуск еженедельного обзвона", href: "https://forum.mytanks.net/index.php?threads/%D0%A8%D0%B0%D0%B1%D0%BB%D0%BE%D0%BD-%D0%B7%D0%B0%D1%8F%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F-%D0%BD%D0%B0-%D0%BF%D1%80%D0%BE%D0%BF%D1%83%D1%81%D0%BA-%D0%B5%D0%B6%D0%B5%D0%BD%D0%B5%D0%B4%D0%B5%D0%BB%D1%8C%D0%BD%D0%BE%D0%B3%D0%BE-%D0%BE%D0%B1%D0%B7%D0%B2%D0%BE%D0%BD%D0%B0.1317/", iconName: "i-clock" },
+    news: { title: "Новости проекта", text: "Последние объявления и новости MyTanks", href: "https://forum.mytanks.net/index.php?forums/%D0%9D%D0%BE%D0%B2%D0%BE%D1%81%D1%82%D0%B8.37/", iconName: "i-newspaper" },
+    complaints: { title: "Жалобы", text: "Раздел жалоб на действия игроков", href: "https://forum.mytanks.net/index.php?forums/%D0%96%D0%B0%D0%BB%D0%BE%D0%B1%D1%8B.38/", iconName: "i-alert-triangle" },
+    appeals: { title: "Апелляции", text: "Раздел апелляций", href: "https://forum.mytanks.net/index.php?forums/%D0%90%D0%BF%D0%B5%D0%BB%D0%BB%D1%8F%D1%86%D0%B8%D0%B8.52/", iconName: "i-scale" },
+    objections: { title: "Обжалования", text: "Раздел обжалований", href: "https://forum.mytanks.net/index.php?forums/%D0%9E%D0%B1%D0%B6%D0%B0%D0%BB%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5.56/", iconName: "i-message-circle" },
+    inactivity: { title: "Заявление об уходе в неактив", text: "Оформление временного ухода", href: "https://forum.mytanks.net/index.php?threads/%D0%A8%D0%B0%D0%B1%D0%BB%D0%BE%D0%BD-%D0%B7%D0%B0%D1%8F%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F-%D0%BE%D0%B1-%D1%83%D1%85%D0%BE%D0%B4%D0%B5-%D0%B2-%D0%BD%D0%B5%D0%B0%D0%BA%D1%82%D0%B8%D0%B2.1301/", iconName: "i-calendar-clock" },
+    meetingAbsence: { title: "Прошение о пропуске собрания", text: "Пропуск еженедельного обзвона", href: "https://forum.mytanks.net/index.php?threads/%D0%A8%D0%B0%D0%B1%D0%BB%D0%BE%D0%BD-%D0%B7%D0%B0%D1%8F%D0%B2%D0%BB%D0%B5%D0%9D%D0%B8%D1%8F-%D0%BD%D0%B0-%D0%BF%D1%80%D0%BE%D0%BF%D1%83%D1%81%D0%BA-%D0%B5%D0%B6%D0%B5%D0%BD%D0%B5%D0%B4%D0%B5%D0%BB%D1%8C%D0%BD%D0%BE%D0%B3%D0%BE-%D0%BE%D0%B1%D0%B7%D0%B2%D0%BE%D0%BD%D0%B0.1317/", iconName: "i-calendar-x" },
     meetingMove: { title: "Прошение о переносе собрания", text: "Запрос на перенос собрания", href: "https://forum.mytanks.net/index.php?threads/%D0%A8%D0%B0%D0%B1%D0%BB%D0%BE%D0%BD-%D0%BF%D1%80%D0%BE%D1%88%D0%B5%D0%BD%D0%B8%D1%8F-%D0%BE-%D0%BF%D0%B5%D1%80%D0%B5%D0%BD%D0%BE%D1%81%D0%B5-%D1%81%D0%BE%D0%B1%D1%80%D0%B0%D0%BD%D0%B8%D1%8F.1318/", iconName: "i-refresh" },
     dailyTemplate: { title: "Шаблон ежедневного отчёта", text: "Единый универсальный шаблон MT DOCS", href: "https://forum.mytanks.net/index.php?threads/%D0%95%D0%B4%D0%B8%D0%BD%D1%8B%D0%B9-%D1%83%D0%BD%D0%B8%D0%B2%D0%B5%D1%80%D1%81%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9-%D1%88%D0%B0%D0%B1%D0%BB%D0%BE%D0%BD-%D0%B4%D0%BB%D1%8F-mt-docs.1320/", iconName: "i-doc" },
     sanctionTemplate: { title: "Шаблон формы на выдачу наказания", text: "Универсальный шаблон оформления наказания", href: "https://forum.mytanks.net/index.php?threads/%D0%A3%D0%BD%D0%B8%D0%B2%D0%B5%D1%80%D1%81%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9-%D1%88%D0%B0%D0%B1%D0%BB%D0%BE%D0%BD-%D1%84%D0%BE%D1%80%D0%BC%D1%8B-%D0%BD%D0%B0-%D0%B2%D1%8B%D0%B4%D0%B0%D1%87%D1%83-%D0%BD%D0%B0%D0%BA%D0%B0%D0%B7%D0%B0%D0%BD%D0%B8%D0%B9.1319/", iconName: "i-shield" }
@@ -1082,14 +1082,14 @@ async function renderHome(view) {
           rowLink({ href: "#/training", iconName: "i-graduation-cap", title: "Учебный центр", text: "Курсы и обучающие материалы MT DOCS" })
         )
       ),
-      block("admin", "Административный Раздел", "Заявления, прошения и рабочие шаблоны", "i-shield",
+      block("admin", "Административный Раздел", "Заявления, прошения и рабочие шаблоны", "i-briefcase",
         h("div", { class: "home-admin-content" },
           adminGroup("Заявления", [links.inactivity]),
           adminGroup("Прошения", [links.meetingAbsence, links.meetingMove]),
           adminGroup("Шаблоны", [links.dailyTemplate, links.sanctionTemplate])
         )
       ),
-      block("complaints", "Апелляционный центр", "Жалобы, апелляции и обжалования", "i-shield",
+      block("complaints", "Апелляционный центр", "Жалобы, апелляции и обжалования", "i-scale",
         h("div", { class: "row-list" },
           externalRow(links.complaints),
           externalRow(links.appeals),
