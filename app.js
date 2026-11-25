@@ -74,16 +74,6 @@ function syncHolidayAtmosphere() {
     moon.className = "holiday-moon";
     city.append(moon);
 
-    const factory = document.createElement("div");
-    factory.className = "holiday-factory";
-    factory.innerHTML = '<i class="factory-hall"></i><i class="factory-roof"></i><i class="factory-stack factory-stack-one"><b></b></i><i class="factory-stack factory-stack-two"><b></b></i><i class="factory-stack factory-stack-three"><b></b></i>';
-    city.append(factory);
-
-    const tower = document.createElement("div");
-    tower.className = "holiday-ostankino";
-    tower.innerHTML = '<i class="ostankino-antenna"></i><i class="ostankino-spire"></i><i class="ostankino-disc ostankino-disc-top"></i><i class="ostankino-disc ostankino-disc-bottom"></i><i class="ostankino-shaft"></i><i class="ostankino-base"></i>';
-    city.append(tower);
-
     let windowIndex = 0;
     for (let buildingIndex = 0; buildingIndex < buildingSpecs.length; buildingIndex++) {
       const [height, width, count] = buildingSpecs[buildingIndex];
