@@ -481,7 +481,7 @@ function emptyBlock(iconName, title, text, action) {
 }
 
 function newReportLink(className = "button button-primary") {
-  return h("a", { class: className, href: config.reportsUrl, target: "_blank", rel: "noopener noreferrer" }, icon("i-plus"), "Новый отчёт");
+  return h("a", { class: className, href: "#/reports" }, icon("i-plus"), "Новый отчёт");
 }
 
 async function render() {
@@ -1099,29 +1099,197 @@ async function renderHome(view) {
     )
   );
 }
-async function renderReports(view, route, current) {
-  const mine = rowLink({ href: "#/reports/mine", iconName: "i-doc", title: "Мои отчёты", text: "История ваших ежедневных отчётов", meta: "…" });
-  view.append(
-    pageHeading("ОТЧЁТНОСТЬ", "Отчётность", "Ежедневные отчёты команды MyTanks."),
-    h("section", { class: "card" }, h("div", { class: "row-list" }, mine,
-      rowLink({ href: config.reportsUrl, iconName: "i-plus", title: "Новый отчёт", text: "Откроется форма MT DOCS в новой вкладке", external: true }))));
-  try {
-    const count = await countRows("reports");
-    if (current()) mine.querySelector(".row-meta").textContent = String(count);
-  } catch {
-    if (current()) mine.querySelector(".row-meta").textContent = "—";
+
+const REPORT_POSITION_GROUPS = [
+  ["1. Младший состав", ["Младший Хелпер", "Хелпер"]],
+  ["2. Средний состав", ["Младший модератор", "Модератор", "Старший модератор", "Администратор", "Старший администратор"]],
+  ["3. Старший состав — на выбор", ["Тестировщик", "Медиа-продакшн", "Технический специалист", "Следящий за форумом", "Старший следящий за форумом", "Следящий за битвами", "Старший следящий за битвами"]],
+  ["4. Старший и Технический состав", ["Зам.куратора технических специалистов", "Куратор технических специалистов", "Зам куратора администрации", "Куратор администрации", "Заместитель Куратора Агентов Поддержки", "Куратор Агентов Поддержки"]],
+  ["5. Высший Административный Состав", ["Заместитель главного администратора", "Главный администратор"]],
+  ["6. Специальный состав", ["Заместитель Специального Администратора", "Специальный Администратор"]]
+];
+const reportField = (id) => document.getElementById(id);
+const reportDraftKey = () => "myworkspace.report-draft." + (state.session?.user?.id || "guest");
+const reportLocalDate = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); };
+function reportNumberedList(text, empty) {
+  const lines = String(text || "").split(/\r?\n/).map(line => line.replace(/^\s*(?:\d+[.)]\s*|[-•]\s+)/, "").trim()).filter(Boolean);
+  return lines.length ? lines.map((line, i) => (i+1) + ". " + line).join("\n") : (empty || "Не проводилась");
+}
+function reportFormText(template) {
+  const get = (id, fallback) => template ? fallback : (reportField(id)?.value.trim() || fallback);
+  const mode = reportField("report-screenshots-group")?.checked ? "group" : reportField("report-screenshots-blocked")?.checked ? "blocked" : "";
+  const shots = mode === "group" ? "Скриншоты направлены в группу «ЕЖЕДНЕВНЫЕ ОТЧЁТЫ»" : mode === "blocked" ? "Отсутствует доступ к сторонним файлообменникам" : [1,2,3].map(n => n + ". " + get("report-screenshot-" + n, "[Ссылка на скриншот " + n + "]")).join("\n");
+  return [
+    "ЕЖЕДНЕВНЫЙ ОТЧЁТ · MYTANKS", "",
+    "1. Дата: " + (template ? "[Дата]" : formatDate(get("report-date", ""))),
+    "2. Ваш ник: " + get("report-nickname", "[Игровой никнейм]"),
+    "3. Должность: " + get("report-position", "[Ваша должность]"),
+    "4. Минуты онлайна: " + get("report-online", "[Минуты]"),
+    "Скриншоты (ссылки):\n" + shots,
+    "5. Кол-во ответов на репорты: " + get("report-count", "[Кол-во]"), "",
+    "6. Проделанная работа:", "", "ИГРОВОЙ ПРОЦЕСС:",
+    template ? "1. [Баны, муты, кики, предупреждения, информирование игроков]" : reportNumberedList(get("report-game-work", ""), "[Опишите работу в игре]"), "",
+    "РАБОТА С СООБЩЕСТВОМ:",
+    template ? "1. [Работа во ВКонтакте, Telegram, Discord]" : reportNumberedList(get("report-community-work", "")), "",
+    "ФОРУМ:",
+    template ? "1. [Ответы на обращения, размещение новых тем, объявления мероприятий]" : reportNumberedList(get("report-forum-work", "")), "",
+    "7. МОИ КЛЮЧЕВЫЕ НАВЫКИ:",
+    template ? "1. [Ваш ключевой навык]" : reportNumberedList(get("report-skills", ""), "[Перечислите навыки]"), "",
+    "8. Соответствующие ссылки:", get("report-links", "Не указаны")
+  ].join("\n");
+}
+function populateReportPositions() {
+  const select = reportField("report-position");
+  select.replaceChildren(new Option("Выберите должность", ""));
+  for (const [label, positions] of REPORT_POSITION_GROUPS) {
+    const group = document.createElement("optgroup"); group.label = label;
+    positions.forEach(position => group.append(new Option(position, position)));
+    select.append(group);
   }
+  select.value = state.profile?.position || "";
+  select.disabled = !state.profile?.manual_report_position;
+  reportField("report-position-hint").textContent = select.disabled
+    ? "Должность подставлена из вашего профиля. Ручной выбор отключён в настройках личного кабинета."
+    : "Вы можете выбрать должность для этого отчёта вручную.";
+}
+function reportScreenshotMode() {
+  const group = reportField("report-screenshots-group"), blocked = reportField("report-screenshots-blocked");
+  if (group.checked) blocked.checked = false;
+  if (blocked.checked) group.checked = false;
+  const mode = group.checked ? "group" : blocked.checked ? "blocked" : "";
+  for (let n=1;n<=3;n++) {
+    const input = reportField("report-screenshot-" + n);
+    input.disabled = Boolean(mode); input.required = !mode;
+    if (mode) input.value = "";
+  }
+  reportField("report-upload-hint").textContent = mode === "group"
+    ? "Скриншоты направьте в группу «ЕЖЕДНЕВНЫЕ ОТЧЁТЫ». Ссылки добавлять не нужно."
+    : mode === "blocked" ? "В отчёт будет добавлена причина отсутствия ссылок."
+    : "Вставьте три полные ссылки http:// или https:// с доступом для получателя.";
+}
+function saveReportDraft() {
+  const form = reportField("workspace-report-form"); if (!form) return;
+  try {
+    localStorage.setItem(reportDraftKey(), JSON.stringify(Object.fromEntries(new FormData(form).entries())));
+    reportField("report-draft-status").textContent = "Черновик сохранён";
+  } catch { reportField("report-draft-status").textContent = "Автосохранение недоступно"; }
+}
+function restoreReportDraft() {
+  try {
+    const draft = JSON.parse(localStorage.getItem(reportDraftKey()) || "null");
+    if (!draft || typeof draft !== "object") return;
+    const form = reportField("workspace-report-form");
+    for (const [key,val] of Object.entries(draft)) {
+      const input = form.elements.namedItem(key); if (!input) continue;
+      if (input.type === "checkbox") input.checked = val === "on";
+      else if (input.id !== "report-position" || state.profile?.manual_report_position) input.value = String(val).slice(0, input.maxLength > 0 ? input.maxLength : 10000);
+    }
+    reportScreenshotMode();
+  } catch {}
+}
+function reportFormMarkup() {
+  return \`
+  <section class="report-builder">
+    <div class="report-builder-toolbar"><span class="report-draft-status" id="report-draft-status">Новый черновик</span><button type="button" class="text-button" id="report-template-button">Посмотреть шаблон</button></div>
+    <form id="workspace-report-form" novalidate>
+      <section class="report-section"><div class="report-section-heading"><span>01</span><div><h2>Основная информация</h2><p>Расскажите, кто вы и как прошёл ваш день.</p></div></div>
+        <div class="report-section-body">
+          <div class="field-row"><div class="field"><label for="report-date">Дата отчёта <span>*</span></label><input type="date" id="report-date" name="report-date" required></div><div class="field"><label for="report-nickname">Игровой никнейм <span>*</span></label><input type="text" id="report-nickname" name="report-nickname" maxlength="64" required></div></div>
+          <div class="field"><label for="report-position">Должность <span>*</span></label><select id="report-position" name="report-position" required></select><small id="report-position-hint"></small></div>
+          <div class="field-row"><div class="field"><label for="report-online">Время онлайн <span>*</span></label><div class="input-with-unit"><input type="number" id="report-online" name="report-online" min="0" max="1440" step="1" placeholder="0" required><span>минут</span></div><small>Общее время за отчётный день</small></div><div class="field"><label for="report-count">Ответы на репорты <span>*</span></label><div class="input-with-unit"><input type="number" id="report-count" name="report-count" min="0" max="99999" step="1" placeholder="0" required><span>ответов</span></div><small>Укажите 0, если ответов не было</small></div></div>
+          <div class="field"><label>Скриншоты <span>*</span></label><div class="report-screenshot-options"><label class="checkbox"><input type="checkbox" id="report-screenshots-group" name="report-screenshots-group"><span>Отправлю скриншоты в группу</span></label><label class="checkbox"><input type="checkbox" id="report-screenshots-blocked" name="report-screenshots-blocked"><span>Отсутствует доступ к сторонним файлообменникам</span></label></div>
+            <div class="report-screenshot-fields"><div class="field"><label for="report-screenshot-1">Скриншот 1 <span>*</span></label><input type="url" id="report-screenshot-1" name="report-screenshot-1" maxlength="2048" placeholder="https://…" required></div><div class="field"><label for="report-screenshot-2">Скриншот 2 <span>*</span></label><input type="url" id="report-screenshot-2" name="report-screenshot-2" maxlength="2048" placeholder="https://…" required></div><div class="field"><label for="report-screenshot-3">Скриншот 3 <span>*</span></label><input type="url" id="report-screenshot-3" name="report-screenshot-3" maxlength="2048" placeholder="https://…" required></div></div><small id="report-upload-hint">Вставьте три полные ссылки http:// или https:// с доступом для получателя.</small>
+          </div>
+        </div>
+      </section>
+      <section class="report-section"><div class="report-section-heading"><span>02</span><div><h2>Проделанная работа</h2><p>Зафиксируйте результаты по каждому направлению.</p></div></div><div class="report-section-body">
+        <div class="field"><label for="report-game-work">Игровой процесс <span>*</span></label><p class="field-description">Баны, муты, кики, предупреждения, помощь и информирование игроков.</p><textarea id="report-game-work" name="report-game-work" rows="4" maxlength="8000" required placeholder="Выдал 3 предупреждения за нарушение правил&#10;Ответил на вопросы игроков&#10;Проверил жалобы на нарушения"></textarea><small>Каждый пункт — с новой строки. Нумерацию добавим автоматически.</small></div>
+        <div class="field"><label for="report-community-work">Работа с сообществом</label><p class="field-description">Активность и модерация во ВКонтакте, Telegram и Discord.</p><textarea id="report-community-work" name="report-community-work" rows="3" maxlength="8000" placeholder="Что вы сделали для сообщества?"></textarea></div>
+        <div class="field"><label for="report-forum-work">Форум</label><p class="field-description">Ответы на обращения, новые темы и объявления мероприятий.</p><textarea id="report-forum-work" name="report-forum-work" rows="3" maxlength="8000" placeholder="Какие задачи на форуме вы выполнили?"></textarea><small>Если работы в соцсетях или на форуме не было, оставьте поля пустыми.</small></div>
+      </div></section>
+      <section class="report-section"><div class="report-section-heading"><span>03</span><div><h2>Навыки и ссылки</h2><p>Дополните отчёт важными деталями.</p></div></div><div class="report-section-body">
+        <div class="field"><label for="report-skills">Мои ключевые навыки <span>*</span></label><textarea id="report-skills" name="report-skills" rows="3" maxlength="4000" required placeholder="Знание правил проекта&#10;Разрешение конфликтов&#10;Работа с обращениями игроков"></textarea><small>По одному навыку на строку.</small></div>
+        <div class="field"><label for="report-links">Дополнительные ссылки</label><textarea id="report-links" name="report-links" rows="3" maxlength="6000" placeholder="Вставьте ссылки на темы форума или другие материалы"></textarea><small>По одной полной ссылке http:// или https:// на строку.</small></div>
+      </div></section>
+      <section class="report-section"><div class="report-section-heading"><span>04</span><div><h2>Всё готово?</h2><p>Проверьте отчёт перед отправкой.</p></div></div><div class="report-section-body">
+        <label class="checkbox report-consent"><input type="checkbox" id="report-consent" name="report-consent" required><span>Подтверждаю достоверность данных и согласен с сохранением отчёта в рабочем пространстве MyTanks.</span></label>
+        <div class="report-form-actions"><button type="button" class="text-button" id="report-clear">Очистить черновик</button><button type="submit" class="button button-primary" id="report-review">Проверить отчёт <svg aria-hidden="true"><use href="#i-chevron"/></svg></button></div>
+      </div></section>
+    </form>
+  </section>\`;
+}
+function bindReportForm() {
+  const form = reportField("workspace-report-form"), today = reportLocalDate();
+  reportField("report-date").value = today; reportField("report-date").max = today;
+  reportField("report-nickname").value = state.profile?.nickname || "";
+  populateReportPositions(); restoreReportDraft();
+  let draftTimer;
+  form.addEventListener("input", () => { reportField("report-draft-status").textContent = "Сохраняем черновик…"; clearTimeout(draftTimer); draftTimer = setTimeout(saveReportDraft, 350); });
+  form.addEventListener("change", event => { if (event.target.id.startsWith("report-screenshots-")) reportScreenshotMode(); saveReportDraft(); });
+  form.addEventListener("submit", event => {
+    event.preventDefault();
+    const mode = reportField("report-screenshots-group").checked || reportField("report-screenshots-blocked").checked;
+    const invalidShot = mode ? "" : [1,2,3].map(n => reportField("report-screenshot-" + n).value.trim()).find(url => !isHttpUrl(url));
+    const links = reportField("report-links").value.split(/\r?\n/).map(x => x.trim()).filter(Boolean);
+    if (invalidShot) { showToast("Укажите три корректные ссылки на скриншоты или выберите способ их передачи."); reportField("report-screenshot-1").focus(); return; }
+    if (links.some(url => !isHttpUrl(url))) { showToast("Дополнительные ссылки должны начинаться с http:// или https://."); reportField("report-links").focus(); return; }
+    if (!form.reportValidity()) return;
+    reportField("report-preview-title").textContent = "Проверка отчёта";
+    reportField("report-preview-body").textContent = reportFormText(false);
+    reportField("report-preview-send").hidden = false;
+    reportField("report-preview-dialog").showModal();
+  });
+  reportField("report-template-button").addEventListener("click", () => {
+    reportField("report-preview-title").textContent = "Шаблон ежедневного отчёта";
+    reportField("report-preview-body").textContent = reportFormText(true);
+    reportField("report-preview-send").hidden = true;
+    reportField("report-preview-dialog").showModal();
+  });
+  reportField("report-preview-send").addEventListener("click", submitWorkspaceReport);
+  reportField("report-clear").addEventListener("click", async () => {
+    if (!await confirmAction("Очистить черновик?", "Все данные текущего отчёта будут удалены.", "Очистить")) return;
+    localStorage.removeItem(reportDraftKey()); form.reset();
+    reportField("report-date").value = today; reportField("report-nickname").value = state.profile?.nickname || "";
+    populateReportPositions(); reportScreenshotMode(); reportField("report-draft-status").textContent = "Новый черновик";
+    showToast("Черновик очищен.");
+  });
+}
+async function submitWorkspaceReport() {
+  const form = reportField("workspace-report-form"), button = reportField("report-preview-send");
+  if (!form.reportValidity()) { reportField("report-preview-dialog").close(); form.reportValidity(); return; }
+  setBusy(button, true, "Сохраняем отчёт…");
+  const mode = reportField("report-screenshots-group").checked || reportField("report-screenshots-blocked").checked;
+  const screenshots = mode ? [] : [1,2,3].map(n => reportField("report-screenshot-" + n).value.trim());
+  const date = reportField("report-date").value, nickname = reportField("report-nickname").value.trim();
+  const position = reportField("report-position").value, subject = "MT DOCS | " + nickname + " | " + formatDate(date);
+  const { error } = await state.client.from("reports").insert({
+    report_date: date, nickname, position, online_minutes: Number(reportField("report-online").value),
+    report_count: Number(reportField("report-count").value), subject, body: reportFormText(false), screenshots
+  });
+  setBusy(button, false);
+  if (error) { showToast(friendlyError(error)); return; }
+  localStorage.removeItem(reportDraftKey()); reportField("report-preview-dialog").close();
+  showToast("Отчёт сохранён в рабочем пространстве."); location.hash = "#/reports/mine";
+}
+
+async function renderReports(view, route, current) {
+  view.append(
+    pageHeading("ЕЖЕДНЕВНАЯ ОТЧЁТНОСТЬ", "Новый отчёт", "Соберите итоги дня — отчёт сохранится в вашем рабочем пространстве.",
+      h("a", { class: "button button-secondary", href: "#/reports/mine" }, icon("i-doc"), "Мои отчёты")),
+    h("div", { id: "report-form-mount" }));
+  $("report-form-mount").outerHTML = reportFormMarkup();
+  bindReportForm();
 }
 
 async function renderMyReports(view, route, current) {
   const body = h("section", { class: "card" }, loadingBlock());
-  view.append(pageHeading("ОТЧЁТНОСТЬ", "Мои отчёты", "Отчёты, отправленные через форму MT DOCS во время входа в рабочее пространство.", newReportLink()), body);
+  view.append(pageHeading("ОТЧЁТНОСТЬ", "Мои отчёты", "Ваши ранее сохранённые ежедневные отчёты.", newReportLink()), body);
   const { data, error } = await state.client.from("reports").select("id, report_date, position, online_minutes, report_count, subject, body, screenshots, created_at")
     .eq("user_id", state.session.user.id).order("report_date", { ascending: false }).order("created_at", { ascending: false }).limit(200);
   if (!current()) return;
   if (error) { body.replaceChildren(errorBlock(error, render)); return; }
   if (!data.length) {
-    body.replaceChildren(emptyBlock("i-doc", "Отчётов пока нет", "Войдите в рабочее пространство в этом браузере и отправьте отчёт через форму MT DOCS — копия появится здесь.", newReportLink("button button-secondary")));
+    body.replaceChildren(emptyBlock("i-doc", "Отчётов пока нет", "После отправки первого отчёта он появится в этом списке.", newReportLink("button button-secondary")));
     return;
   }
   body.replaceChildren(h("div", { class: "table" },
@@ -1333,7 +1501,17 @@ function openAccountSettings() {
   $("settings-new-email").disabled = locked; $("settings-email-submit").disabled = locked;
   $("settings-email-locked").hidden = !locked;
   $("settings-email-message").hidden = true; $("settings-nickname-message").hidden = true; $("settings-password-message").hidden = true;
-  $("settings-nickname").value = state.profile?.nickname || ""; $("account-settings-dialog").showModal();
+  $("settings-nickname").value = state.profile?.nickname || ""; $("manual-report-position").checked = Boolean(state.profile?.manual_report_position); $("account-settings-dialog").showModal();
+}
+
+async function changeManualReportPosition(event) {
+  const input = event.target; input.disabled = true;
+  const { error } = await state.client.rpc("set_own_manual_report_position", { enabled: input.checked });
+  input.disabled = false;
+  if (error) { input.checked = !input.checked; showToast(friendlyError(error)); return; }
+  state.profile = await loadProfile();
+  showToast(input.checked ? "Ручной выбор должности включён." : "Используется должность из профиля.");
+  if (location.hash === "#/reports") render();
 }
 
 async function changeNickname(event) {
@@ -1529,6 +1707,7 @@ function bindApp() {
   $("settings-nickname-form").addEventListener("submit", changeNickname);
   $("settings-email-form").addEventListener("submit", requestEmailChange);
   $("settings-password-form").addEventListener("submit", changePassword);
+  $("manual-report-position").addEventListener("change", changeManualReportPosition);
   $("sanction-permanent").addEventListener("change", (event) => {
     $("sanction-duration").disabled = event.target.checked;
     $("sanction-unit").disabled = event.target.checked;
