@@ -13,10 +13,10 @@
   <link rel="icon" href="./favicon-16.png" type="image/png" sizes="16x16">
   <link rel="shortcut icon" href="./favicon.ico">
   <link rel="apple-touch-icon" href="./apple-touch-icon.png" sizes="180x180">
-  <link rel="stylesheet" href="./styles.css?v=47">
+  <link rel="stylesheet" href="./styles.css?v=48">
   <script src="./vendor/supabase.js?v=2.119.1" defer></script>
   <script src="./config.js?v=2" defer></script>
-  <script src="./app.js?v=49" defer></script>
+  <script src="./app.js?v=50" defer></script>
 </head>
 <body>
   <svg class="svg-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
@@ -115,6 +115,7 @@
         <form id="login-form" role="tabpanel" aria-labelledby="tab-login" novalidate>
           <h1>С возвращением<span>.</span></h1>
           <p class="muted">Войдите, чтобы открыть рабочее пространство команды.</p>
+          <div class="service-warning" role="note"><svg aria-hidden="true"><use href="#i-shield"/></svg><p><strong>Служебный доступ.</strong> Продолжая работу с сервисом, вы подтверждаете ознакомление с правилами использования и принимаете ответственность за сохранность служебной информации.</p><a href="#service-rules" data-open-service-rules>Правила использования</a></div>
           <div class="field"><label for="login-email">Почта <span>*</span></label><input type="email" id="login-email" maxlength="254" autocomplete="email" required></div>
           <div class="field"><label for="login-password">Пароль <span>*</span></label><input type="password" id="login-password" maxlength="72" autocomplete="current-password" required></div>
           <p class="form-message" id="login-message" role="alert" hidden></p>
@@ -194,6 +195,7 @@
         <div class="topbar-right"><span class="topbar-user" id="topbar-nickname"></span><div class="topbar-account"><button type="button" class="topbar-avatar-button" id="topbar-account-button" aria-label="Открыть меню аккаунта" aria-haspopup="true" aria-expanded="false" aria-controls="topbar-account-menu"><img class="topbar-avatar" src="./mytanks-avatar.jpg" alt="" width="36" height="36"><svg class="topbar-account-chevron" aria-hidden="true"><use href="#i-chevron"/></svg></button><div class="account-menu" id="topbar-account-menu" hidden><a href="#/account" class="account-menu-item"><svg aria-hidden="true"><use href="#i-user"/></svg><span>Личный кабинет</span></a><div class="account-menu-divider"></div><a href="#/reports/mine" class="account-menu-item"><svg aria-hidden="true"><use href="#i-doc"/></svg><span>Мои отчёты</span></a><a href="#/blocks" class="account-menu-item"><svg aria-hidden="true"><use href="#i-lock"/></svg><span>Мои блокировки</span></a><a href="#/training" class="account-menu-item"><svg aria-hidden="true"><use href="#i-book-open"/></svg><span>Учебный центр</span></a><div class="account-menu-divider"></div><button type="button" class="account-menu-item account-menu-logout" id="topbar-logout"><svg aria-hidden="true"><use href="#i-logout"/></svg><span>Выйти</span></button></div></div></div>
       </header>
       <main id="view" tabindex="-1"></main>
+      <footer class="workspace-footer"><span>MT DOCS · Служебное рабочее пространство</span><a href="#service-rules" data-open-service-rules>Правила использования</a></footer>
     </div>
   </div>
 
@@ -281,6 +283,40 @@
   </dialog>
 
 
+  <dialog id="service-rules-dialog" class="service-rules-dialog" aria-labelledby="service-rules-title">
+    <div class="service-rules-shell">
+      <header class="service-rules-header">
+        <div class="service-rules-logo" aria-label="MT DOCS"><span class="brand-mark">M<span>T</span></span></div>
+        <span class="eyebrow">MYTANKS TEAM WORKSPACE</span>
+        <h1 id="service-rules-title">Правила использования<br><span>служебного сервиса</span></h1>
+        <p>Обязательные условия доступа к MT DOCS</p>
+      </header>
+      <div class="service-rules-scroll" id="service-rules-scroll" tabindex="0">
+        <section class="service-rules-section"><h2>1. Общие положения</h2>
+          <p>MT DOCS (MyWorkspace) является закрытым внутренним сервисом команды MyTanks, предназначенным исключительно для выполнения служебных, административных, организационных и технических задач.</p>
+          <p>Сервис не предназначен для обычных игроков, посетителей форума и иных лиц, не имеющих официального разрешения. Доступ предоставляется только уполномоченным участникам команды.</p>
+          <p>Использование сервиса означает согласие с настоящими правилами и обязанность соблюдать их в полном объёме.</p></section>
+        <section class="service-rules-section"><h2>2. Учётная запись и доступ</h2>
+          <ul><li>Используйте только личную учётную запись. Передача логина, пароля или доступа третьим лицам запрещена.</li><li>Запрещены попытки получить доступ к разделам, данным и функциям за пределами выданных полномочий.</li><li>Запрещены обход ограничений, вмешательство в работу сервиса и использование уязвимостей.</li><li>Пользователь обязан обеспечивать сохранность средств авторизации и незамедлительно сообщать руководству о подозрении на компрометацию аккаунта.</li><li>Служебный доступ предоставляется для выполнения обязанностей, а не для личных целей.</li></ul></section>
+        <section class="service-rules-section"><h2>3. Конфиденциальность служебной информации</h2>
+          <p>Любые сведения, размещённые в MT DOCS и других закрытых источниках администрации, считаются внутренней служебной информацией, если руководство явно не определило иное.</p><p>Без прямого разрешения руководства запрещается:</p>
+          <ul><li>передавать, публиковать, пересылать или иным способом раскрывать третьим лицам сведения из сервиса;</li><li>делать и распространять скриншоты, фотографии, видеозаписи, копии документов, отчётов, переписок и внутренних материалов;</li><li>выгружать служебные данные за пределы сервиса или размещать их в личных хранилищах и общедоступных ресурсах;</li><li>раскрывать внутренние проверки, решения администрации, сведения о сотрудниках, структуру сервиса, его функции и механизмы доступа;</li><li>использовать служебные сведения в личных целях, для давления, шантажа, конфликтов или получения преимуществ.</li></ul>
+          <p>Запрет действует в отношении любых каналов передачи, включая игровые чаты, форумы, социальные сети, мессенджеры, сайты и личные сообщения. Обязанность сохранять конфиденциальность действует и после прекращения работы в команде.</p></section>
+        <section class="service-rules-section"><h2>4. Ответственность за утечку информации</h2>
+          <p class="service-rules-danger">Слив, передача, публикация или любое несанкционированное раскрытие данных и информации из MT DOCS либо другого закрытого источника администрации рассматривается как грубое нарушение служебных обязанностей.</p>
+          <p>За подтверждённый факт такого нарушения предусматриваются следующие меры:</p>
+          <ol><li><strong>Перманентное снятие с занимаемой должности</strong> без восстановления в должности.</li><li><strong>Лишение прав доступа</strong> к административным возможностям и инструментам игры.</li><li><strong>Лишение прав доступа</strong> к закрытым разделам и инструментам форума.</li><li><strong>Добавление личности нарушителя в ОЧСА</strong> (Основной Чёрный Список Администрации) навсегда, без последующего исключения и повторного назначения.</li></ol>
+          <p>Ответственность распространяется не только на непосредственную публикацию, но и на передачу материалов посредникам, содействие утечке и сознательное предоставление доступа посторонним лицам. Удаление опубликованных материалов, отсутствие личной выгоды или заявление о незнании правил сами по себе не отменяют ответственности.</p><p>Обстоятельства нарушения и применяемые меры рассматриваются руководством на основании имеющихся доказательств.</p></section>
+        <section class="service-rules-section"><h2>5. Работа со служебными материалами</h2>
+          <ul><li>Используйте отчёты, документы и сведения только в рамках своих должностных полномочий.</li><li>Вносите достоверную информацию. Не допускаются намеренное искажение, подмена, сокрытие или удаление служебных данных без соответствующих полномочий.</li><li>Не используйте доступ к материалам для личных разбирательств, давления на коллег или сведения счётов.</li><li>При обнаружении ошибки, подозрительной активности или возможной утечки незамедлительно уведомите руководство.</li></ul></section>
+        <section class="service-rules-section"><h2>6. Заключительные положения</h2>
+          <p>Каждый пользователь обязан соблюдать настоящие правила и поддерживать конфиденциальность внутренней информации. Руководство вправе ограничить или отозвать доступ при нарушении правил либо возникновении угрозы безопасности.</p><p>Правила могут обновляться. Продолжение использования сервиса после публикации новой редакции означает необходимость ознакомиться с ней повторно.</p>
+          <p class="service-rules-final">Служебный доступ является рабочим полномочием, а не личной привилегией. Ответственность за его использование несёт каждый допущенный пользователь.</p></section>
+        <div class="service-rules-end" id="service-rules-end">Конец документа · MT DOCS</div>
+      </div>
+      <footer class="service-rules-actions"><span id="service-rules-progress">Прокрутите документ до конца, чтобы продолжить.</span><button type="button" class="button button-primary" id="service-rules-continue" disabled>Прочитал. Вернуться на главную</button></footer>
+    </div>
+  </dialog>
   <div class="toast" id="toast" role="status" hidden></div>
   <noscript><div class="notice">Для работы MT DOCS включите JavaScript.</div></noscript>
 </body>
