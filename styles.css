@@ -2193,3 +2193,9 @@ html[data-theme="new-year"] .report-section .field input:disabled { color: #91a6
 .service-rules-actions .button{min-height:40px;white-space:nowrap}
 .service-rules-actions .button:disabled{cursor:not-allowed;opacity:.42}
 @media(max-width:700px){.workspace-footer{padding:14px 18px}.service-rules-dialog{width:calc(100vw - 12px);height:calc(100dvh - 12px);max-height:calc(100dvh - 12px);border-radius:10px}.service-rules-header{padding:20px 16px 16px}.service-rules-scroll{padding:20px 18px 28px}.service-rules-actions{align-items:stretch;flex-direction:column;gap:9px;padding:12px}.service-rules-actions>span{text-align:center}.service-rules-actions .button{width:100%;justify-content:center;white-space:normal}}
+
+
+/* Keep the workspace footer pinned to the bottom on short pages. */
+.workspace { display: flex; flex-direction: column; min-height: 100vh; }
+main#view { flex: 1 0 auto; }
+.workspace-footer { margin-top: auto; }
