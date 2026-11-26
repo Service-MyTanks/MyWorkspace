@@ -2332,3 +2332,53 @@ main#view { flex: 1 0 auto; }
   .metrics-settings-menu { right: 0; bottom: 54px; width: min(340px, calc(100vw - 24px)); }
   .metrics-consent-banner { right: 8px; bottom: 68px; width: calc(100vw - 16px); }
 }
+
+
+/* Generated translucent cookie control: compact, animated and bottom-left. */
+.metrics-settings {
+  left: 18px;
+  right: auto;
+  bottom: 16px;
+}
+.metrics-cookie-trigger {
+  width: 48px;
+  height: 48px;
+  padding: 5px;
+  overflow: visible;
+  background: color-mix(in srgb, var(--card) 72%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.metrics-cookie-trigger:hover,
+.metrics-cookie-trigger[aria-expanded="true"] {
+  transform: translateY(-2px) scale(1.03);
+}
+.metrics-cookie-trigger .metrics-cookie-image {
+  display: block;
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  animation: cookie-float 3.2s ease-in-out infinite;
+  filter: drop-shadow(0 2px 5px #0004);
+  pointer-events: none;
+}
+.metrics-cookie-trigger:hover .metrics-cookie-image {
+  animation-duration: 1.5s;
+}
+.metrics-settings-menu {
+  left: 0;
+  right: auto;
+}
+@keyframes cookie-float {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-3px) rotate(3deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .metrics-cookie-trigger .metrics-cookie-image { animation: none; }
+}
+@media (max-width: 640px) {
+  .metrics-settings { left: 12px; right: auto; bottom: 12px; }
+  .metrics-cookie-trigger { width: 46px; height: 46px; }
+  .metrics-cookie-trigger .metrics-cookie-image { width: 35px; height: 35px; }
+  .metrics-settings-menu { left: 0; right: auto; bottom: 54px; }
+}
