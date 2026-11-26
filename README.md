@@ -47,3 +47,18 @@ favicon*, *.png, mytanks-avatar.jpg   иконки и аватар
 - CSP через `<meta>`, без inline-скриптов; пользовательский ввод только через `textContent`.
 - Админ-действия — через RPC `set_account_status` с серверной проверкой прав.
 - Регистрация ≠ доступ: заявка проходит подтверждение почты и одобрение руководителем.
+
+
+## Google sign-in and backup password
+
+Google sign-in is available alongside email/password authentication. New Google users must set a backup password and submit their employee nickname and position before their account can enter the workspace. The database creates their profile with the default `pending` status; a manager must still approve access.
+
+To enable the provider:
+
+1. Create a Google OAuth 2.0 Web application in Google Cloud Console.
+2. Add this authorized redirect URI to the Google OAuth client: `https://nrurjjklmypodbvwwele.supabase.co/auth/v1/callback`.
+3. In Supabase → Authentication → Providers → Google, enable Google and enter the OAuth Client ID and Client Secret. Keep the secret in Supabase only; never add it to this repository.
+4. In Supabase → Authentication → URL Configuration → Redirect URLs, allow `https://service-mytanks.github.io/MyWorkspace/` and the local test URL `http://localhost:8000/`.
+5. Apply migration `supabase/migrations/20261126204300_google_oauth_registration.sql`.
+
+Existing email/password users can continue using their current login. If they sign in with Google using the same verified email, Supabase can link the verified identity to the existing account.

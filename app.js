@@ -26,7 +26,7 @@ const SERVICE_RULES_VERSION = "2026-11-25-v1";
 function serviceRulesKey() { return "myworkspace.serviceRules." + (state.session?.user?.id || "guest"); }
 function hasAcceptedServiceRules() { try { return localStorage.getItem(serviceRulesKey()) === SERVICE_RULES_VERSION; } catch { return false; } }
 function acceptServiceRules() { try { localStorage.setItem(serviceRulesKey(), SERVICE_RULES_VERSION); } catch {} }
-const state = { client: null, session: null, profile: null, accountControls: null, renderId: 0, sanctionKind: "ban", recovery: false, theme: "mt-standard", globalTheme: "mt-standard", globalThemeChannel: null, holidayLightsTimer: null, holidayDemonTimer: null, holidayCity: null, deviceSessionVerified: false, deviceHeartbeatTimer: null };
+const state = { client: null, session: null, profile: null, accountControls: null, renderId: 0, sanctionKind: "ban", recovery: false, googleIdentity: false, theme: "mt-standard", globalTheme: "mt-standard", globalThemeChannel: null, holidayLightsTimer: null, holidayDemonTimer: null, holidayCity: null, deviceSessionVerified: false, deviceHeartbeatTimer: null };
 
 const THEME_OPTIONS = [
   { id: "mt-standard", name: "MT Standard", description: "Исходное оформление MyWorkspace", swatch: "theme-swatch-standard" },
@@ -349,6 +349,8 @@ function showScreen(name) {
   $("login-panel").hidden = name !== "login";
   $("gate-panel").hidden = name !== "gate";
   $("recovery-panel").hidden = name !== "recovery";
+  $("backup-password-panel").hidden = name !== "backup-password";
+  $("google-registration-panel").hidden = name !== "google-registration";
 }
 
 function showGate({ title, text, iconName = "i-clock", actions = true }) {
@@ -440,9 +442,25 @@ async function loadProfile() {
   return data;
 }
 
+async function getCurrentIdentities() {
+  const { data, error } = await state.client.auth.getUserIdentities();
+  if (error) throw error;
+  return data?.identities || [];
+}
+
 async function enterWorkspace() {
   if (!state.session) { showScreen("login"); return; }
   if (state.recovery) { showScreen("recovery"); return; }
+  let identities;
+  try {
+    identities = await getCurrentIdentities();
+  } catch (error) {
+    showGate({ title: "Не удалось проверить способы входа", text: friendlyError(error), iconName: "i-warning" });
+    return;
+  }
+  state.googleIdentity = identities.some((identity) => identity.provider === "google");
+  const hasEmailPassword = identities.some((identity) => identity.provider === "email");
+  if (state.googleIdentity && !hasEmailPassword) { showScreen("backup-password"); return; }
   if (!await ensureDeviceSession()) return;
   let profile;
   try {
@@ -456,7 +474,9 @@ async function enterWorkspace() {
     const { data: controls, error: controlsError } = await state.client.from("account_controls").select("*").eq("user_id", profile.id).maybeSingle();
     state.accountControls = controlsError ? { allowed_themes: ["mt-standard"], can_change_nickname: false, can_change_email: false, can_upload_avatar: false, can_access_training: false, can_use_additional_device: false } : (controls || { allowed_themes: ["mt-standard"], can_change_nickname: true, can_change_email: true, can_upload_avatar: true, can_access_training: true, can_use_additional_device: false });
   } else state.accountControls = null;
-  if (!profile) {
+  if (!profile && state.googleIdentity) {
+    showScreen("google-registration");
+  } else if (!profile) {
     showGate({ title: "Профиль не найден", text: "Аккаунт есть, но профиль сотрудника не создан. Обратитесь к руководителю.", iconName: "i-warning" });
   } else if (profile.status === "pending") {
     showGate({ title: "Заявка на рассмотрении", text: `${profile.nickname}, ваша заявка на должность «${profile.position}» отправлена. Доступ откроется после одобрения руководителем.` });
@@ -2324,6 +2344,7 @@ function openSidebar() { document.body.classList.add("sidebar-open"); $("sidebar
 function closeSidebar() { document.body.classList.remove("sidebar-open"); $("sidebar-backdrop").hidden = true; $("menu-button").setAttribute("aria-expanded", "false"); }
 
 function bindAuthForms() {
+  $("google-register-position").innerHTML = $("register-position").innerHTML;
   $("tab-login").addEventListener("click", () => selectTab("login"));
   $("tab-register").addEventListener("click", () => selectTab("register"));
 
@@ -2340,6 +2361,62 @@ function bindAuthForms() {
     if (error) { setMessage("login-message", friendlyError(error)); return; }
     state.session = data.session;
     $("login-password").value = "";
+    enterWorkspace();
+  });
+
+  $("google-login").addEventListener("click", async () => {
+    const button = $("google-login");
+    setBusy(button, true, "Переходим к Google…");
+    const { error } = await state.client.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: appUrl(), queryParams: { access_type: "online", prompt: "select_account" } },
+    });
+    if (error) {
+      setBusy(button, false);
+      setMessage("login-message", friendlyError(error));
+    }
+  });
+
+  $("backup-password-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const password = $("backup-password").value;
+    const repeat = $("backup-password-repeat").value;
+    if (password.length < 8) { setMessage("backup-password-message", "Резервный пароль должен содержать не менее 8 символов."); $("backup-password").focus(); return; }
+    if (password !== repeat) { setMessage("backup-password-message", "Пароли не совпадают."); $("backup-password-repeat").focus(); return; }
+    const button = event.target.querySelector("button[type=submit]");
+    setBusy(button, true, "Сохраняем…");
+    const { error } = await state.client.auth.updateUser({ password });
+    if (error) {
+      setBusy(button, false);
+      setMessage("backup-password-message", friendlyError(error));
+      return;
+    }
+    const { data: identityData, error: identityError } = await state.client.auth.getUserIdentities();
+    setBusy(button, false);
+    if (identityError || !identityData?.identities?.some((identity) => identity.provider === "email")) {
+      setMessage("backup-password-message", "Пароль сохранён, но Supabase пока не подтвердил способ входа по почте. Обновите страницу и повторите проверку. Если ошибка останется, обратитесь к администратору.");
+      return;
+    }
+    const { data: userData } = await state.client.auth.getUser();
+    if (userData?.user) state.session.user = userData.user;
+    event.target.reset();
+    showToast("Резервный пароль установлен.");
+    enterWorkspace();
+  });
+
+  $("google-registration-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const nickname = $("google-register-nickname").value.trim();
+    const position = $("google-register-position").value;
+    if (nickname.length < 2 || nickname.length > 64) { setMessage("google-registration-message", "Никнейм должен содержать от 2 до 64 символов."); $("google-register-nickname").focus(); return; }
+    if (!POSITIONS.includes(position)) { setMessage("google-registration-message", "Выберите должность из списка."); $("google-register-position").focus(); return; }
+    const button = event.target.querySelector("button[type=submit]");
+    setBusy(button, true, "Отправляем заявку…");
+    const { error } = await state.client.rpc("complete_google_registration", { p_nickname: nickname, p_position: position });
+    setBusy(button, false);
+    if (error) { setMessage("google-registration-message", friendlyError(error)); return; }
+    event.target.reset();
+    showToast("Заявка отправлена на рассмотрение.");
     enterWorkspace();
   });
 
