@@ -2555,3 +2555,31 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator { opacity: .72; 
   html[data-theme="new-year"] .traffic-headlight-front::before { left: -7px; }
   html[data-theme="new-year"] .traffic-headlight-rear { left: 1px; }
 }
+
+
+/* Tablet transition: keep the winter scene aligned with the workspace as the
+   desktop navigation collapses, and stack report side content before it gets cramped. */
+@media (max-width: 900px) {
+  html[data-theme="new-year"] .holiday-cityscape {
+    left: 0;
+    right: 0;
+    width: auto;
+  }
+}
+@media (max-width: 980px) {
+  .report-content-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .report-aside {
+    position: static;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+  .report-aside-card { min-width: 0; margin-bottom: 0; }
+  .report-aside-card:last-child { grid-column: 1 / -1; }
+}
+@media (max-width: 640px) {
+  .report-aside { grid-template-columns: minmax(0, 1fr); }
+  .report-aside-card:last-child { grid-column: auto; }
+}
