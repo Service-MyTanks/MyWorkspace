@@ -2412,13 +2412,20 @@ function bindAuthForms() {
     if (password !== repeat) { setMessage("backup-password-message", "Пароли не совпадают."); $("backup-password-repeat").focus(); return; }
     const button = event.target.querySelector("button[type=submit]");
     setBusy(button, true, "Сохраняем пароль…");
-    const { data: passwordUpdate, error: passwordError } = await state.client.auth.updateUser({
+    const backupPasswordMetadata = {
+      ...(state.session.user?.user_metadata || {}),
+      mytanks_backup_password_set: true
+    };
+    let { data: passwordUpdate, error: passwordError } = await state.client.auth.updateUser({
       password,
-      data: {
-        ...(state.session.user?.user_metadata || {}),
-        mytanks_backup_password_set: true
-      }
+      data: backupPasswordMetadata
     });
+    if (passwordError && /different from (the )?old password/i.test(passwordError.message || "")) {
+      // The previous attempt may already have saved this exact password before the old identity check failed.
+      const metadataUpdate = await state.client.auth.updateUser({ data: backupPasswordMetadata });
+      passwordUpdate = metadataUpdate.data;
+      passwordError = metadataUpdate.error;
+    }
     if (passwordError) {
       setBusy(button, false);
       setMessage("backup-password-message", friendlyError(passwordError));
