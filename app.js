@@ -40,8 +40,8 @@ function applyMetricsConsent(value) {
   // Analytics integrations must check this flag before collecting or sending events.
   window.MT_METRICS_CONSENT = value === "accepted";
 }
-function updateMetricsConsentVisibility(screenName) {
-  const loginVisible = screenName === "login" || (!$("auth-view").hidden && $("login-panel").hidden === false);
+function updateMetricsConsentVisibility() {
+  const loginVisible = !$("auth-view").hidden && !$("login-panel").hidden;
   const choice = readMetricsConsent();
   $("metrics-settings").hidden = !loginVisible;
   $("metrics-consent-banner").hidden = !loginVisible || (Boolean(choice) && !shouldRepeatMetricsNotice());
@@ -51,7 +51,7 @@ function initializeMetricsConsent() {
   applyMetricsConsent(choice);
   $("metrics-settings-enabled").checked = choice === "accepted";
   $("metrics-settings-repeat").checked = shouldRepeatMetricsNotice();
-  updateMetricsConsentVisibility("boot");
+  updateMetricsConsentVisibility();
 }
 function saveMetricsConsent(choice, remember) {
   try {
@@ -73,7 +73,7 @@ function setRepeatMetricsNotice(enabled) {
     else localStorage.removeItem(METRICS_REPEAT_NOTICE_KEY);
   } catch {}
   $("metrics-settings-repeat").checked = enabled;
-  updateMetricsConsentVisibility("login");
+  updateMetricsConsentVisibility();
 }
 
 const state = { client: null, session: null, profile: null, accountControls: null, renderId: 0, sanctionKind: "ban", recovery: false, googleIdentity: false, theme: "mt-standard", globalTheme: "mt-standard", globalThemeChannel: null, holidayLightsTimer: null, holidayDemonTimer: null, holidayCity: null, deviceSessionVerified: false, deviceHeartbeatTimer: null };
@@ -401,7 +401,7 @@ function showScreen(name) {
   $("recovery-panel").hidden = name !== "recovery";
   $("backup-password-panel").hidden = name !== "backup-password";
   $("google-registration-panel").hidden = name !== "google-registration";
-  updateMetricsConsentVisibility(name);
+  updateMetricsConsentVisibility();
 }
 
 function showGate({ title, text, iconName = "i-clock", actions = true }) {
