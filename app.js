@@ -769,7 +769,7 @@ function enhanceTrainingDeck(view, route) {
     viewport.append(slide);
     return slide;
   });
-  const previous = h("button", { type: "button", class: "button button-secondary training-prev", disabled: true }, icon("i-chevron"), "Назад");
+  const previous = h("button", { type: "button", class: "button button-secondary training-prev" }, icon("i-chevron"), "К Главной");
   const next = h("button", { type: "button", class: "button button-primary training-next" }, "Далее", icon("i-chevron"));
   const controls = h("div", { class: "training-deck-controls" },
     h("span", { class: "training-deck-hint", text: "Листайте карточки или используйте кнопки навигации" }),
@@ -788,14 +788,17 @@ function enhanceTrainingDeck(view, route) {
     progress.querySelector(".training-progress-fill").style.width = `${((active + 1) / slides.length) * 100}%`;
     progress.querySelector(".training-progress-label").textContent = active === slides.length - 1 ? "Последний этап" : `Этап ${active + 1}`;
     progress.querySelector(".training-progress-count").textContent = `${active + 1} / ${slides.length}`;
-    previous.disabled = active === 0;
+    previous.replaceChildren(icon("i-chevron"), active === 0 ? "К Главной" : "Назад");
     next.replaceChildren(...(active === slides.length - 1
       ? ["Завершить курс", icon("i-check")]
       : ["Далее", icon("i-chevron")]));
     next.dataset.finish = String(active === slides.length - 1);
     viewport.scrollIntoView({ behavior: "smooth", block: "nearest" });
   };
-  previous.addEventListener("click", () => update(-1));
+  previous.addEventListener("click", () => {
+    if (active === 0) location.hash = "#/training";
+    else update(-1);
+  });
   next.addEventListener("click", () => {
     if (active === slides.length - 1) location.hash = "#/training";
     else update(1);
