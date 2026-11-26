@@ -183,6 +183,26 @@
         </form>
       </section>
     </main>
+    <div class="metrics-settings" id="metrics-settings" hidden>
+      <button type="button" class="metrics-cookie-trigger" id="metrics-cookie-trigger" aria-label="Настройки cookies и Metrics" aria-expanded="false" aria-controls="metrics-settings-menu" title="Настройки cookies и Metrics">
+        <img src="./assets/cookie-settings.webp" alt="" aria-hidden="true" class="metrics-cookie-image">
+      </button>
+      <section class="metrics-settings-menu" id="metrics-settings-menu" aria-label="Параметры cookies и Metrics" hidden>
+        <div class="metrics-settings-heading">
+          <strong>Настройки конфиденциальности</strong>
+          <span>Управляйте согласием и уведомлениями</span>
+        </div>
+        <label class="metrics-settings-option">
+          <span><strong>Включить cookies &amp; Google Metrics</strong><small>Разрешить необязательную аналитику. Обязательное хранилище для входа и безопасности работает всегда.</small></span>
+          <input type="checkbox" id="metrics-settings-enabled">
+        </label>
+        <label class="metrics-settings-option">
+          <span><strong>Показывать уведомление при каждом обновлении страницы входа</strong><small>Повторно показывать уведомление при каждой загрузке экрана входа.</small></span>
+          <input type="checkbox" id="metrics-settings-repeat">
+        </label>
+        <a href="./privacy.html" target="_blank" rel="noopener">Политика конфиденциальности</a>
+      </section>
+    </div>
   </div>
 
   <div id="app-view" hidden>
@@ -299,10 +319,6 @@
         <small class="settings-hint">Почта обновится только после подтверждения нового адреса.</small>
       </section>
       <section class="settings-section">
-        <h3>Отчётность</h3>
-        <label class="checkbox settings-toggle"><input type="checkbox" id="manual-report-position"><span><strong>Вручную выбирать должность</strong><small>По умолчанию в новый отчёт подставляется должность из вашего профиля. Включите опцию, чтобы выбирать её отдельно для каждого отчёта.</small></span></label>
-      </section>
-      <section class="settings-section">
         <h3>Пароль</h3>
         <form id="settings-password-form" novalidate>
           <div class="field-row">
@@ -312,6 +328,23 @@
           <p class="form-message" id="settings-password-message" role="alert" hidden></p>
           <div class="form-actions"><button type="submit" id="settings-password-submit" class="button button-primary">Сменить пароль</button></div>
         </form>
+      </section>
+      <section class="settings-section">
+        <h3>Отчётность</h3>
+        <label class="checkbox settings-toggle"><input type="checkbox" id="manual-report-position"><span><strong>Вручную выбирать должность</strong><small>По умолчанию в новый отчёт подставляется должность из вашего профиля. Включите опцию, чтобы выбирать её отдельно для каждого отчёта.</small></span></label>
+      </section>
+      <section class="settings-section metrics-account-settings">
+        <h3>Cookies и аналитика</h3>
+        <p class="muted">Необязательная аналитика Metrics включается только с вашего согласия. Обязательное хранилище для авторизации и безопасности работает всегда.</p>
+        <label class="metrics-settings-option">
+          <span><strong>Разрешить необязательную аналитику</strong><small>Включить сбор статистики работы сервиса, если интеграция Metrics активна.</small></span>
+          <input type="checkbox" id="metrics-settings-enabled">
+        </label>
+        <label class="metrics-settings-option">
+          <span><strong>Показывать уведомление при каждом обновлении страницы входа</strong><small>Повторно отображать окно согласия при каждой загрузке экрана входа.</small></span>
+          <input type="checkbox" id="metrics-settings-repeat">
+        </label>
+        <a href="./privacy.html" target="_blank" rel="noopener">Политика конфиденциальности</a>
       </section>
     </div>
   </dialog>
@@ -397,26 +430,6 @@
       <button type="button" class="button button-primary wide" id="metrics-reject-close">Понятно</button>
     </div>
   </dialog>
-  <div class="metrics-settings" id="metrics-settings">
-    <button type="button" class="metrics-cookie-trigger" id="metrics-cookie-trigger" aria-label="Настройки cookies и Metrics" aria-expanded="false" aria-controls="metrics-settings-menu" title="Настройки cookies и Metrics">
-      <img src="./assets/cookie-settings.webp" alt="" aria-hidden="true" class="metrics-cookie-image">
-    </button>
-    <section class="metrics-settings-menu" id="metrics-settings-menu" aria-label="Параметры cookies и Metrics" hidden>
-      <div class="metrics-settings-heading">
-        <strong>Настройки конфиденциальности</strong>
-        <span>Управляйте согласием и уведомлениями</span>
-      </div>
-      <label class="metrics-settings-option">
-        <span><strong>Включить cookies &amp; Google Metrics</strong><small>Разрешить необязательную аналитику. Обязательное хранилище для входа и безопасности работает всегда.</small></span>
-        <input type="checkbox" id="metrics-settings-enabled">
-      </label>
-      <label class="metrics-settings-option">
-        <span><strong>Отображать уведомление при каждом обновлении страницы</strong><small>Повторно показывать уведомление о согласии при каждой загрузке сайта.</small></span>
-        <input type="checkbox" id="metrics-settings-repeat">
-      </label>
-      <a href="./privacy.html" target="_blank" rel="noopener">Политика конфиденциальности</a>
-    </section>
-  </div>
   <div class="toast" id="toast" role="status" hidden></div>
   <noscript><div class="notice">Для работы MT DOCS включите JavaScript.</div></noscript>
 </body>
