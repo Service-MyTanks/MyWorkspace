@@ -1018,7 +1018,7 @@ async function renderTraining(view, route) {
 
     view.append(
       pageHeading("ОБУЧЕНИЕ СОТРУДНИКОВ", route.section, "Знакомство с форумом MyTanks и правилами работы с административными разделами."),
-      forumStageCard("1. Начальный этап — Права доступа и информация о форуме", "Познакомься с назначением форума и правилами доступа к закрытым разделам.", "i-messages",
+      forumStageCard("1. Начальный этап — Права доступа и информация о форуме", "Познакомься с назначением форума и правилами доступа к закрытым разделам.", "i-forum",
         h("div", { class: "row-list training-info-list" },
           h("div", { class: "training-info-item" },
             h("button", { type: "button", class: "training-info-trigger", popovertarget: "forum-about-popover", "aria-label": "Открыть раздел: Что такое форум?" },
@@ -1281,7 +1281,7 @@ async function renderHome(view) {
       block("news", "Быстрые действия", "Основные ресурсы проекта в одном месте", "i-zap",
         h("div", { class: "row-list" },
           rowLink({ href: "#/reports/new", iconName: "i-file-text", title: "Новый отчёт", text: "Перейти к составлению ежедневного отчёта" }),
-          externalRow({ title: "Форум", text: "Официальный форум MyTanks", href: "https://forum.mytanks.net/", iconName: "i-messages" }),
+          externalRow({ title: "Форум", text: "Официальный форум MyTanks", href: "https://forum.mytanks.net/", iconName: "i-forum" }),
           rowLink({ href: "#/training", iconName: "i-graduation-cap", title: "Учебный центр", text: "Курсы и обучающие материалы MT DOCS" })
         )
       ),
