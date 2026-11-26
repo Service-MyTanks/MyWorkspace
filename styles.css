@@ -437,10 +437,9 @@ dialog::backdrop { background: #090c11bd; backdrop-filter: blur(4px); }
 .training-slide-viewport:focus-visible { border-radius: var(--radius); box-shadow: 0 0 0 2px var(--accent); }
 .training-slide[hidden] { display: none !important; }
 .training-slide.is-active { display: block; }
-.training-slide.slide-enter-next { animation: training-slide-next .38s cubic-bezier(.2,.75,.25,1) both; }
-.training-slide.slide-enter-prev { animation: training-slide-prev .38s cubic-bezier(.2,.75,.25,1) both; }
-@keyframes training-slide-next { from { opacity: 0; transform: translateX(42px); } to { opacity: 1; transform: translateX(0); } }
-@keyframes training-slide-prev { from { opacity: 0; transform: translateX(-42px); } to { opacity: 1; transform: translateX(0); } }
+.training-slide.slide-enter-next,
+.training-slide.slide-enter-prev { animation: training-slide-enter .28s cubic-bezier(.2,.75,.25,1) both; }
+@keyframes training-slide-enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 .training-deck-controls { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 18px; }
 .training-deck-hint { color: var(--faint); font-size: 10px; }
 .training-deck-actions { display: flex; gap: 9px; }
