@@ -50,7 +50,9 @@ function initializeMetricsConsent() {
   const choice = readMetricsConsent();
   applyMetricsConsent(choice);
   $("metrics-settings-enabled").checked = choice === "accepted";
+  $("metrics-account-enabled").checked = choice === "accepted";
   $("metrics-settings-repeat").checked = shouldRepeatMetricsNotice();
+  $("metrics-account-repeat").checked = shouldRepeatMetricsNotice();
   updateMetricsConsentVisibility();
 }
 function saveMetricsConsent(choice, remember) {
@@ -65,6 +67,7 @@ function saveMetricsConsent(choice, remember) {
   } catch {}
   applyMetricsConsent(choice);
   $("metrics-settings-enabled").checked = choice === "accepted";
+  $("metrics-account-enabled").checked = choice === "accepted";
   $("metrics-consent-banner").hidden = true;
 }
 function setRepeatMetricsNotice(enabled) {
@@ -73,6 +76,7 @@ function setRepeatMetricsNotice(enabled) {
     else localStorage.removeItem(METRICS_REPEAT_NOTICE_KEY);
   } catch {}
   $("metrics-settings-repeat").checked = enabled;
+  $("metrics-account-repeat").checked = enabled;
   updateMetricsConsentVisibility();
 }
 
@@ -2623,6 +2627,12 @@ function bindApp() {
     saveMetricsConsent(event.currentTarget.checked ? "accepted" : "rejected", true);
   });
   $("metrics-settings-repeat").addEventListener("change", (event) => {
+    setRepeatMetricsNotice(event.currentTarget.checked);
+  });
+  $("metrics-account-enabled").addEventListener("change", (event) => {
+    saveMetricsConsent(event.currentTarget.checked ? "accepted" : "rejected", true);
+  });
+  $("metrics-account-repeat").addEventListener("change", (event) => {
     setRepeatMetricsNotice(event.currentTarget.checked);
   });
   $("metrics-consent-accept").addEventListener("click", () => {
