@@ -448,6 +448,20 @@ async function getCurrentIdentities() {
   return data?.identities || [];
 }
 
+function googleRegistrationDraftKey() { return "myworkspace.google-registration." + (state.session?.user?.id || "guest"); }
+function readGoogleRegistrationDraft() {
+  try {
+    const value = JSON.parse(sessionStorage.getItem(googleRegistrationDraftKey()) || "null");
+    return value && typeof value.nickname === "string" && typeof value.position === "string" ? value : null;
+  } catch { return null; }
+}
+function saveGoogleRegistrationDraft(nickname, position) {
+  try { sessionStorage.setItem(googleRegistrationDraftKey(), JSON.stringify({ nickname, position })); } catch {}
+}
+function clearGoogleRegistrationDraft() {
+  try { sessionStorage.removeItem(googleRegistrationDraftKey()); } catch {}
+}
+
 async function enterWorkspace() {
   if (!state.session) { showScreen("login"); return; }
   if (state.recovery) { showScreen("recovery"); return; }
@@ -460,8 +474,6 @@ async function enterWorkspace() {
   }
   state.googleIdentity = identities.some((identity) => identity.provider === "google");
   const hasEmailPassword = identities.some((identity) => identity.provider === "email");
-  if (state.googleIdentity && !hasEmailPassword) { showScreen("backup-password"); return; }
-  if (!await ensureDeviceSession()) return;
   let profile;
   try {
     profile = await loadProfile();
@@ -470,13 +482,27 @@ async function enterWorkspace() {
     return;
   }
   state.profile = profile;
+  if (!profile && state.googleIdentity) {
+    const draft = readGoogleRegistrationDraft();
+    if (draft) {
+      $("google-register-nickname").value = draft.nickname;
+      $("google-register-position").value = draft.position;
+      showScreen("backup-password");
+    } else {
+      showScreen("google-registration");
+    }
+    return;
+  }
+  if (profile && state.googleIdentity && !hasEmailPassword) {
+    showScreen("backup-password");
+    return;
+  }
+  if (!await ensureDeviceSession()) return;
   if (profile) {
     const { data: controls, error: controlsError } = await state.client.from("account_controls").select("*").eq("user_id", profile.id).maybeSingle();
     state.accountControls = controlsError ? { allowed_themes: ["mt-standard"], can_change_nickname: false, can_change_email: false, can_upload_avatar: false, can_access_training: false, can_use_additional_device: false } : (controls || { allowed_themes: ["mt-standard"], can_change_nickname: true, can_change_email: true, can_upload_avatar: true, can_access_training: true, can_use_additional_device: false });
   } else state.accountControls = null;
-  if (!profile && state.googleIdentity) {
-    showScreen("google-registration");
-  } else if (!profile) {
+  if (!profile) {
     showGate({ title: "Профиль не найден", text: "Аккаунт есть, но профиль сотрудника не создан. Обратитесь к руководителю.", iconName: "i-warning" });
   } else if (profile.status === "pending") {
     showGate({ title: "Заявка на рассмотрении", text: `${profile.nickname}, ваша заявка на должность «${profile.position}» отправлена. Доступ откроется после одобрения руководителем.` });
@@ -2385,24 +2411,53 @@ function bindAuthForms() {
     if (password.length < 8) { setMessage("backup-password-message", "Резервный пароль должен содержать не менее 8 символов."); $("backup-password").focus(); return; }
     if (password !== repeat) { setMessage("backup-password-message", "Пароли не совпадают."); $("backup-password-repeat").focus(); return; }
     const button = event.target.querySelector("button[type=submit]");
-    setBusy(button, true, "Сохраняем…");
-    const { error } = await state.client.auth.updateUser({ password });
-    if (error) {
+    setBusy(button, true, "Сохраняем пароль…");
+    const { data: currentIdentityData, error: currentIdentityError } = await state.client.auth.getUserIdentities();
+    if (currentIdentityError) {
       setBusy(button, false);
-      setMessage("backup-password-message", friendlyError(error));
+      setMessage("backup-password-message", friendlyError(currentIdentityError));
       return;
     }
+    const hasEmailIdentity = currentIdentityData?.identities?.some((identity) => identity.provider === "email");
+    if (!hasEmailIdentity) {
+      const { error } = await state.client.auth.updateUser({ password });
+      if (error) {
+        setBusy(button, false);
+        setMessage("backup-password-message", friendlyError(error));
+        return;
+      }
+    }
     const { data: identityData, error: identityError } = await state.client.auth.getUserIdentities();
-    setBusy(button, false);
     if (identityError || !identityData?.identities?.some((identity) => identity.provider === "email")) {
-      setMessage("backup-password-message", "Пароль сохранён, но Supabase пока не подтвердил способ входа по почте. Обновите страницу и повторите проверку. Если ошибка останется, обратитесь к администратору.");
+      setBusy(button, false);
+      setMessage("backup-password-message", "Пароль сохранён, но Supabase пока не подтвердил способ входа по почте. Обновите страницу и повторите проверку.");
       return;
+    }
+    const draft = readGoogleRegistrationDraft();
+    if (!state.profile && state.googleIdentity) {
+      if (!draft) {
+        setBusy(button, false);
+        showScreen("google-registration");
+        setMessage("google-registration-message", "Сначала заполните данные профиля.");
+        return;
+      }
+      const { error: registrationError } = await state.client.rpc("complete_google_registration", {
+        p_nickname: draft.nickname,
+        p_position: draft.position
+      });
+      if (registrationError) {
+        setBusy(button, false);
+        setMessage("backup-password-message", friendlyError(registrationError));
+        return;
+      }
+      clearGoogleRegistrationDraft();
     }
     const { data: userData } = await state.client.auth.getUser();
     if (userData?.user) state.session.user = userData.user;
+    setBusy(button, false);
     event.target.reset();
-    showToast("Резервный пароль установлен.");
-    enterWorkspace();
+    showToast("Резервный пароль установлен. Заявка отправлена на одобрение.");
+    await enterWorkspace();
   });
 
   $("google-registration-form").addEventListener("submit", async (event) => {
@@ -2411,14 +2466,9 @@ function bindAuthForms() {
     const position = $("google-register-position").value;
     if (nickname.length < 2 || nickname.length > 64) { setMessage("google-registration-message", "Никнейм должен содержать от 2 до 64 символов."); $("google-register-nickname").focus(); return; }
     if (!POSITIONS.includes(position)) { setMessage("google-registration-message", "Выберите должность из списка."); $("google-register-position").focus(); return; }
-    const button = event.target.querySelector("button[type=submit]");
-    setBusy(button, true, "Отправляем заявку…");
-    const { error } = await state.client.rpc("complete_google_registration", { p_nickname: nickname, p_position: position });
-    setBusy(button, false);
-    if (error) { setMessage("google-registration-message", friendlyError(error)); return; }
-    event.target.reset();
-    showToast("Заявка отправлена на рассмотрение.");
-    enterWorkspace();
+    saveGoogleRegistrationDraft(nickname, position);
+    $("backup-password").focus();
+    showScreen("backup-password");
   });
 
   $("forgot-password").addEventListener("click", async () => {
