@@ -2307,3 +2307,28 @@ main#view { flex: 1 0 auto; }
   .metrics-consent-actions .button { min-width: 0; padding-inline: 9px; font-size: 11px; }
   .metrics-reject-content { padding: 21px; }
 }
+
+
+/* Persistent privacy settings shortcut and compact menu. */
+.metrics-settings { position: fixed; z-index: 1100; right: 18px; bottom: 18px; }
+.metrics-cookie-trigger { display: grid; width: 46px; height: 46px; place-items: center; border: 1px solid var(--border); border-radius: 50%; background: var(--card); color: var(--text); box-shadow: 0 8px 28px #0007; cursor: pointer; transition: transform .18s, border-color .18s, color .18s; }
+.metrics-cookie-trigger:hover, .metrics-cookie-trigger[aria-expanded="true"] { transform: translateY(-2px); border-color: var(--accent); color: var(--accent); }
+.metrics-cookie-trigger svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.metrics-settings-menu { position: absolute; right: 0; bottom: 58px; display: grid; gap: 13px; width: min(340px, calc(100vw - 28px)); padding: 16px; border: 1px solid var(--border); border-radius: 12px; background: var(--card); color: var(--text); box-shadow: 0 16px 50px #0009; }
+.metrics-settings-menu[hidden] { display: none; }
+.metrics-settings-heading { display: grid; gap: 4px; padding-bottom: 2px; }
+.metrics-settings-heading strong { font-size: 13px; }
+.metrics-settings-heading span { color: var(--muted); font-size: 10px; line-height: 1.5; }
+.metrics-settings-option { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 11px 0; border-top: 1px solid var(--border); cursor: pointer; }
+.metrics-settings-option > span { display: grid; gap: 5px; min-width: 0; }
+.metrics-settings-option strong { font-size: 11px; line-height: 1.45; font-weight: 600; }
+.metrics-settings-option small { color: var(--muted); font-size: 10px; line-height: 1.55; }
+.metrics-settings-option input { flex: 0 0 auto; width: 16px; height: 16px; margin: 2px 0 0; accent-color: var(--accent); }
+.metrics-settings-menu > a { justify-self: start; color: var(--accent); font-size: 10px; text-decoration: underline; text-underline-offset: 3px; }
+.metrics-consent-banner { right: 76px; width: min(710px, calc(100vw - 94px)); }
+@media (max-width: 640px) {
+  .metrics-settings { right: 12px; bottom: 12px; }
+  .metrics-cookie-trigger { width: 44px; height: 44px; }
+  .metrics-settings-menu { right: 0; bottom: 54px; width: min(340px, calc(100vw - 24px)); }
+  .metrics-consent-banner { right: 8px; bottom: 68px; width: calc(100vw - 16px); }
+}
