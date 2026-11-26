@@ -362,6 +362,8 @@ dialog::backdrop { background: #090c11bd; backdrop-filter: blur(4px); }
 .training-subsection[open] .training-subsection-chevron { transform: rotate(90deg); }
 .training-subsection-list { padding: 0 10px 10px; }
 .training-subsection-list .row-link { background: var(--card); border-radius: 8px; }
+.training-final-stage .training-subsection-list { display: grid; gap: 8px; }
+.training-final-stage .training-subsection-list .row-link + .row-link { border-top: 0; }
 .training-mandatory-note { margin: 0; padding: 0 22px 20px; color: var(--muted); font-size: 12px; line-height: 1.6; }
 @media (max-width: 600px) {
   .training-help-popover { padding: 20px; font-size: 12px; }
