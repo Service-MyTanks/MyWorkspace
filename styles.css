@@ -2392,7 +2392,7 @@ main#view { flex: 1 0 auto; }
 
 /* Keep the account link anchored directly above the account identity block. */
 .sidebar-account-link { flex: 0 0 auto; margin-top: auto; margin-bottom: 8px; }
-.sidebar-bottom { margin-top: 0; }
+.sidebar-bottom { margin-top: 0; flex-shrink: 0; }
 
 /* Keep sidebar scrolling available without a permanently visible scrollbar. */
 .sidebar { scrollbar-width: thin; scrollbar-color: transparent transparent; }
