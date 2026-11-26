@@ -769,7 +769,7 @@ function enhanceTrainingDeck(view, route) {
     viewport.append(slide);
     return slide;
   });
-  const previous = h("button", { type: "button", class: "button button-secondary training-prev" }, icon("i-chevron"), "На главную");
+  const previous = h("button", { type: "button", class: "button button-secondary training-prev" }, icon("i-chevron"), "Учебный центр");
   const next = h("button", { type: "button", class: "button button-primary training-next" }, "Далее", icon("i-chevron"));
   const controls = h("div", { class: "training-deck-controls" },
     h("span", { class: "training-deck-hint", text: "Листайте карточки или используйте кнопки навигации" }),
@@ -788,7 +788,7 @@ function enhanceTrainingDeck(view, route) {
     progress.querySelector(".training-progress-fill").style.width = `${((active + 1) / slides.length) * 100}%`;
     progress.querySelector(".training-progress-label").textContent = active === slides.length - 1 ? "Последний этап" : `Этап ${active + 1}`;
     progress.querySelector(".training-progress-count").textContent = `${active + 1} / ${slides.length}`;
-    previous.replaceChildren(icon("i-chevron"), active === 0 ? "На главную" : "Назад");
+    previous.replaceChildren(icon("i-chevron"), active === 0 ? "Учебный центр" : "Назад");
     next.replaceChildren(...(active === slides.length - 1
       ? ["Завершить курс", icon("i-check")]
       : ["Далее", icon("i-chevron")]));
