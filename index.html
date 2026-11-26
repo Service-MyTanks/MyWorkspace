@@ -159,27 +159,27 @@
         </form>
       </section>
 
-      <section id="backup-password-panel" hidden>
-        <div class="eyebrow"><span></span>ЗАЩИТА АККАУНТА</div>
-        <h1>Резервный пароль<span>.</span></h1>
-        <p class="muted">Вы вошли через Google. Чтобы сохранить альтернативный способ доступа, задайте пароль для входа по электронной почте.</p>
-        <form id="backup-password-form" novalidate>
-          <div class="field"><label for="backup-password">Резервный пароль <span>*</span></label><input type="password" id="backup-password" minlength="8" maxlength="72" autocomplete="new-password" required><small>Не менее 8 символов.</small></div>
-          <div class="field"><label for="backup-password-repeat">Повторите пароль <span>*</span></label><input type="password" id="backup-password-repeat" minlength="8" maxlength="72" autocomplete="new-password" required></div>
-          <p class="form-message" id="backup-password-message" role="alert" hidden></p>
-          <button type="submit" class="button button-primary wide">Сохранить резервный пароль</button>
-        </form>
-      </section>
-
       <section id="google-registration-panel" hidden>
-        <div class="eyebrow"><span></span>ПЕРВИЧНОЕ ОФОРМЛЕНИЕ</div>
-        <h1>Заявка на доступ<span>.</span></h1>
-        <p class="muted">Google подтвердил вашу почту. Укажите игровой никнейм и должность. Заявка поступит руководителю на рассмотрение.</p>
+        <div class="eyebrow"><span></span>ШАГ 1 ИЗ 2 · ДАННЫЕ ПРОФИЛЯ</div>
+        <h1>Оформление профиля<span>.</span></h1>
+        <p class="muted">Google подтвердил вашу почту. Укажите игровой никнейм и выберите должность для заявки на доступ.</p>
         <form id="google-registration-form" novalidate>
           <div class="field"><label for="google-register-nickname">Игровой никнейм <span>*</span></label><input type="text" id="google-register-nickname" minlength="2" maxlength="64" autocomplete="nickname" required></div>
           <div class="field"><label for="google-register-position">Должность <span>*</span></label><select id="google-register-position" required><option value="" disabled selected>Выберите должность</option></select></div>
           <p class="form-message" id="google-registration-message" role="alert" hidden></p>
-          <button type="submit" class="button button-primary wide">Отправить заявку</button>
+          <button type="submit" class="button button-primary wide">Продолжить</button>
+        </form>
+      </section>
+
+      <section id="backup-password-panel" hidden>
+        <div class="eyebrow"><span></span>ШАГ 2 ИЗ 2 · ЗАЩИТА АККАУНТА</div>
+        <h1>Резервный пароль<span>.</span></h1>
+        <p class="muted">Создайте пароль для альтернативного входа по электронной почте. После сохранения заявка будет отправлена руководителю на одобрение.</p>
+        <form id="backup-password-form" novalidate>
+          <div class="field"><label for="backup-password">Резервный пароль <span>*</span></label><input type="password" id="backup-password" minlength="8" maxlength="72" autocomplete="new-password" required><small>Не менее 8 символов.</small></div>
+          <div class="field"><label for="backup-password-repeat">Повторите пароль <span>*</span></label><input type="password" id="backup-password-repeat" minlength="8" maxlength="72" autocomplete="new-password" required></div>
+          <p class="form-message" id="backup-password-message" role="alert" hidden></p>
+          <button type="submit" class="button button-primary wide">Сохранить и отправить заявку</button>
         </form>
       </section>
     </main>
