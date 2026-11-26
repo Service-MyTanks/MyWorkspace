@@ -2390,5 +2390,14 @@ main#view { flex: 1 0 auto; }
 .metrics-account-settings .metrics-settings-option { margin: 0; }
 .metrics-account-settings > a { justify-self: start; color: var(--accent); font-size: 10px; text-decoration: underline; text-underline-offset: 3px; }
 
-/* Keep the account navigation item clear of the account identity block below. */
-.primary-nav > .nav-item[data-nav="account"] { margin-top: 136px; margin-bottom: 8px; }
+/* Keep the account link anchored directly above the account identity block. */
+.sidebar-account-link { flex: 0 0 auto; margin-top: auto; margin-bottom: 8px; }
+.sidebar-bottom { margin-top: 0; }
+
+/* Keep sidebar scrolling available without a permanently visible scrollbar. */
+.sidebar { scrollbar-width: thin; scrollbar-color: transparent transparent; }
+.sidebar::-webkit-scrollbar { width: 6px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: transparent; border-radius: 8px; }
+.sidebar:hover { scrollbar-color: var(--border) transparent; }
+.sidebar:hover::-webkit-scrollbar-thumb { background: var(--border); }
