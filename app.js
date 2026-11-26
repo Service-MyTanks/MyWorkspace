@@ -12,8 +12,7 @@ const KINDS = {
   warning: { title: "Мои предупреждения", one: "Предупреждение", add: "Добавить предупреждение", icon: "i-warning", hint: "Устные и письменные предупреждения" },
 };
 
-// Единый список должностей (иерархия из 6 уровней). Должен совпадать с <select id="register-position"> в index.html.
-// Публичная регистрация: должности, доступные в общей форме заявки.
+// Список должностей, доступных для самостоятельной регистрации.
 const POSITIONS = Object.freeze([
   "Младший Хелпер", "Хелпер",
   "Младший модератор", "Модератор", "Старший модератор", "Администратор", "Старший администратор",
@@ -22,8 +21,6 @@ const POSITIONS = Object.freeze([
   "Заместитель главного администратора", "Главный администратор",
   "Заместитель Специального Администратора", "Специальный Администратор",
 ]);
-// Внутренняя Google-регистрация сотрудников включает отдельную должность техподдержки.
-const GOOGLE_REGISTRATION_POSITIONS = Object.freeze([...POSITIONS, "Техническая поддержка"]);
 
 const SERVICE_RULES_VERSION = "2026-11-25-v1";
 function serviceRulesKey() { return "myworkspace.serviceRules." + (state.session?.user?.id || "guest"); }
@@ -2373,7 +2370,7 @@ function openSidebar() { document.body.classList.add("sidebar-open"); $("sidebar
 function closeSidebar() { document.body.classList.remove("sidebar-open"); $("sidebar-backdrop").hidden = true; $("menu-button").setAttribute("aria-expanded", "false"); }
 
 function bindAuthForms() {
-  $("google-register-position").innerHTML = $("register-position").innerHTML;\n  const technicalSupportGroup = [...$("google-register-position").querySelectorAll("optgroup")].find(group => group.label.startsWith("4."));\n  if (technicalSupportGroup) technicalSupportGroup.prepend(new Option("Техническая поддержка", "Техническая поддержка"));
+  $("google-register-position").innerHTML = $("register-position").innerHTML;
   $("tab-login").addEventListener("click", () => selectTab("login"));
   $("tab-register").addEventListener("click", () => selectTab("register"));
 
@@ -2467,7 +2464,7 @@ function bindAuthForms() {
     const nickname = $("google-register-nickname").value.trim();
     const position = $("google-register-position").value;
     if (nickname.length < 2 || nickname.length > 64) { setMessage("google-registration-message", "Никнейм должен содержать от 2 до 64 символов."); $("google-register-nickname").focus(); return; }
-    if (!GOOGLE_REGISTRATION_POSITIONS.includes(position)) { setMessage("google-registration-message", "Выберите должность из списка."); $("google-register-position").focus(); return; }
+    if (!POSITIONS.includes(position)) { setMessage("google-registration-message", "Выберите должность из списка."); $("google-register-position").focus(); return; }
     saveGoogleRegistrationDraft(nickname, position);
     $("backup-password").focus();
     showScreen("backup-password");
