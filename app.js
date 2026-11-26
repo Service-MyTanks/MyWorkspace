@@ -27,9 +27,14 @@ function serviceRulesKey() { return "myworkspace.serviceRules." + (state.session
 function hasAcceptedServiceRules() { try { return localStorage.getItem(serviceRulesKey()) === SERVICE_RULES_VERSION; } catch { return false; } }
 function acceptServiceRules() { try { localStorage.setItem(serviceRulesKey(), SERVICE_RULES_VERSION); } catch {} }
 const METRICS_CONSENT_KEY = "myworkspace.metricsConsent.v1";
+const METRICS_REPEAT_NOTICE_KEY = "myworkspace.metricsRepeatNotice.v1";
 function readMetricsConsent() {
   try { return localStorage.getItem(METRICS_CONSENT_KEY) || sessionStorage.getItem(METRICS_CONSENT_KEY); }
   catch { return null; }
+}
+function shouldRepeatMetricsNotice() {
+  try { return localStorage.getItem(METRICS_REPEAT_NOTICE_KEY) === "true"; }
+  catch { return false; }
 }
 function applyMetricsConsent(value) {
   // Analytics integrations must check this flag before collecting or sending events.
@@ -38,7 +43,9 @@ function applyMetricsConsent(value) {
 function initializeMetricsConsent() {
   const choice = readMetricsConsent();
   applyMetricsConsent(choice);
-  $("metrics-consent-banner").hidden = Boolean(choice);
+  $("metrics-consent-banner").hidden = Boolean(choice) && !shouldRepeatMetricsNotice();
+  $("metrics-settings-enabled").checked = choice === "accepted";
+  $("metrics-settings-repeat").checked = shouldRepeatMetricsNotice();
 }
 function saveMetricsConsent(choice, remember) {
   try {
@@ -51,7 +58,17 @@ function saveMetricsConsent(choice, remember) {
     }
   } catch {}
   applyMetricsConsent(choice);
+  $("metrics-settings-enabled").checked = choice === "accepted";
   $("metrics-consent-banner").hidden = true;
+}
+function setRepeatMetricsNotice(enabled) {
+  try {
+    if (enabled) localStorage.setItem(METRICS_REPEAT_NOTICE_KEY, "true");
+    else localStorage.removeItem(METRICS_REPEAT_NOTICE_KEY);
+  } catch {}
+  $("metrics-settings-repeat").checked = enabled;
+  if (enabled) $("metrics-consent-banner").hidden = false;
+  else if (readMetricsConsent()) $("metrics-consent-banner").hidden = true;
 }
 
 const state = { client: null, session: null, profile: null, accountControls: null, renderId: 0, sanctionKind: "ban", recovery: false, googleIdentity: false, theme: "mt-standard", globalTheme: "mt-standard", globalThemeChannel: null, holidayLightsTimer: null, holidayDemonTimer: null, holidayCity: null, deviceSessionVerified: false, deviceHeartbeatTimer: null };
@@ -2574,9 +2591,34 @@ function finishServiceRules() {
 }
 
 function bindApp() {
-  const metricsBanner = $("metrics-consent-banner");
   const metricsRejectDialog = $("metrics-reject-dialog");
+  const metricsSettingsMenu = $("metrics-settings-menu");
+  const metricsCookieTrigger = $("metrics-cookie-trigger");
   initializeMetricsConsent();
+  metricsCookieTrigger.addEventListener("click", () => {
+    const isOpen = !metricsSettingsMenu.hidden;
+    metricsSettingsMenu.hidden = isOpen;
+    metricsCookieTrigger.setAttribute("aria-expanded", String(!isOpen));
+  });
+  document.addEventListener("click", (event) => {
+    if (!metricsSettingsMenu.hidden && !event.target.closest("#metrics-settings")) {
+      metricsSettingsMenu.hidden = true;
+      metricsCookieTrigger.setAttribute("aria-expanded", "false");
+    }
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !metricsSettingsMenu.hidden) {
+      metricsSettingsMenu.hidden = true;
+      metricsCookieTrigger.setAttribute("aria-expanded", "false");
+      metricsCookieTrigger.focus();
+    }
+  });
+  $("metrics-settings-enabled").addEventListener("change", (event) => {
+    saveMetricsConsent(event.currentTarget.checked ? "accepted" : "rejected", true);
+  });
+  $("metrics-settings-repeat").addEventListener("change", (event) => {
+    setRepeatMetricsNotice(event.currentTarget.checked);
+  });
   $("metrics-consent-accept").addEventListener("click", () => {
     saveMetricsConsent("accepted", $("metrics-consent-remember").checked);
   });
