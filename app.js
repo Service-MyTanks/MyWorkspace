@@ -26,6 +26,34 @@ const SERVICE_RULES_VERSION = "2026-11-25-v1";
 function serviceRulesKey() { return "myworkspace.serviceRules." + (state.session?.user?.id || "guest"); }
 function hasAcceptedServiceRules() { try { return localStorage.getItem(serviceRulesKey()) === SERVICE_RULES_VERSION; } catch { return false; } }
 function acceptServiceRules() { try { localStorage.setItem(serviceRulesKey(), SERVICE_RULES_VERSION); } catch {} }
+const METRICS_CONSENT_KEY = "myworkspace.metricsConsent.v1";
+function readMetricsConsent() {
+  try { return localStorage.getItem(METRICS_CONSENT_KEY) || sessionStorage.getItem(METRICS_CONSENT_KEY); }
+  catch { return null; }
+}
+function applyMetricsConsent(value) {
+  // Analytics integrations must check this flag before collecting or sending events.
+  window.MT_METRICS_CONSENT = value === "accepted";
+}
+function initializeMetricsConsent() {
+  const choice = readMetricsConsent();
+  applyMetricsConsent(choice);
+  $("metrics-consent-banner").hidden = Boolean(choice);
+}
+function saveMetricsConsent(choice, remember) {
+  try {
+    if (remember) {
+      localStorage.setItem(METRICS_CONSENT_KEY, choice);
+      sessionStorage.removeItem(METRICS_CONSENT_KEY);
+    } else {
+      localStorage.removeItem(METRICS_CONSENT_KEY);
+      sessionStorage.setItem(METRICS_CONSENT_KEY, choice);
+    }
+  } catch {}
+  applyMetricsConsent(choice);
+  $("metrics-consent-banner").hidden = true;
+}
+
 const state = { client: null, session: null, profile: null, accountControls: null, renderId: 0, sanctionKind: "ban", recovery: false, googleIdentity: false, theme: "mt-standard", globalTheme: "mt-standard", globalThemeChannel: null, holidayLightsTimer: null, holidayDemonTimer: null, holidayCity: null, deviceSessionVerified: false, deviceHeartbeatTimer: null };
 
 const THEME_OPTIONS = [
@@ -2546,6 +2574,20 @@ function finishServiceRules() {
 }
 
 function bindApp() {
+  const metricsBanner = $("metrics-consent-banner");
+  const metricsRejectDialog = $("metrics-reject-dialog");
+  initializeMetricsConsent();
+  $("metrics-consent-accept").addEventListener("click", () => {
+    saveMetricsConsent("accepted", $("metrics-consent-remember").checked);
+  });
+  $("metrics-consent-reject").addEventListener("click", () => {
+    saveMetricsConsent("rejected", $("metrics-consent-remember").checked);
+    metricsRejectDialog.showModal();
+  });
+  $("metrics-reject-close").addEventListener("click", () => metricsRejectDialog.close());
+  metricsRejectDialog.addEventListener("click", (event) => {
+    if (event.target === metricsRejectDialog) metricsRejectDialog.close();
+  });
   const documentsDialog = $("service-documents-dialog");
   $("service-documents-open").addEventListener("click", () => documentsDialog.showModal());
   $("service-documents-close").addEventListener("click", () => documentsDialog.close());
