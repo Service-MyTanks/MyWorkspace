@@ -344,7 +344,7 @@ function setBusy(button, busy, label) {
 
 function showScreen(name) {
   $("boot-view").hidden = name !== "boot";
-  $("auth-view").hidden = !["login", "gate", "recovery"].includes(name);
+  $("auth-view").hidden = !["login", "gate", "recovery", "backup-password", "google-registration"].includes(name);
   $("app-view").hidden = name !== "app";
   $("login-panel").hidden = name !== "login";
   $("gate-panel").hidden = name !== "gate";

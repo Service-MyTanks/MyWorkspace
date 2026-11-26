@@ -71,6 +71,13 @@ begin
     raise exception 'Выберите должность из списка';
   end if;
 
+  if not exists (
+    select 1 from auth.users
+    where id = v_user_id and coalesce(encrypted_password, '') <> ''
+  ) then
+    raise exception 'Сначала задайте резервный пароль для входа по электронной почте' using errcode = '42501';
+  end if;
+
   insert into public.profiles (id, email, nickname, position)
   values (v_user_id, v_email, btrim(p_nickname), p_position);
 end;
