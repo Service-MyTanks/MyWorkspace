@@ -41,7 +41,7 @@ function applyMetricsConsent(value) {
   window.MT_METRICS_CONSENT = value === "accepted";
 }
 function updateMetricsConsentVisibility() {
-  const loginVisible = !$("auth-view").hidden && !$("login-panel").hidden;
+  const loginVisible = !$("auth-view").hidden && !$("login-panel").hidden && !$("login-form").hidden;
   const choice = readMetricsConsent();
   $("metrics-settings").hidden = !loginVisible;
   $("metrics-consent-banner").hidden = !loginVisible || (Boolean(choice) && !shouldRepeatMetricsNotice());
@@ -424,6 +424,7 @@ function selectTab(name) {
   $("register-form").hidden = login;
   setMessage("login-message", "");
   setMessage("register-message", "");
+  updateMetricsConsentVisibility();
 }
 
 const DEVICE_ID_KEY = "myworkspace.device-id.v1";
@@ -726,7 +727,7 @@ function renderTrainingIndex(view) {
   const courses = [
     ["gameplay", "Игровой процесс", "Дежурство, игровой чат, режим наблюдателя и мониторинг битв.", "i-gamepad"],
     ["community", "Работа с сообществом", "Социальные сети, игровой чат и работа с обращениями игроков.", "i-users"],
-    ["forum", "Работа с форумом", "Права доступа, административные разделы и работа с обращениями.", "i-messages"],
+    ["forum", "Работа с форумом", "Права доступа, административные разделы и работа с обращениями.", "i-forum"],
     ["administration", "Административный аппарат", "Структура команды, обязанности, регламенты и нормативы.", "i-briefcase"]
   ];
   view.append(
@@ -1021,7 +1022,7 @@ async function renderTraining(view, route) {
         h("div", { class: "row-list training-info-list" },
           h("div", { class: "training-info-item" },
             h("button", { type: "button", class: "training-info-trigger", popovertarget: "forum-about-popover", "aria-label": "Открыть раздел: Что такое форум?" },
-              h("span", { class: "section-icon" }, icon("i-message")),
+              h("span", { class: "section-icon" }, icon("i-forum")),
               h("span", { class: "row-text" }, h("strong", { text: "Что такое форум?" })),
               icon("i-chevron", "row-arrow")
             ),
@@ -1248,7 +1249,7 @@ async function renderHome(view) {
     meetingAbsence: { title: "Прошение о пропуске собрания", text: "Пропуск еженедельного обзвона", href: "https://forum.mytanks.net/index.php?threads/%D0%A8%D0%B0%D0%B1%D0%BB%D0%BE%D0%BD-%D0%B7%D0%B0%D1%8F%D0%B2%D0%BB%D0%B5%D0%9D%D0%B8%D1%8F-%D0%BD%D0%B0-%D0%BF%D1%80%D0%BE%D0%BF%D1%83%D1%81%D0%BA-%D0%B5%D0%B6%D0%B5%D0%BD%D0%B5%D0%B4%D0%B5%D0%BB%D1%8C%D0%BD%D0%BE%D0%B3%D0%BE-%D0%BE%D0%B1%D0%B7%D0%B2%D0%BE%D0%BD%D0%B0.1317/", iconName: "i-calendar-x" },
     meetingMove: { title: "Прошение о переносе собрания", text: "Запрос на перенос собрания", href: "https://forum.mytanks.net/index.php?threads/%D0%A8%D0%B0%D0%B1%D0%BB%D0%BE%D0%BD-%D0%BF%D1%80%D0%BE%D1%88%D0%B5%D0%BD%D0%B8%D1%8F-%D0%BE-%D0%BF%D0%B5%D1%80%D0%B5%D0%BD%D0%BE%D1%81%D0%B5-%D1%81%D0%BE%D0%B1%D1%80%D0%B0%D0%BD%D0%B8%D1%8F.1318/", iconName: "i-calendar-sync" },
     dailyTemplate: { title: "Шаблон ежедневного отчёта", text: "Единый универсальный шаблон MT DOCS", href: "https://forum.mytanks.net/index.php?threads/%D0%95%D0%B4%D0%B8%D0%BD%D1%8B%D0%B9-%D1%83%D0%BD%D0%B8%D0%B2%D0%B5%D1%80%D1%81%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9-%D1%88%D0%B0%D0%B1%D0%BB%D0%BE%D0%BD-%D0%B4%D0%BB%D1%8F-mt-docs.1320/", iconName: "i-file-text" },
-    sanctionTemplate: { title: "Шаблон формы на выдачу наказания", text: "Универсальный шаблон оформления наказания", href: "https://forum.mytanks.net/index.php?threads/%D0%A3%D0%BD%D0%B8%D0%B2%D0%B5%D1%80%D1%81%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9-%D1%88%D0%B0%D0%B1%D0%BB%D0%BE%D0%BD-%D1%84%D0%BE%D1%80%D0%BC%D1%8B-%D0%BD%D0%B0-%D0%B2%D1%8B%D0%B4%D0%B0%D1%87%D1%83-%D0%BD%D0%B0%D0%BA%D0%B0%D0%B7%D0%B0%D0%BD%D0%B8%D0%B9.1319/", iconName: "i-gavel" }
+    sanctionTemplate: { title: "Шаблон формы на выдачу наказания", text: "Универсальный шаблон оформления наказания", href: "https://forum.mytanks.net/index.php?threads/%D0%A3%D0%BD%D0%B8%D0%B2%D0%B5%D1%80%D1%81%D0%B0%D0%BB%D1%8C%D0%BD%D1%8B%D0%B9-%D1%88%D0%B0%D0%B1%D0%BB%D0%BE%D0%BD-%D1%84%D0%BE%D1%80%D0%BC%D1%8B-%D0%BD%D0%B0-%D0%B2%D1%8B%D0%B4%D0%B0%D1%87%D1%83-%D0%BD%D0%B0%D0%BA%D0%B0%D0%B7%D0%B0%D0%BD%D0%B8%D0%B9.1319/", iconName: "i-ban" }
   };
   const externalRow = (item) => rowLink({ ...item, external: true });
   const adminGroup = (title, items) => h("section", { class: "home-admin-group" },
