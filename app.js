@@ -473,7 +473,6 @@ async function enterWorkspace() {
     return;
   }
   state.googleIdentity = identities.some((identity) => identity.provider === "google");
-  const hasBackupPassword = state.session.user?.user_metadata?.mytanks_backup_password_set === true;
   let profile;
   try {
     profile = await loadProfile();
@@ -491,10 +490,6 @@ async function enterWorkspace() {
     } else {
       showScreen("google-registration");
     }
-    return;
-  }
-  if (profile && state.googleIdentity && !hasBackupPassword) {
-    showScreen("backup-password");
     return;
   }
   if (!await ensureDeviceSession()) return;
