@@ -2274,3 +2274,36 @@ main#view { flex: 1 0 auto; }
 #backup-password-panel > .muted, #google-registration-panel > .muted { font-size: 13px; margin: 0 0 22px; }
 #backup-password-panel h1, #google-registration-panel h1 { margin-top: 22px; }
 @media (max-width: 520px) { .auth-card { padding: 26px 22px; } }
+
+
+/* Privacy and optional Metrics consent notice. */
+.metrics-consent-banner {
+  position: fixed; z-index: 1000; inset: auto 18px 18px; width: min(780px, calc(100vw - 36px));
+  box-sizing: border-box; margin: 0 auto; display: grid; grid-template-columns: minmax(0,1fr) auto;
+  align-items: end; gap: 22px; padding: 20px 22px; border: 1px solid var(--border);
+  border-radius: 14px; background: var(--card); color: var(--text); box-shadow: 0 18px 60px #0009;
+}
+.metrics-consent-banner[hidden] { display: none; }
+.metrics-consent-copy { min-width: 0; }
+.metrics-consent-copy .eyebrow { color: var(--muted); font-size: 9px; letter-spacing: 1.7px; }
+.metrics-consent-copy h2 { margin: 7px 0 6px; font-size: 16px; letter-spacing: -.2px; }
+.metrics-consent-copy p { margin: 0 0 8px; color: var(--muted); font-size: 11px; line-height: 1.7; }
+.metrics-consent-copy > a, .metrics-reject-content a { color: var(--accent); font-size: 11px; text-decoration: underline; text-underline-offset: 3px; }
+.metrics-consent-remember { display: flex; align-items: center; gap: 8px; width: fit-content; margin-top: 12px; color: var(--muted); font-size: 11px; cursor: pointer; }
+.metrics-consent-remember input { width: 15px; height: 15px; margin: 0; accent-color: var(--accent); }
+.metrics-consent-actions { display: grid; min-width: 142px; gap: 8px; }
+.metrics-consent-actions .button { min-height: 38px; justify-content: center; white-space: nowrap; }
+.metrics-reject-dialog { width: min(440px, calc(100vw - 28px)); max-width: 440px; padding: 0; border: 1px solid var(--border); border-radius: 14px; background: var(--card); color: var(--text); box-shadow: 0 28px 90px #000b; }
+.metrics-reject-dialog::backdrop { background: #080a0dd9; backdrop-filter: blur(5px); }
+.metrics-reject-content { display: grid; justify-items: start; gap: 13px; padding: 25px; }
+.metrics-reject-content .gate-icon { width: 44px; height: 44px; }
+.metrics-reject-content .gate-icon svg { width: 22px; height: 22px; }
+.metrics-reject-content h2 { margin: 2px 0 0; font-size: 19px; }
+.metrics-reject-content p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.75; }
+.metrics-reject-content .button { margin-top: 5px; }
+@media (max-width: 640px) {
+  .metrics-consent-banner { inset: auto 8px 8px; width: calc(100vw - 16px); grid-template-columns: 1fr; gap: 14px; padding: 17px; }
+  .metrics-consent-actions { grid-template-columns: 1fr 1fr; min-width: 0; }
+  .metrics-consent-actions .button { min-width: 0; padding-inline: 9px; font-size: 11px; }
+  .metrics-reject-content { padding: 21px; }
+}
