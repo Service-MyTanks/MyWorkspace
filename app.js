@@ -473,7 +473,7 @@ async function enterWorkspace() {
     return;
   }
   state.googleIdentity = identities.some((identity) => identity.provider === "google");
-  const hasEmailPassword = identities.some((identity) => identity.provider === "email");
+  const hasBackupPassword = state.session.user?.user_metadata?.mytanks_backup_password_set === true;
   let profile;
   try {
     profile = await loadProfile();
@@ -493,7 +493,7 @@ async function enterWorkspace() {
     }
     return;
   }
-  if (profile && state.googleIdentity && !hasEmailPassword) {
+  if (profile && state.googleIdentity && !hasBackupPassword) {
     showScreen("backup-password");
     return;
   }
@@ -2412,27 +2412,19 @@ function bindAuthForms() {
     if (password !== repeat) { setMessage("backup-password-message", "Пароли не совпадают."); $("backup-password-repeat").focus(); return; }
     const button = event.target.querySelector("button[type=submit]");
     setBusy(button, true, "Сохраняем пароль…");
-    const { data: currentIdentityData, error: currentIdentityError } = await state.client.auth.getUserIdentities();
-    if (currentIdentityError) {
-      setBusy(button, false);
-      setMessage("backup-password-message", friendlyError(currentIdentityError));
-      return;
-    }
-    const hasEmailIdentity = currentIdentityData?.identities?.some((identity) => identity.provider === "email");
-    if (!hasEmailIdentity) {
-      const { error } = await state.client.auth.updateUser({ password });
-      if (error) {
-        setBusy(button, false);
-        setMessage("backup-password-message", friendlyError(error));
-        return;
+    const { data: passwordUpdate, error: passwordError } = await state.client.auth.updateUser({
+      password,
+      data: {
+        ...(state.session.user?.user_metadata || {}),
+        mytanks_backup_password_set: true
       }
-    }
-    const { data: identityData, error: identityError } = await state.client.auth.getUserIdentities();
-    if (identityError || !identityData?.identities?.some((identity) => identity.provider === "email")) {
+    });
+    if (passwordError) {
       setBusy(button, false);
-      setMessage("backup-password-message", "Пароль сохранён, но Supabase пока не подтвердил способ входа по почте. Обновите страницу и повторите проверку.");
+      setMessage("backup-password-message", friendlyError(passwordError));
       return;
     }
+    if (passwordUpdate?.user) state.session.user = passwordUpdate.user;
     const draft = readGoogleRegistrationDraft();
     if (!state.profile && state.googleIdentity) {
       if (!draft) {
