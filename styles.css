@@ -2310,7 +2310,7 @@ main#view { flex: 1 0 auto; }
 
 
 /* Persistent privacy settings shortcut and compact menu. */
-.metrics-settings { position: fixed; z-index: 1100; right: 18px; bottom: 18px; }
+.metrics-settings { position: fixed; z-index: 1100; left: 18px; right: auto; bottom: 18px; }
 .metrics-cookie-trigger { display: grid; width: 46px; height: 46px; place-items: center; border: 1px solid var(--border); border-radius: 50%; background: var(--card); color: var(--text); box-shadow: 0 8px 28px #0007; cursor: pointer; transition: transform .18s, border-color .18s, color .18s; }
 .metrics-cookie-trigger:hover, .metrics-cookie-trigger[aria-expanded="true"] { transform: translateY(-2px); border-color: var(--accent); color: var(--accent); }
 .metrics-cookie-trigger svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
@@ -2325,7 +2325,7 @@ main#view { flex: 1 0 auto; }
 .metrics-settings-option small { color: var(--muted); font-size: 10px; line-height: 1.55; }
 .metrics-settings-option input { flex: 0 0 auto; width: 16px; height: 16px; margin: 2px 0 0; accent-color: var(--accent); }
 .metrics-settings-menu > a { justify-self: start; color: var(--accent); font-size: 10px; text-decoration: underline; text-underline-offset: 3px; }
-.metrics-consent-banner { right: 76px; width: min(710px, calc(100vw - 94px)); }
+.metrics-consent-banner { left: 76px; right: 18px; width: min(710px, calc(100vw - 94px)); }
 @media (max-width: 640px) {
   .metrics-settings { right: 12px; bottom: 12px; }
   .metrics-cookie-trigger { width: 44px; height: 44px; }
@@ -2382,3 +2382,9 @@ main#view { flex: 1 0 auto; }
   .metrics-cookie-trigger .metrics-cookie-image { width: 35px; height: 35px; }
   .metrics-settings-menu { left: 0; right: auto; bottom: 54px; }
 }
+
+
+/* Cookie preferences inside the account settings dialog. */
+.metrics-account-settings > p { margin: 0 0 4px; font-size: 11px; line-height: 1.65; }
+.metrics-account-settings .metrics-settings-option { margin: 0; }
+.metrics-account-settings > a { justify-self: start; color: var(--accent); font-size: 10px; text-decoration: underline; text-underline-offset: 3px; }
