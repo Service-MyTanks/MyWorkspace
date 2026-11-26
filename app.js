@@ -2364,8 +2364,7 @@ function bindAuthForms() {
     enterWorkspace();
   });
 
-  $("google-login").addEventListener("click", async () => {
-    const button = $("google-login");
+  const startGoogleSignIn = async (button) => {
     setBusy(button, true, "Переходим к Google…");
     const { error } = await state.client.auth.signInWithOAuth({
       provider: "google",
@@ -2375,7 +2374,9 @@ function bindAuthForms() {
       setBusy(button, false);
       setMessage("login-message", friendlyError(error));
     }
-  });
+  };
+  $("google-login").addEventListener("click", (event) => startGoogleSignIn(event.currentTarget));
+  $("google-register").addEventListener("click", (event) => startGoogleSignIn(event.currentTarget));
 
   $("backup-password-form").addEventListener("submit", async (event) => {
     event.preventDefault();
