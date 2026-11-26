@@ -13,14 +13,17 @@ const KINDS = {
 };
 
 // Единый список должностей (иерархия из 6 уровней). Должен совпадать с <select id="register-position"> в index.html.
+// Публичная регистрация: должности, доступные в общей форме заявки.
 const POSITIONS = Object.freeze([
   "Младший Хелпер", "Хелпер",
   "Младший модератор", "Модератор", "Старший модератор", "Администратор", "Старший администратор",
-  "Тестировщик", "Медиа-продакшн", "Технический специалист", "Техническая поддержка", "Следящий за форумом", "Старший следящий за форумом", "Следящий за битвами", "Старший следящий за битвами",
+  "Тестировщик", "Медиа-продакшн", "Технический специалист", "Следящий за форумом", "Старший следящий за форумом", "Следящий за битвами", "Старший следящий за битвами",
   "Зам.куратора технических специалистов", "Куратор технических специалистов", "Зам куратора администрации", "Куратор администрации", "Заместитель Куратора Агентов Поддержки", "Куратор Агентов Поддержки",
   "Заместитель главного администратора", "Главный администратор",
   "Заместитель Специального Администратора", "Специальный Администратор",
 ]);
+// Внутренняя Google-регистрация сотрудников включает отдельную должность техподдержки.
+const GOOGLE_REGISTRATION_POSITIONS = Object.freeze([...POSITIONS, "Техническая поддержка"]);
 
 const SERVICE_RULES_VERSION = "2026-11-25-v1";
 function serviceRulesKey() { return "myworkspace.serviceRules." + (state.session?.user?.id || "guest"); }
@@ -2370,7 +2373,7 @@ function openSidebar() { document.body.classList.add("sidebar-open"); $("sidebar
 function closeSidebar() { document.body.classList.remove("sidebar-open"); $("sidebar-backdrop").hidden = true; $("menu-button").setAttribute("aria-expanded", "false"); }
 
 function bindAuthForms() {
-  $("google-register-position").innerHTML = $("register-position").innerHTML;
+  $("google-register-position").innerHTML = $("register-position").innerHTML;\n  const technicalSupportGroup = [...$("google-register-position").querySelectorAll("optgroup")].find(group => group.label.startsWith("4."));\n  if (technicalSupportGroup) technicalSupportGroup.prepend(new Option("Техническая поддержка", "Техническая поддержка"));
   $("tab-login").addEventListener("click", () => selectTab("login"));
   $("tab-register").addEventListener("click", () => selectTab("register"));
 
@@ -2464,7 +2467,7 @@ function bindAuthForms() {
     const nickname = $("google-register-nickname").value.trim();
     const position = $("google-register-position").value;
     if (nickname.length < 2 || nickname.length > 64) { setMessage("google-registration-message", "Никнейм должен содержать от 2 до 64 символов."); $("google-register-nickname").focus(); return; }
-    if (!POSITIONS.includes(position)) { setMessage("google-registration-message", "Выберите должность из списка."); $("google-register-position").focus(); return; }
+    if (!GOOGLE_REGISTRATION_POSITIONS.includes(position)) { setMessage("google-registration-message", "Выберите должность из списка."); $("google-register-position").focus(); return; }
     saveGoogleRegistrationDraft(nickname, position);
     $("backup-password").focus();
     showScreen("backup-password");
