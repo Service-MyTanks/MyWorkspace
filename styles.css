@@ -2391,4 +2391,4 @@ main#view { flex: 1 0 auto; }
 .metrics-account-settings > a { justify-self: start; color: var(--accent); font-size: 10px; text-decoration: underline; text-underline-offset: 3px; }
 
 /* Keep the account navigation item clear of the account identity block below. */
-.primary-nav > .nav-item[data-nav="account"] { margin-top: -3px; }
+.primary-nav > .nav-item[data-nav="account"] { margin-top: 0; margin-bottom: 8px; }
