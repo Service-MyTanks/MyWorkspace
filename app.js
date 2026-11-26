@@ -1192,7 +1192,7 @@ async function renderTraining(view, route) {
         rowLink({ href: links.textAttestation, iconName: "i-file-check", title: "Регламент текстовой аттестации", text: "Раздел с правилами и материалами текстовой аттестации.", external: true }),
         rowLink({ href: links.audioMeeting, iconName: "i-mic", title: "Регламент аудиосозвона", text: "Раздел с правилами проведения аудиосозвона.", external: true })
       ]),
-      finalSubsection("Шаблоны заявлений и форм прошения", "i-files", [
+      finalSubsection("Шаблоны заявлений и форм прошения", "i-document-stack", [
         rowLink({ href: links.applications, iconName: "i-file-plus", title: "Шаблоны заявлений", text: "Утверждённые формы заявлений.", external: true }),
         rowLink({ href: links.requests, iconName: "i-mail", title: "Шаблоны форм прошения", text: "Утверждённые формы прошений.", external: true })
       ])
